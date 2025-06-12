@@ -30,7 +30,17 @@ export default function CreateTeamPage() {
       setSelectedTeam(team);
       setNewTeam({ name: '', country: '', logo: '' });
       setShowAddTeamModal(false);
+      localStorage.removeItem('fifaPlayers');
       router.push('/manager');
+    }
+  };
+
+  const handleDeleteTeam = (e: React.MouseEvent, teamId: string) => {
+    e.stopPropagation();
+    const updatedTeams = teams.filter(team => team.id !== teamId);
+    setTeams(updatedTeams);
+    if (selectedTeam?.id === teamId) {
+      setSelectedTeam(null);
     }
   };
 
@@ -64,12 +74,20 @@ export default function CreateTeamPage() {
           {teams.map((team) => (
             <div
               key={team.id}
-              className="bg-white p-6 rounded-lg shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+              className="bg-white p-6 rounded-lg shadow-lg cursor-pointer hover:shadow-xl transition-shadow relative group"
               onClick={() => {
                 setSelectedTeam(team);
                 router.push('/manager');
               }}
             >
+              <button
+                onClick={(e) => handleDeleteTeam(e, team.id)}
+                className="absolute top-2 right-2 text-red-600 opacity-0 group-hover:opacity-100 hover:text-red-800 active:scale-95 transition-all"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
               {team.logo && (
                 <div className="relative w-32 h-32 mx-auto mb-4">
                   <Image

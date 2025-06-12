@@ -7,12 +7,15 @@ export interface PlayerAttributes {
   defending: number;
 }
 
+export type PlayerRole = 'C' | 'I' | 'R' | 'S' | 'P';
+
 export interface Player {
   id: string;
   name: string;
   age: number;
   nationality: string;
   mainPosition: string;
+  role: PlayerRole;
   attributes: PlayerAttributes;
   overall: number;
 }

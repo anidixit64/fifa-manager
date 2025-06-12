@@ -12,21 +12,27 @@ interface Team {
   logo?: string;
 }
 
-const FORMATIONS = ['4-4-2', '4-3-3', '4-2-3-1', '3-5-2', '5-3-2'];
+const POSITIONS = [
+  'GK', 'LB', 'CB', 'RB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST'
+];
 
-const ATTRIBUTES = ['pace', 'shooting', 'passing', 'dribbling', 'defending', 'physical'];
+const ATTRIBUTES = ['Pace', 'Shooting', 'Passing', 'Dribbling', 'Defending', 'Physical'];
 
-interface PositionTactic {
+interface PositionCount {
   position: string;
-  primaryAttribute: string;
+  count: number;
+}
+
+interface PositionPriority {
+  position: string;
+  priorities: string[];
 }
 
 export default function EditTacticsPage() {
   const router = useRouter();
   const [selectedTeam] = useLocalStorage<Team | null>('selectedTeam', null);
-  const [players] = useLocalStorage<Player[]>('fifaPlayers', []);
-  const [formation, setFormation] = useLocalStorage<string>('formation', '4-4-2');
-  const [positionTactics, setPositionTactics] = useLocalStorage<PositionTactic[]>('positionTactics', []);
+  const [positionCounts, setPositionCounts] = useLocalStorage<PositionCount[]>('positionCounts', []);
+  const [positionPriorities, setPositionPriorities] = useLocalStorage<PositionPriority[]>('positionPriorities', []);
 
   useEffect(() => {
     if (!selectedTeam) {
@@ -34,28 +40,81 @@ export default function EditTacticsPage() {
     }
   }, [selectedTeam, router]);
 
-  // Get unique positions from players
-  const positions = Array.from(new Set(players.map(p => p.mainPosition)));
-
-  // Initialize position tactics if not already set
+  // Initialize position counts if not already set
   useEffect(() => {
-    if (positionTactics.length === 0) {
-      const initialTactics = positions.map(pos => ({
+    if (positionCounts.length === 0) {
+      const initialCounts = POSITIONS.map(pos => ({
         position: pos,
-        primaryAttribute: ATTRIBUTES[0]
+        count: 0
       }));
-      setPositionTactics(initialTactics);
+      setPositionCounts(initialCounts);
     }
-  }, [positions, positionTactics.length, setPositionTactics]);
+  }, [positionCounts.length, setPositionCounts]);
 
-  const updatePositionTactic = (position: string, attribute: string) => {
-    setPositionTactics(prev => 
-      prev.map(tactic => 
-        tactic.position === position 
-          ? { ...tactic, primaryAttribute: attribute }
-          : tactic
-      )
-    );
+  // Initialize position priorities if not already set
+  useEffect(() => {
+    if (positionPriorities.length === 0) {
+      const initialPriorities = POSITIONS.map(pos => ({
+        position: pos,
+        priorities: []
+      }));
+      setPositionPriorities(initialPriorities);
+    }
+  }, [positionPriorities.length, setPositionPriorities]);
+
+  const updatePositionCount = (position: string, delta: number) => {
+    setPositionCounts((prev: PositionCount[]) => {
+      const newCounts = prev.map((pc: PositionCount) => {
+        if (pc.position === position) {
+          const newCount = pc.count + delta;
+          // GK can only be 0 or 1
+          if (position === 'GK') {
+            return { ...pc, count: Math.max(0, Math.min(1, newCount)) };
+          }
+          // Other positions can be 0 or more
+          return { ...pc, count: Math.max(0, newCount) };
+        }
+        return pc;
+      });
+
+      // Check if total count would exceed 11
+      const totalCount = newCounts.reduce((sum: number, pc: PositionCount) => sum + pc.count, 0);
+      if (totalCount > 11) {
+        return prev;
+      }
+
+      return newCounts;
+    });
+  };
+
+  const updatePositionPriority = (position: string, attribute: string) => {
+    setPositionPriorities((prev: PositionPriority[]) => {
+      const positionPriority = prev.find((pp: PositionPriority) => pp.position === position);
+      if (!positionPriority) return prev;
+
+      const priorities = [...positionPriority.priorities];
+      const index = priorities.indexOf(attribute);
+
+      if (index === -1) {
+        // Add attribute if not already in priorities and less than 3
+        if (priorities.length < 3) {
+          priorities.push(attribute);
+        }
+      } else {
+        // Remove attribute if already in priorities
+        priorities.splice(index, 1);
+      }
+
+      return prev.map((pp: PositionPriority) => 
+        pp.position === position 
+          ? { ...pp, priorities }
+          : pp
+      );
+    });
+  };
+
+  const getTotalCount = () => {
+    return positionCounts.reduce((sum, pc) => sum + pc.count, 0);
   };
 
   return (
@@ -73,45 +132,86 @@ export default function EditTacticsPage() {
           <h1 className="text-3xl font-bold text-black">Edit Tactics</h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Position Selection Sidebar */}
+          <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-black mb-6">Formation</h2>
-              <select
-                value={formation}
-                onChange={(e) => setFormation(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-              >
-                {FORMATIONS.map(form => (
-                  <option key={form} value={form}>{form}</option>
-                ))}
-              </select>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-black">Positions</h2>
+                <span className="text-sm font-medium text-gray-600">
+                  {getTotalCount()}/11 Players
+                </span>
+              </div>
+              <div className="space-y-4">
+                {POSITIONS.map(position => {
+                  const count = positionCounts.find(pc => pc.position === position)?.count || 0;
+                  return (
+                    <div key={position} className="flex items-center justify-between">
+                      <span className="text-black font-medium">{position}</span>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => updatePositionCount(position, -1)}
+                          className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 active:scale-95 transition-all"
+                        >
+                          -
+                        </button>
+                        <span className="w-8 text-center text-black font-medium">{count}</span>
+                        <button
+                          onClick={() => updatePositionCount(position, 1)}
+                          className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 active:scale-95 transition-all"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          <div className="lg:col-span-1">
+          {/* Attribute Priority Area */}
+          <div className="lg:col-span-3">
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-black mb-6">Position Tactics</h2>
-              <div className="space-y-4">
-                {positions.map(position => {
-                  const tactic = positionTactics.find(t => t.position === position);
+              <h2 className="text-xl font-bold text-black mb-6">Position Priorities</h2>
+              <div className="space-y-6">
+                {POSITIONS.map(position => {
+                  const count = positionCounts.find(pc => pc.position === position)?.count || 0;
+                  const priorities = positionPriorities.find(pp => pp.position === position)?.priorities || [];
+                  
+                  if (count === 0) return null;
+
                   return (
-                    <div key={position} className="border-b border-gray-200 pb-4 last:border-0">
-                      <h3 className="text-lg font-semibold text-black mb-2">{position}</h3>
-                      <div className="grid grid-cols-2 gap-2">
-                        {ATTRIBUTES.map(attr => (
-                          <button
-                            key={attr}
-                            onClick={() => updatePositionTactic(position, attr)}
-                            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                              tactic?.primaryAttribute === attr
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-100 text-black hover:bg-gray-200'
-                            }`}
-                          >
-                            {attr.charAt(0).toUpperCase() + attr.slice(1)}
-                          </button>
-                        ))}
+                    <div key={position} className="border-b border-gray-200 pb-6 last:border-0">
+                      <h3 className="text-lg font-semibold text-black mb-4">{position}</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        {ATTRIBUTES.map(attr => {
+                          const priorityIndex = priorities.indexOf(attr);
+                          return (
+                            <button
+                              key={attr}
+                              onClick={() => updatePositionPriority(position, attr)}
+                              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                                priorityIndex !== -1
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-gray-100 text-black hover:bg-gray-200'
+                              }`}
+                            >
+                              {attr}
+                              {priorityIndex !== -1 && (
+                                <span className={`ml-2 text-xs font-bold ${
+                                  priorityIndex === 0 
+                                    ? 'text-green-300' // #1 - Green
+                                    : priorityIndex === 1 
+                                    ? 'text-yellow-300' // #2 - Yellow
+                                    : 'text-red-300' // #3 - Red
+                                }`}>
+                                  #{priorityIndex + 1}
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   );
