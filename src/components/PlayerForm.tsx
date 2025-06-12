@@ -10,7 +10,7 @@ interface PlayerFormProps {
 }
 
 const POSITIONS = [
-  'GK', 'LB', 'CB', 'RB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST'
+  'GK', 'RB', 'RWB', 'CB', 'LB', 'LWB', 'CM', 'RM', 'LM', 'CDM', 'CAM', 'RF', 'RW', 'LF', 'LW', 'ST', 'CF'
 ];
 
 const ROLES = [
@@ -43,6 +43,8 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
       },
     }
   );
+  const [playerSuggestions, setPlayerSuggestions] = useState<string[]>([]);
+  const [allPlayerNames, setAllPlayerNames] = useState<string[]>([]);
 
   useEffect(() => {
     if (initialData) {
@@ -50,6 +52,44 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
       setFormData(rest);
     }
   }, [initialData]);
+
+  useEffect(() => {
+    // Load player names from CSV
+    fetch('/data/players.csv')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to load players data');
+        }
+        return response.text();
+      })
+      .then(data => {
+        const rows = data.split('\n').slice(1); // Skip header row
+        const names = rows.map(row => row.split(',')[0]); // Get player names from first column
+        setAllPlayerNames(names);
+      })
+      .catch(error => {
+        console.error('Error loading players:', error);
+      });
+  }, []);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, name: value }));
+    
+    if (value) {
+      const suggestions = allPlayerNames.filter(name => 
+        name.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 5); // Limit to 5 suggestions
+      setPlayerSuggestions(suggestions);
+    } else {
+      setPlayerSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setFormData(prev => ({ ...prev, name: suggestion }));
+    setPlayerSuggestions([]);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +117,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
-            <div>
+            <div className="relative">
               <label htmlFor="name" className="block text-sm font-medium text-black mb-2">
                 Name
               </label>
@@ -85,10 +125,24 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
                 type="text"
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={handleNameChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black bg-gray-50"
                 required
               />
+              {playerSuggestions.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                  {playerSuggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      className="w-full px-4 py-2 text-left text-black hover:bg-gray-100 focus:outline-none"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>

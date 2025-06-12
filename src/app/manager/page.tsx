@@ -7,32 +7,40 @@ import PlayerForm from '@/components/PlayerForm';
 import PlayerList from '@/components/PlayerList';
 import TeamStats from '@/components/TeamStats';
 import { Player, PositionCategory, POSITION_CATEGORIES } from '@/types/player';
+import { useTeamTheme } from '@/contexts/TeamThemeContext';
 
 interface Team {
   id: string;
   name: string;
   country: string;
   logo?: string;
+  theme?: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
 }
 
 export default function ManagerPage() {
   const router = useRouter();
   const [teams, setTeams] = useLocalStorage<Team[]>('fifaTeams', []);
-  const [selectedTeam, setSelectedTeam] = useLocalStorage<Team | null>('selectedTeam', null);
+  const [selectedTeam] = useLocalStorage<Team | null>('selectedTeam', null);
   const [players, setPlayers] = useLocalStorage<Player[]>('fifaPlayers', []);
   const [showPlayerForm, setShowPlayerForm] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
   const [formation, setFormation] = useLocalStorage<string>('formation', '4-4-2');
   const [bestXI, setBestXI] = useState<Player[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { setTheme } = useTeamTheme();
 
   useEffect(() => {
     if (!selectedTeam) {
       router.push('/create-team');
-    } else {
-      setIsLoading(false);
+    } else if (selectedTeam.theme) {
+      setTheme(selectedTeam.theme);
     }
-  }, [selectedTeam, router]);
+    setIsLoading(false);
+  }, [selectedTeam, router, setTheme]);
 
   const calculateOverall = (attributes: Player['attributes']): number => {
     const values = Object.values(attributes);
@@ -139,21 +147,14 @@ export default function ManagerPage() {
 
   const stats = calculateTeamStats();
 
-  if (isLoading) {
-    return (
-      <main className="min-h-screen bg-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-center h-screen">
-            <div className="text-black">Loading...</div>
-          </div>
-        </div>
-      </main>
-    );
+  if (!selectedTeam || isLoading) {
+    return null;
   }
 
   return (
-    <main className="min-h-screen bg-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main className="min-h-screen bg-gray-100 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-4xl font-bold text-black mb-8">Manager Dashboard</h1>
         <div className="flex items-center mb-8">
           <button
             onClick={() => router.push('/create-team')}

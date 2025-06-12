@@ -1,34 +1,60 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import Image from 'next/image';
+import { extractColorsFromImage } from '@/utils/colorUtils';
 
 interface Team {
   id: string;
   name: string;
-  country: string;
   logo?: string;
+  theme?: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
 }
 
 export default function CreateTeamPage() {
   const router = useRouter();
   const [teams, setTeams] = useLocalStorage<Team[]>('fifaTeams', []);
   const [showAddTeamModal, setShowAddTeamModal] = useState(false);
-  const [newTeam, setNewTeam] = useState({ name: '', country: '', logo: '' });
+  const [newTeam, setNewTeam] = useState({ name: '', logo: '' });
   const [selectedTeam, setSelectedTeam] = useLocalStorage<Team | null>('selectedTeam', null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [teamSuggestions, setTeamSuggestions] = useState<string[]>([]);
+  const [allTeamNames, setAllTeamNames] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Load team names from CSV
+    fetch('/data/teams.csv')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to load teams data');
+        }
+        return response.text();
+      })
+      .then(data => {
+        const rows = data.split('\n').slice(1); // Skip header row
+        const names = rows.map(row => row.split(',')[1]); // Get team names from second column
+        setAllTeamNames(names);
+      })
+      .catch(error => {
+        console.error('Error loading teams:', error);
+      });
+  }, []);
 
   const handleAddTeam = () => {
-    if (newTeam.name && newTeam.country) {
+    if (newTeam.name) {
       const team: Team = {
         id: Date.now().toString(),
         ...newTeam,
       };
       setTeams([...teams, team]);
       setSelectedTeam(team);
-      setNewTeam({ name: '', country: '', logo: '' });
+      setNewTeam({ name: '', logo: '' });
       setShowAddTeamModal(false);
       localStorage.removeItem('fifaPlayers');
       router.push('/manager');
@@ -44,15 +70,50 @@ export default function CreateTeamPage() {
     }
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewTeam(prev => ({ ...prev, logo: reader.result as string }));
+      reader.onloadend = async () => {
+        const logoUrl = reader.result as string;
+        try {
+          // Extract colors from the logo
+          const colors = await extractColorsFromImage(logoUrl);
+          setNewTeam(prev => ({ 
+            ...prev, 
+            logo: logoUrl,
+            theme: {
+              primary: colors.primary,
+              secondary: colors.secondary,
+              accent: colors.accent
+            }
+          }));
+        } catch (error) {
+          console.error('Error extracting colors:', error);
+          setNewTeam(prev => ({ ...prev, logo: logoUrl }));
+        }
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleTeamNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNewTeam(prev => ({ ...prev, name: value }));
+    
+    if (value) {
+      const suggestions = allTeamNames.filter(name => 
+        name.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 5); // Limit to 5 suggestions
+      setTeamSuggestions(suggestions);
+    } else {
+      setTeamSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setNewTeam(prev => ({ ...prev, name: suggestion }));
+    setTeamSuggestions([]);
   };
 
   return (
@@ -74,32 +135,27 @@ export default function CreateTeamPage() {
           {teams.map((team) => (
             <div
               key={team.id}
-              className="bg-white p-6 rounded-lg shadow-lg cursor-pointer hover:shadow-xl transition-shadow relative group"
+              className="bg-white p-6 rounded-lg shadow-lg cursor-pointer hover:shadow-xl transition-shadow relative group overflow-hidden h-64 flex items-center justify-center"
               onClick={() => {
                 setSelectedTeam(team);
                 router.push('/manager');
               }}
             >
+              {team.logo && (
+                <div 
+                  className="absolute inset-0 bg-cover bg-center filter blur-md opacity-60"
+                  style={{ backgroundImage: `url(${team.logo})` }}
+                />
+              )}
               <button
                 onClick={(e) => handleDeleteTeam(e, team.id)}
-                className="absolute top-2 right-2 text-red-600 opacity-0 group-hover:opacity-100 hover:text-red-800 active:scale-95 transition-all"
+                className="absolute top-2 right-2 text-red-600 opacity-0 group-hover:opacity-100 hover:text-red-800 active:scale-95 transition-all z-10"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </button>
-              {team.logo && (
-                <div className="relative w-32 h-32 mx-auto mb-4">
-                  <Image
-                    src={team.logo}
-                    alt={`${team.name} logo`}
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-              )}
-              <h2 className="text-xl font-semibold text-black text-center">{team.name}</h2>
-              <p className="text-black text-center">{team.country}</p>
+              <h2 className="text-xl font-semibold text-black text-center z-10 relative">{team.name}</h2>
             </div>
           ))}
 
@@ -120,25 +176,28 @@ export default function CreateTeamPage() {
           <div className="bg-white rounded-lg max-w-md w-full p-6 transform transition-all duration-300 scale-100 animate-fade-in">
             <h2 className="text-2xl font-bold text-black mb-6">Create New Team</h2>
             <div className="space-y-4">
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-medium text-black mb-1">Team Name</label>
                 <input
                   type="text"
                   value={newTeam.name}
-                  onChange={(e) => setNewTeam(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={handleTeamNameChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                   placeholder="Enter team name"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-black mb-1">Country</label>
-                <input
-                  type="text"
-                  value={newTeam.country}
-                  onChange={(e) => setNewTeam(prev => ({ ...prev, country: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                  placeholder="Enter country"
-                />
+                {teamSuggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                    {teamSuggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        className="w-full px-4 py-2 text-left text-black hover:bg-gray-100 focus:outline-none"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-black mb-1">Team Logo</label>
