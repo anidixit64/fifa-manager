@@ -13,6 +13,14 @@ const POSITIONS = [
   'GK', 'LB', 'CB', 'RB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST'
 ];
 
+const ROLES = [
+  { value: 'C', label: 'Crucial' },
+  { value: 'I', label: 'Important' },
+  { value: 'R', label: 'Rotation' },
+  { value: 'S', label: 'Squad' },
+  { value: 'P', label: 'Prospect' }
+];
+
 const ATTRIBUTES: (keyof Player['attributes'])[] = [
   'pace', 'shooting', 'passing', 'dribbling', 'defending', 'physical'
 ];
@@ -42,6 +50,15 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
     onUpdatePlayer(updatedPlayer);
   };
 
+  const updateAge = (player: Player, delta: number) => {
+    const newAge = Math.max(18, Math.min(50, player.age + delta));
+    const updatedPlayer = {
+      ...player,
+      age: newAge
+    };
+    onUpdatePlayer(updatedPlayer);
+  };
+
   const updatePosition = (player: Player, direction: 'next' | 'prev') => {
     const currentIndex = POSITIONS.indexOf(player.mainPosition);
     const newIndex = direction === 'next' 
@@ -50,6 +67,18 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
     const updatedPlayer = {
       ...player,
       mainPosition: POSITIONS[newIndex]
+    };
+    onUpdatePlayer(updatedPlayer);
+  };
+
+  const updateRole = (player: Player, direction: 'next' | 'prev') => {
+    const currentIndex = ROLES.findIndex(r => r.value === player.role);
+    const newIndex = direction === 'next' 
+      ? (currentIndex + 1) % ROLES.length 
+      : (currentIndex - 1 + ROLES.length) % ROLES.length;
+    const updatedPlayer = {
+      ...player,
+      role: ROLES[newIndex].value as PlayerRole
     };
     onUpdatePlayer(updatedPlayer);
   };
@@ -71,15 +100,17 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
           {/* Attribute Headers */}
           <div className="flex items-center px-4">
             <div className="w-32"></div> {/* Name spacer */}
-            <div className="w-12"></div> {/* Position spacer */}
-            <div className="w-12"></div> {/* Overall spacer */}
-            <div className="flex-1 grid grid-cols-6 gap-0 pl-4">
+            <div className="w-16 text-center text-xs text-black">Country</div>
+            <div className="w-16 text-center text-xs text-black">Position</div>
+            <div className="w-16 text-center text-xs text-black">Role</div>
+            <div className="w-16 text-center text-xs text-black">Overall</div>
+            <div className="flex-1 grid grid-cols-6 gap-0 pl-8 mr-16">
               {ATTRIBUTES.map((attr) => (
                 <div 
                   key={attr} 
                   className="text-xs text-black text-center"
                 >
-                  {attr}
+                  {attr.charAt(0).toUpperCase() + attr.slice(1)}
                 </div>
               ))}
             </div>
@@ -94,9 +125,11 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                 <div className="flex items-center">
                   <div className="flex items-center flex-1">
                     <span className="font-semibold text-black w-32">{player.name}</span>
-                    <span className="text-black w-12">{player.mainPosition}</span>
-                    <span className="font-medium text-blue-600 w-12">{player.overall}</span>
-                    <div className="flex-1 grid grid-cols-6 gap-0 pl-4">
+                    <span className="text-black w-16 text-center">{player.nationality}</span>
+                    <span className="text-black w-16 text-center">{player.mainPosition}</span>
+                    <span className="text-black w-16 text-center">{player.role}</span>
+                    <span className="font-medium text-blue-600 w-16 text-center">{player.overall}</span>
+                    <div className="flex-1 grid grid-cols-6 gap-0 pl-8 mr-16">
                       {ATTRIBUTES.map((attr) => (
                         <div 
                           key={attr} 
@@ -123,16 +156,45 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                     </svg>
                   </button>
                   <div className="grid grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-bold text-black">{player.name}</h3>
-                      <p className="text-black">Age: {player.age}</p>
-                      <p className="text-black">Nationality: {player.nationality}</p>
+                    <div className="grid grid-cols-1 gap-6">
+                      <div className="flex flex-col items-center space-y-2">
+                        <span className="text-lg font-medium text-black">Age</span>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateAge(player, -1);
+                            }}
+                            className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 active:scale-95 transition-all"
+                          >
+                            -
+                          </button>
+                          <span className="text-sm font-medium text-black w-8 text-center">
+                            {player.age}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateAge(player, 1);
+                            }}
+                            className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 active:scale-95 transition-all"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-center space-y-2">
+                        <span className="text-lg font-medium text-black">Nationality</span>
+                        <span className="text-sm font-medium text-black">
+                          {player.nationality}
+                        </span>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-3 gap-x-24 gap-y-2 mr-32">
                       {ATTRIBUTES.map(attr => (
-                        <div key={attr} className="flex flex-col items-center space-y-1">
-                          <span className="text-sm text-black capitalize">{attr}</span>
-                          <div className="flex items-center space-x-2">
+                        <div key={attr} className="flex flex-col items-center space-y-0.5">
+                          <span className="text-sm text-black">{attr.charAt(0).toUpperCase() + attr.slice(1)}</span>
+                          <div className="flex items-center space-x-1">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -157,9 +219,9 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                           </div>
                         </div>
                       ))}
-                      <div className="flex flex-col items-center space-y-1">
+                      <div className="flex flex-col items-center space-y-0.5">
                         <span className="text-sm text-black">Overall</span>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-1">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -183,9 +245,9 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                           </button>
                         </div>
                       </div>
-                      <div className="flex flex-col items-center space-y-1">
+                      <div className="flex flex-col items-center space-y-0.5">
                         <span className="text-sm text-black">Position</span>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-1">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -202,6 +264,32 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                             onClick={(e) => {
                               e.stopPropagation();
                               updatePosition(player, 'next');
+                            }}
+                            className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 active:scale-95 transition-all"
+                          >
+                            &gt;
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-center space-y-0.5">
+                        <span className="text-sm text-black">Role</span>
+                        <div className="flex items-center space-x-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateRole(player, 'prev');
+                            }}
+                            className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 active:scale-95 transition-all"
+                          >
+                            &lt;
+                          </button>
+                          <span className="text-sm font-medium text-black w-8 text-center">
+                            {player.role}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateRole(player, 'next');
                             }}
                             className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 active:scale-95 transition-all"
                           >
