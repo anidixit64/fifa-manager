@@ -9,6 +9,11 @@ interface PlayerFormProps {
   initialData?: Player;
 }
 
+interface Country {
+  Country: string;
+  FIFA: string;
+}
+
 const POSITIONS = [
   'GK', 'RB', 'RWB', 'CB', 'LB', 'LWB', 'CM', 'RM', 'LM', 'CDM', 'CAM', 'RF', 'RW', 'LF', 'LW', 'ST', 'CF'
 ];
@@ -19,7 +24,9 @@ const ROLES = [
   { value: 'R', label: 'Rotation' },
   { value: 'S', label: 'Squad' },
   { value: 'P', label: 'Prospect' }
-];
+] as const;
+
+type PlayerRole = typeof ROLES[number]['value'];
 
 const ATTRIBUTES: (keyof PlayerAttributes)[] = [
   'pace', 'shooting', 'passing', 'dribbling', 'defending', 'physical'
@@ -31,8 +38,11 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
       name: '',
       age: 18,
       nationality: '',
+      fifaCode: '',
       mainPosition: 'ST',
       role: 'S',
+      alternatePositions: [],
+      overall: 50,
       attributes: {
         pace: 50,
         shooting: 50,
@@ -43,8 +53,8 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
       },
     }
   );
-  const [playerSuggestions, setPlayerSuggestions] = useState<string[]>([]);
-  const [allPlayerNames, setAllPlayerNames] = useState<string[]>([]);
+  const [countrySuggestions, setCountrySuggestions] = useState<Country[]>([]);
+  const [allCountries, setAllCountries] = useState<Country[]>([]);
 
   useEffect(() => {
     if (initialData) {
@@ -54,41 +64,43 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
   }, [initialData]);
 
   useEffect(() => {
-    // Load player names from CSV
-    fetch('/data/players.csv')
+    // Load countries from JSON
+    fetch('/data/countries.json')
       .then(response => {
         if (!response.ok) {
-          throw new Error('Failed to load players data');
+          throw new Error('Failed to load countries data');
         }
-        return response.text();
+        return response.json();
       })
-      .then(data => {
-        const rows = data.split('\n').slice(1); // Skip header row
-        const names = rows.map(row => row.split(',')[0]); // Get player names from first column
-        setAllPlayerNames(names);
+      .then(countries => {
+        setAllCountries(countries);
       })
       .catch(error => {
-        console.error('Error loading players:', error);
+        console.error('Error loading countries:', error);
       });
   }, []);
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCountryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setFormData(prev => ({ ...prev, name: value }));
+    setFormData(prev => ({ ...prev, nationality: value }));
     
     if (value) {
-      const suggestions = allPlayerNames.filter(name => 
-        name.toLowerCase().includes(value.toLowerCase())
+      const suggestions = allCountries.filter(country => 
+        country.Country.toLowerCase().includes(value.toLowerCase())
       ).slice(0, 5); // Limit to 5 suggestions
-      setPlayerSuggestions(suggestions);
+      setCountrySuggestions(suggestions);
     } else {
-      setPlayerSuggestions([]);
+      setCountrySuggestions([]);
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setFormData(prev => ({ ...prev, name: suggestion }));
-    setPlayerSuggestions([]);
+  const handleCountrySuggestionClick = (country: Country) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      nationality: country.Country,
+      fifaCode: country.FIFA
+    }));
+    setCountrySuggestions([]);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -96,14 +108,13 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
     onSubmit(formData);
   };
 
-  const handleAttributeChange = (attr: keyof PlayerAttributes, value: string) => {
-    const numValue = parseInt(value);
-    if (!isNaN(numValue) && numValue >= 0 && numValue <= 99) {
+  const handleAttributeChange = (attr: keyof PlayerAttributes, value: number) => {
+    if (value >= 0 && value <= 99) {
       setFormData(prev => ({
         ...prev,
         attributes: {
           ...prev.attributes,
-          [attr]: numValue
+          [attr]: value
         }
       }));
     }
@@ -117,7 +128,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
-            <div className="relative">
+            <div>
               <label htmlFor="name" className="block text-sm font-medium text-black mb-2">
                 Name
               </label>
@@ -125,24 +136,10 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
                 type="text"
                 id="name"
                 value={formData.name}
-                onChange={handleNameChange}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black bg-gray-50"
                 required
               />
-              {playerSuggestions.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                  {playerSuggestions.map((suggestion, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleSuggestionClick(suggestion)}
-                      className="w-full px-4 py-2 text-left text-black hover:bg-gray-100 focus:outline-none"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div>
@@ -164,7 +161,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
               </select>
             </div>
 
-            <div>
+            <div className="relative">
               <label htmlFor="nationality" className="block text-sm font-medium text-black mb-2">
                 Nationality
               </label>
@@ -172,10 +169,24 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
                 type="text"
                 id="nationality"
                 value={formData.nationality}
-                onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
+                onChange={handleCountryChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black bg-gray-50"
                 required
               />
+              {countrySuggestions.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                  {countrySuggestions.map((country, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleCountrySuggestionClick(country)}
+                      className="w-full px-4 py-2 text-left text-black hover:bg-gray-100 focus:outline-none"
+                    >
+                      {country.Country}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>

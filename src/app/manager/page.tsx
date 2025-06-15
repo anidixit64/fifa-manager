@@ -63,8 +63,15 @@ export default function ManagerPage() {
     setShowPlayerForm(true);
   };
 
-  const handleUpdatePlayer = (updatedPlayer: Player) => {
-    setPlayers(players.map(p => p.id === updatedPlayer.id ? updatedPlayer : p));
+  const handleUpdatePlayer = (playerData: Omit<Player, 'id'>) => {
+    if (!editingPlayer) return;
+    const updatedPlayer: Player = {
+      ...playerData,
+      id: editingPlayer.id
+    };
+    setPlayers(players.map(p => p.id === editingPlayer.id ? updatedPlayer : p));
+    setShowPlayerForm(false);
+    setEditingPlayer(null);
   };
 
   const handleDeletePlayer = (playerId: string) => {
@@ -176,58 +183,53 @@ export default function ManagerPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-black">Squad Management</h2>
-                <button
-                  onClick={() => {
-                    setEditingPlayer(null);
-                    setShowPlayerForm(true);
-                  }}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 active:scale-95 transition-transform"
-                >
-                  Add Player
-                </button>
-              </div>
-              <PlayerList
-                players={players}
-                onDeletePlayer={handleDeletePlayer}
-                onUpdatePlayer={handleUpdatePlayer}
-              />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Squad Management - Left */}
+          <div className="lg:col-span-9 bg-white rounded-lg shadow p-6 order-1">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-black">Squad Management</h2>
+              <button
+                onClick={() => setShowPlayerForm(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:scale-95 transition-transform"
+              >
+                Add Player
+              </button>
             </div>
+            <PlayerList
+              players={players}
+              onDeletePlayer={handleDeletePlayer}
+              onUpdatePlayer={handleUpdatePlayer}
+            />
           </div>
 
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-black mb-4">Team Stats</h2>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-black">Average Overall</p>
-                  <p className="text-2xl font-bold text-blue-600">{stats.avgOverall}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-black">Average Age</p>
-                  <p className="text-2xl font-bold text-blue-600">{stats.avgAge}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-black">Squad Size</p>
-                  <p className="text-2xl font-bold text-blue-600">{players.length}</p>
-                </div>
-                <button
-                  onClick={() => router.push('/edit-tactics')}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 active:scale-95 transition-transform"
-                >
-                  Edit Tactics
-                </button>
-                <button
-                  onClick={analyzeTeam}
-                  className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 active:scale-95 transition-transform"
-                >
-                  Analyze Team
-                </button>
+          {/* Team Stats Sidebar - Right */}
+          <div className="lg:col-span-3 bg-white rounded-lg shadow p-6 order-2">
+            <h2 className="text-xl font-bold text-black mb-4">Team Stats</h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 mb-2">Overall Rating</h3>
+                <div className="text-2xl font-bold text-blue-600">{stats.avgOverall}</div>
               </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 mb-2">Average Age</h3>
+                <div className="text-2xl font-bold text-blue-600">{stats.avgAge}</div>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 mb-2">Squad Size</h3>
+                <div className="text-2xl font-bold text-blue-600">{players.length}</div>
+              </div>
+              <button
+                onClick={() => router.push('/edit-tactics')}
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 active:scale-95 transition-transform"
+              >
+                Edit Tactics
+              </button>
+              <button
+                onClick={analyzeTeam}
+                className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 active:scale-95 transition-transform"
+              >
+                Analyze Team
+              </button>
             </div>
           </div>
         </div>

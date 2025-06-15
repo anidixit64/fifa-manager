@@ -19,7 +19,9 @@ const ROLES = [
   { value: 'R', label: 'Rotation' },
   { value: 'S', label: 'Squad' },
   { value: 'P', label: 'Prospect' }
-];
+] as const;
+
+type PlayerRole = typeof ROLES[number]['value'];
 
 const ATTRIBUTES: (keyof Player['attributes'])[] = [
   'pace', 'shooting', 'passing', 'dribbling', 'defending', 'physical'
@@ -99,20 +101,18 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
         <div className="space-y-2">
           {/* Attribute Headers */}
           <div className="flex items-center px-4">
-            <div className="w-32"></div> {/* Name spacer */}
-            <div className="w-16 text-center text-xs text-black">Country</div>
-            <div className="w-16 text-center text-xs text-black">Position</div>
-            <div className="w-16 text-center text-xs text-black">Role</div>
-            <div className="w-16 text-center text-xs text-black">Overall</div>
-            <div className="flex-1 grid grid-cols-6 gap-0 pl-8 mr-16">
-              {ATTRIBUTES.map((attr) => (
-                <div 
-                  key={attr} 
-                  className="text-xs text-black text-center"
-                >
-                  {attr.charAt(0).toUpperCase() + attr.slice(1)}
-                </div>
-              ))}
+            <div className="w-65"></div> {/* Name spacer */}
+            <div className="flex-1 flex justify-between items-center">
+              <div className="w-8 text-center text-xs text-black">Country</div>
+              <div className="w-8 text-center text-xs text-black">Position</div>
+              <div className="w-8 text-center text-xs text-black">Role</div>
+              <div className="w-8 text-center text-xs text-black">Overall</div>
+              <div className="w-8 text-center text-xs text-black">PAC</div>
+              <div className="w-8 text-center text-xs text-black">SHO</div>
+              <div className="w-8 text-center text-xs text-black">PAS</div>
+              <div className="w-8 text-center text-xs text-black">DRI</div>
+              <div className="w-8 text-center text-xs text-black">DEF</div>
+              <div className="w-8 text-center text-xs text-black">PHY</div>
             </div>
           </div>
 
@@ -123,22 +123,20 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                 className="bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center">
-                  <div className="flex items-center flex-1">
-                    <span className="font-semibold text-black w-32">{player.name}</span>
-                    <span className="text-black w-16 text-center">{player.nationality}</span>
-                    <span className="text-black w-16 text-center">{player.mainPosition}</span>
-                    <span className="text-black w-16 text-center">{player.role}</span>
-                    <span className="font-medium text-blue-600 w-16 text-center">{player.overall}</span>
-                    <div className="flex-1 grid grid-cols-6 gap-0 pl-8 mr-16">
-                      {ATTRIBUTES.map((attr) => (
-                        <div 
-                          key={attr} 
-                          className="text-sm font-medium text-black text-center"
-                        >
-                          {player.attributes[attr]}
-                        </div>
-                      ))}
-                    </div>
+                  <div className="w-65">
+                    <span className="font-semibold text-black">{player.name}</span>
+                  </div>
+                  <div className="flex-1 flex justify-between items-center">
+                    <div className="w-8 text-center text-black">{player.fifaCode}</div>
+                    <div className="w-8 text-center text-black">{player.mainPosition}</div>
+                    <div className="w-8 text-center text-black">{player.role}</div>
+                    <div className="w-8 text-center font-medium text-blue-600">{player.overall}</div>
+                    <div className="w-8 text-center text-black">{player.attributes.pace}</div>
+                    <div className="w-8 text-center text-black">{player.attributes.shooting}</div>
+                    <div className="w-8 text-center text-black">{player.attributes.passing}</div>
+                    <div className="w-8 text-center text-black">{player.attributes.dribbling}</div>
+                    <div className="w-8 text-center text-black">{player.attributes.defending}</div>
+                    <div className="w-8 text-center text-black">{player.attributes.physical}</div>
                   </div>
                 </div>
               </div>
