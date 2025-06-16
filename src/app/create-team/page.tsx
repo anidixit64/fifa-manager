@@ -28,17 +28,16 @@ export default function CreateTeamPage() {
   const [allTeamNames, setAllTeamNames] = useState<string[]>([]);
 
   useEffect(() => {
-    // Load team names from CSV
-    fetch('/data/teams.csv')
+    // Load team names from JSON
+    fetch('/data/teams.json')
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to load teams data');
         }
-        return response.text();
+        return response.json();
       })
       .then(data => {
-        const rows = data.split('\n').slice(1); // Skip header row
-        const names = rows.map(row => row.split(',')[1]); // Get team names from second column
+        const names = data.map((team: any) => team['Team Name']);
         setAllTeamNames(names);
       })
       .catch(error => {
