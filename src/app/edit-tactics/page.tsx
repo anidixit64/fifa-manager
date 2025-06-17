@@ -16,6 +16,9 @@ const POSITIONS = [
   'RB', 'RWB', 'CB', 'LB', 'LWB', 'CM', 'RM', 'LM', 'CDM', 'CAM', 'RF', 'RW', 'LF', 'LW', 'ST', 'CF',
 ] as const;
 
+const TOGGLE_POSITIONS = ['RWB', 'RB', 'RW', 'LWB', 'LB', 'LW'] as const;
+type TogglePosition = typeof TOGGLE_POSITIONS[number];
+
 const ATTRIBUTES = [
   'Pace',
   'Shooting',
@@ -62,9 +65,16 @@ export default function EditTacticsPage() {
   const [selectedTeam] = useLocalStorage<Team | null>('selectedTeam', null);
   const [positionCounts, setPositionCounts] = useLocalStorage<PositionCount[]>('positionCounts', []);
   const [positionPriorities, setPositionPriorities] = useLocalStorage<PositionPriority[]>('positionPriorities', []);
+  const [toggledPositions, setToggledPositions] = useState<Set<TogglePosition>>(new Set());
+  const [isClient, setIsClient] = useState(false);
   const styles = useTeamThemeStyles();
 
-  // Initialize state
+  // Set isClient to true after mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Initialize position counts and priorities
   useEffect(() => {
     if (!positionCounts.length) {
       const initialCounts = POSITIONS.map((pos) => ({
@@ -82,6 +92,21 @@ export default function EditTacticsPage() {
       setPositionPriorities(initialPriorities);
     }
   }, [positionCounts.length, positionPriorities.length, setPositionCounts, setPositionPriorities]);
+
+  // Load toggled positions from localStorage
+  useEffect(() => {
+    if (isClient) {
+      const storedToggles = localStorage.getItem('toggledPositions');
+      if (storedToggles) {
+        try {
+          const parsedToggles = JSON.parse(storedToggles);
+          setToggledPositions(new Set(parsedToggles));
+        } catch (error) {
+          console.error('Error parsing toggled positions:', error);
+        }
+      }
+    }
+  }, [isClient]);
 
   // Handle navigation
   useEffect(() => {
@@ -148,6 +173,22 @@ export default function EditTacticsPage() {
   };
 
   const getTotalCount = () => positionCounts.reduce((sum, pc) => sum + pc.count, 0);
+
+  const handleTogglePosition = (position: TogglePosition) => {
+    setToggledPositions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(position)) {
+        newSet.delete(position);
+      } else {
+        newSet.add(position);
+      }
+      // Save to localStorage only on client
+      if (isClient) {
+        localStorage.setItem('toggledPositions', JSON.stringify(Array.from(newSet)));
+      }
+      return newSet;
+    });
+  };
 
   if (!selectedTeam) {
     return null;
@@ -228,7 +269,23 @@ export default function EditTacticsPage() {
                 );
                 return (
                   <div key={position} className="p-4 border rounded-lg">
-                    <h3 className="text-lg font-bold mb-2 text-black">{position}</h3>
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-lg font-bold text-black">{position}</h3>
+                      {TOGGLE_POSITIONS.includes(position as TogglePosition) && (
+                        <button
+                          onClick={() => handleTogglePosition(position as TogglePosition)}
+                          className={`w-12 h-6 rounded-full transition-colors ${
+                            toggledPositions.has(position as TogglePosition) ? 'bg-blue-600' : 'bg-gray-300'
+                          }`}
+                        >
+                          <div
+                            className={`w-5 h-5 rounded-full bg-white transform transition-transform ${
+                              toggledPositions.has(position as TogglePosition) ? 'translate-x-6' : 'translate-x-0.5'
+                            }`}
+                          />
+                        </button>
+                      )}
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {ATTRIBUTES.map((attr) => {
                         const idx = positionPriority?.priorities.indexOf(attr) ?? -1;

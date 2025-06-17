@@ -136,6 +136,21 @@ export default function BestXIPage() {
     const roleWeight = ROLE_WEIGHTS[player.role] || 0.2;
     rating += roleWeight * 0.15;
 
+    // Foot preference boost for wing positions
+    if (TOGGLE_POSITIONS.includes(position as TogglePosition)) {
+      const isInverted = toggledPositions.has(position as TogglePosition);
+      const isRightWing = ['RB', 'RWB', 'RW'].includes(position);
+      const isRightFooted = player.preferred_foot === 'Right';
+      
+      // If inverted is off, boost same foot. If inverted is on, boost opposite foot
+      if ((isRightWing && isRightFooted && !isInverted) || 
+          (isRightWing && !isRightFooted && isInverted) ||
+          (!isRightWing && !isRightFooted && !isInverted) ||
+          (!isRightWing && isRightFooted && isInverted)) {
+        rating += 0.5; // Small boost of 0.5 points
+      }
+    }
+
     return rating;
   };
 

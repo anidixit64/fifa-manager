@@ -21,6 +21,7 @@ export interface Player {
   role: PlayerRole;
   attributes: PlayerAttributes;
   overall: number;
+  preferred_foot: 'Left' | 'Right';
 }
 
 export type PositionCategory = 'GK' | 'DEF' | 'MID' | 'FWD';
