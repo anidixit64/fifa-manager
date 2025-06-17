@@ -12,6 +12,7 @@ export type PlayerRole = 'C' | 'I' | 'R' | 'S' | 'P';
 export interface Player {
   id: string;
   name: string;
+  shortName: string;
   age: number;
   nationality: string;
   fifaCode: string;

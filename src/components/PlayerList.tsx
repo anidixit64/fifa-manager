@@ -124,7 +124,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
               >
                 <div className="flex items-center">
                   <div className="w-65">
-                    <span className="font-semibold text-black">{player.name}</span>
+                    <span className="font-semibold text-black">{player.shortName || player.name}</span>
                   </div>
                   <div className="flex-1 flex justify-between items-center">
                     <div className="w-8 text-center text-black">{player.fifaCode}</div>

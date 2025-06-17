@@ -14,6 +14,12 @@ interface Country {
   FIFA: string;
 }
 
+interface PlayerSuggestion {
+  long_name: string;
+  short_name: string;
+  nationality_name: string;
+}
+
 const POSITIONS = [
   'GK', 'RB', 'RWB', 'CB', 'LB', 'LWB', 'CM', 'RM', 'LM', 'CDM', 'CAM', 'RF', 'RW', 'LF', 'LW', 'ST', 'CF'
 ];
@@ -36,6 +42,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
   const [formData, setFormData] = useState<Omit<Player, 'id'>>(
     initialData || {
       name: '',
+      shortName: '',
       age: 18,
       nationality: '',
       fifaCode: '',
@@ -55,6 +62,8 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
   );
   const [countrySuggestions, setCountrySuggestions] = useState<Country[]>([]);
   const [allCountries, setAllCountries] = useState<Country[]>([]);
+  const [playerSuggestions, setPlayerSuggestions] = useState<PlayerSuggestion[]>([]);
+  const [allPlayers, setAllPlayers] = useState<PlayerSuggestion[]>([]);
 
   useEffect(() => {
     if (initialData) {
@@ -78,7 +87,48 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
       .catch(error => {
         console.error('Error loading countries:', error);
       });
+
+    // Load players from JSON
+    fetch('/data/players.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to load players data');
+        }
+        return response.json();
+      })
+      .then(players => {
+        setAllPlayers(players);
+      })
+      .catch(error => {
+        console.error('Error loading players:', error);
+      });
   }, []);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, name: value }));
+    
+    if (value) {
+      const suggestions = allPlayers.filter(player => 
+        player.long_name.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 5); // Limit to 5 suggestions
+      setPlayerSuggestions(suggestions);
+    } else {
+      setPlayerSuggestions([]);
+    }
+  };
+
+  const handlePlayerSuggestionClick = (player: PlayerSuggestion) => {
+    const country = allCountries.find(c => c.Country === player.nationality_name);
+    setFormData(prev => ({ 
+      ...prev, 
+      name: player.long_name,
+      shortName: player.short_name,
+      nationality: player.nationality_name,
+      fifaCode: country?.FIFA || ''
+    }));
+    setPlayerSuggestions([]);
+  };
 
   const handleCountryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -128,7 +178,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
-            <div>
+            <div className="relative">
               <label htmlFor="name" className="block text-sm font-medium text-black mb-2">
                 Name
               </label>
@@ -136,10 +186,24 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
                 type="text"
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={handleNameChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black bg-gray-50"
                 required
               />
+              {playerSuggestions.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                  {playerSuggestions.map((player, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handlePlayerSuggestionClick(player)}
+                      className="w-full px-4 py-2 text-left text-black hover:bg-gray-100 focus:outline-none"
+                    >
+                      {player.long_name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>
