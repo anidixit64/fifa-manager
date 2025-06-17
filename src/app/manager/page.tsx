@@ -225,6 +225,12 @@ export default function ManagerPage() {
                 Edit Tactics
               </button>
               <button
+                onClick={() => router.push('/player-stats')}
+                className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 active:scale-95 transition-transform"
+              >
+                Player Stats
+              </button>
+              <button
                 onClick={analyzeTeam}
                 className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 active:scale-95 transition-transform"
               >
