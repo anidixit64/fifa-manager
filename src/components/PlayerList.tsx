@@ -29,6 +29,10 @@ const ATTRIBUTES: (keyof Player['attributes'])[] = [
 
 export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: PlayerListProps) {
   const [expandedPlayers, setExpandedPlayers] = useState<Set<string>>(new Set());
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: 'asc' | 'desc' | null;
+  }>({ key: 'mainPosition', direction: 'asc' });
 
   const togglePlayer = (playerId: string) => {
     const newExpanded = new Set(expandedPlayers);
@@ -38,6 +42,61 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
       newExpanded.add(playerId);
     }
     setExpandedPlayers(newExpanded);
+  };
+
+  const handleSort = (key: string) => {
+    let direction: 'asc' | 'desc' | null = 'asc';
+    if (sortConfig.key === key) {
+      if (sortConfig.direction === 'asc') {
+        direction = 'desc';
+      } else if (sortConfig.direction === 'desc') {
+        direction = null;
+      }
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortedPlayers = () => {
+    if (!sortConfig.direction) {
+      return [...players].sort((a, b) => POSITIONS.indexOf(a.mainPosition) - POSITIONS.indexOf(b.mainPosition));
+    }
+
+    return [...players].sort((a, b) => {
+      let aValue: any;
+      let bValue: any;
+
+      if (sortConfig.key === 'mainPosition') {
+        aValue = POSITIONS.indexOf(a.mainPosition);
+        bValue = POSITIONS.indexOf(b.mainPosition);
+      } else if (sortConfig.key === 'overall') {
+        aValue = a.overall;
+        bValue = b.overall;
+      } else if (sortConfig.key === 'fifaCode') {
+        aValue = a.fifaCode;
+        bValue = b.fifaCode;
+      } else if (sortConfig.key === 'role') {
+        aValue = a.role;
+        bValue = b.role;
+      } else if (sortConfig.key in a.attributes) {
+        aValue = a.attributes[sortConfig.key as keyof typeof a.attributes];
+        bValue = b.attributes[sortConfig.key as keyof typeof b.attributes];
+      }
+
+      if (aValue < bValue) {
+        return sortConfig.direction === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return sortConfig.direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  };
+
+  const getSortIcon = (key: string) => {
+    if (sortConfig.key !== key) return null;
+    if (sortConfig.direction === 'asc') return '↑';
+    if (sortConfig.direction === 'desc') return '↓';
+    return null;
   };
 
   const updateAttribute = (player: Player, attr: keyof Player['attributes'], delta: number) => {
@@ -85,11 +144,6 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
     onUpdatePlayer(updatedPlayer);
   };
 
-  // Sort players by position
-  const sortedPlayers = [...players].sort((a, b) => {
-    return POSITIONS.indexOf(a.mainPosition) - POSITIONS.indexOf(b.mainPosition);
-  });
-
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-bold text-black">Squad</h2>
@@ -103,20 +157,80 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
           <div className="flex items-center px-4">
             <div className="w-65"></div> {/* Name spacer */}
             <div className="flex-1 flex justify-between items-center">
-              <div className="w-8 text-center text-xs text-black">Country</div>
-              <div className="w-8 text-center text-xs text-black">Position</div>
-              <div className="w-8 text-center text-xs text-black">Role</div>
-              <div className="w-8 text-center text-xs text-black">Overall</div>
-              <div className="w-8 text-center text-xs text-black">PAC</div>
-              <div className="w-8 text-center text-xs text-black">SHO</div>
-              <div className="w-8 text-center text-xs text-black">PAS</div>
-              <div className="w-8 text-center text-xs text-black">DRI</div>
-              <div className="w-8 text-center text-xs text-black">DEF</div>
-              <div className="w-8 text-center text-xs text-black">PHY</div>
+              <div 
+                className="w-8 text-center text-xs text-black cursor-pointer hover:text-blue-600"
+                onClick={() => handleSort('fifaCode')}
+              >
+                <div className="h-4">{getSortIcon('fifaCode')}</div>
+                Country
+              </div>
+              <div 
+                className="w-8 text-center text-xs text-black cursor-pointer hover:text-blue-600"
+                onClick={() => handleSort('mainPosition')}
+              >
+                <div className="h-4">{getSortIcon('mainPosition')}</div>
+                Position
+              </div>
+              <div 
+                className="w-8 text-center text-xs text-black cursor-pointer hover:text-blue-600"
+                onClick={() => handleSort('role')}
+              >
+                <div className="h-4">{getSortIcon('role')}</div>
+                Role
+              </div>
+              <div 
+                className="w-8 text-center text-xs text-black cursor-pointer hover:text-blue-600"
+                onClick={() => handleSort('overall')}
+              >
+                <div className="h-4">{getSortIcon('overall')}</div>
+                Overall
+              </div>
+              <div 
+                className="w-8 text-center text-xs text-black cursor-pointer hover:text-blue-600"
+                onClick={() => handleSort('pace')}
+              >
+                <div className="h-4">{getSortIcon('pace')}</div>
+                PAC
+              </div>
+              <div 
+                className="w-8 text-center text-xs text-black cursor-pointer hover:text-blue-600"
+                onClick={() => handleSort('shooting')}
+              >
+                <div className="h-4">{getSortIcon('shooting')}</div>
+                SHO
+              </div>
+              <div 
+                className="w-8 text-center text-xs text-black cursor-pointer hover:text-blue-600"
+                onClick={() => handleSort('passing')}
+              >
+                <div className="h-4">{getSortIcon('passing')}</div>
+                PAS
+              </div>
+              <div 
+                className="w-8 text-center text-xs text-black cursor-pointer hover:text-blue-600"
+                onClick={() => handleSort('dribbling')}
+              >
+                <div className="h-4">{getSortIcon('dribbling')}</div>
+                DRI
+              </div>
+              <div 
+                className="w-8 text-center text-xs text-black cursor-pointer hover:text-blue-600"
+                onClick={() => handleSort('defending')}
+              >
+                <div className="h-4">{getSortIcon('defending')}</div>
+                DEF
+              </div>
+              <div 
+                className="w-8 text-center text-xs text-black cursor-pointer hover:text-blue-600"
+                onClick={() => handleSort('physical')}
+              >
+                <div className="h-4">{getSortIcon('physical')}</div>
+                PHY
+              </div>
             </div>
           </div>
 
-          {sortedPlayers.map((player) => (
+          {getSortedPlayers().map((player) => (
             <div key={player.id}>
               <div
                 onClick={() => togglePlayer(player.id)}
