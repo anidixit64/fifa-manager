@@ -26,24 +26,33 @@ export default function CreateTeamPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [teamSuggestions, setTeamSuggestions] = useState<string[]>([]);
   const [allTeamNames, setAllTeamNames] = useState<string[]>([]);
+  const [isClient, setIsClient] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load team names from JSON
-    fetch('/data/teams.json')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to load teams data');
-        }
-        return response.json();
-      })
-      .then(data => {
-        const names = data.map((team: any) => team['Team Name']);
-        setAllTeamNames(names);
-      })
-      .catch(error => {
-        console.error('Error loading teams:', error);
-      });
+    setIsClient(true);
+    setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      // Load team names from JSON
+      fetch('/data/teams.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to load teams data');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const names = data.map((team: any) => team['Team Name']);
+          setAllTeamNames(names);
+        })
+        .catch(error => {
+          console.error('Error loading teams:', error);
+        });
+    }
+  }, [isClient]);
 
   const handleAddTeam = () => {
     if (newTeam.name) {
@@ -115,12 +124,28 @@ export default function CreateTeamPage() {
     setTeamSuggestions([]);
   };
 
+  const handleBack = () => {
+    router.push('/');
+  };
+
+  if (!isClient || isLoading) {
+    return (
+      <main className="min-h-screen bg-gray-100 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center mb-8">
+            <h1 className="text-4xl font-bold text-black">Create Your Team</h1>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center mb-8">
           <button
-            onClick={() => router.push('/')}
+            onClick={handleBack}
             className="mr-4 text-black hover:text-blue-600 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
