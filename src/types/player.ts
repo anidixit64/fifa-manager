@@ -22,6 +22,10 @@ export interface Player {
   attributes: PlayerAttributes;
   overall: number;
   preferred_foot: 'Left' | 'Right';
+  stats: {
+    goals: number;
+    assists: number;
+  };
 }
 
 export type PositionCategory = 'GK' | 'DEF' | 'MID' | 'FWD';

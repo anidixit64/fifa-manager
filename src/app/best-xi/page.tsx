@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import { Player } from '@/types/player';
+import { Player, PositionCategory, POSITION_CATEGORIES } from '@/types/player';
 
 interface Team {
   id: string;
@@ -11,6 +11,10 @@ interface Team {
   country: string;
   logo?: string;
 }
+
+type TogglePosition = 'RWB' | 'RB' | 'RW' | 'LWB' | 'LB' | 'LW';
+
+const TOGGLE_POSITIONS: TogglePosition[] = ['RWB', 'RB', 'RW', 'LWB', 'LB', 'LW'];
 
 interface PositionCount {
   position: string;
