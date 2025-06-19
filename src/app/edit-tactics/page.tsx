@@ -195,12 +195,12 @@ export default function EditTacticsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 py-8">
+    <main className="min-h-screen bg-[#3c5c34] py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center mb-8">
           <button
             onClick={() => router.push('/manager')}
-            className="mr-4 text-black hover:opacity-80 transition-opacity"
+            className="mr-4 text-[#dde1e0]/80 hover:text-[#a78968] transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -217,69 +217,78 @@ export default function EditTacticsPage() {
               />
             </svg>
           </button>
-          <h1 className="text-4xl font-bold text-black">Edit Tactics</h1>
+          <h1 className="text-4xl font-bold text-[#dde1e0] font-mono tracking-wider">Edit Tactics</h1>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Sidebar */}
-          <div className="lg:col-span-3 bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-bold mb-4 text-black">Position Counts</h2>
+          <div className="lg:col-span-3 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-[#a78968]/30">
+            <h2 className="text-xl font-bold mb-4 text-[#dde1e0] font-mono tracking-wider">Position Counts</h2>
             <div className="space-y-2">
               {positionCounts.map(({ position, count }) => (
                 <div
                   key={position}
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50"
+                  className="flex items-center justify-between p-2 rounded-lg hover:bg-[#644d36]/20 transition-colors border border-transparent hover:border-[#644d36]/30"
                 >
-                  <span className="font-medium text-black">{position}</span>
+                  <span className="font-medium text-[#dde1e0] font-mono">{position}</span>
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => handleDecrement(position)}
-                      className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 active:scale-95 transition-all"
+                      className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a78968]/40 text-[#dde1e0] hover:bg-[#a78968]/60 active:scale-95 transition-all"
                     >
                       -
                     </button>
-                    <span className="w-8 text-center text-black">{count}</span>
+                    <span className="w-8 text-center text-[#a78968] font-mono font-bold">{count}</span>
                     <button
                       onClick={() => handleIncrement(position)}
-                      className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 active:scale-95 transition-all"
+                      className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a78968]/40 text-[#dde1e0] hover:bg-[#a78968]/60 active:scale-95 transition-all"
                     >
                       +
                     </button>
                   </div>
                 </div>
               ))}
-              <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
-                <span className="font-medium text-black">Total (excl. GK)</span>
-                <span className="font-bold text-black">{getTotalCount()}/10</span>
+              <div className="mt-4 pt-4 border-t border-[#a78968]/30 flex justify-between items-center">
+                <span className="font-medium text-[#dde1e0] font-mono">Total (excl. GK)</span>
+                <span className="font-bold text-[#a78968] font-mono text-lg">{getTotalCount()}/10</span>
               </div>
               <button
                 onClick={handleReset}
-                className="mt-4 w-full py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 active:scale-95 transition-all"
+                className="mt-4 w-full relative group px-4 py-2 text-[#dde1e0] overflow-hidden font-mono"
               >
-                Reset Counts
+                {/* Button background */}
+                <div className="absolute inset-0 bg-[#644d36]/30 group-hover:bg-[#644d36]/50 transition-colors"></div>
+                
+                {/* Button border */}
+                <div className="absolute inset-0 border border-[#644d36]/50"></div>
+                
+                {/* Button text */}
+                <span className="relative z-10 tracking-wider font-semibold">
+                  Reset Counts
+                </span>
               </button>
             </div>
           </div>
           {/* Main area: Attribute priorities for positions with count >= 1 */}
-          <div className="lg:col-span-9 bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-6 text-black">Attribute Priorities</h2>
+          <div className="lg:col-span-9 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-[#a78968]/30">
+            <h2 className="text-2xl font-bold mb-6 text-[#dde1e0] font-mono tracking-wider">Attribute Priorities</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {positionCounts.filter((pc) => pc.count > 0).map(({ position }) => {
                 const positionPriority = positionPriorities.find(
                   (pp) => pp.position === position
                 );
                 return (
-                  <div key={position} className="p-4 border rounded-lg">
+                  <div key={position} className="p-4 border border-[#644d36]/40 rounded-lg bg-[#dde1e0]/5 hover:bg-[#644d36]/10 transition-colors">
                     <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-lg font-bold text-black">{position}</h3>
+                      <h3 className="text-lg font-bold text-[#a78968] font-mono">{position}</h3>
                       {TOGGLE_POSITIONS.includes(position as TogglePosition) && (
                         <button
                           onClick={() => handleTogglePosition(position as TogglePosition)}
                           className={`w-12 h-6 rounded-full transition-colors ${
-                            toggledPositions.has(position as TogglePosition) ? 'bg-blue-600' : 'bg-gray-300'
+                            toggledPositions.has(position as TogglePosition) ? 'bg-[#a78968]' : 'bg-[#644d36]/50'
                           }`}
                         >
                           <div
-                            className={`w-5 h-5 rounded-full bg-white transform transition-transform ${
+                            className={`w-5 h-5 rounded-full bg-[#dde1e0] transform transition-transform ${
                               toggledPositions.has(position as TogglePosition) ? 'translate-x-6' : 'translate-x-0.5'
                             }`}
                           />
@@ -291,26 +300,26 @@ export default function EditTacticsPage() {
                         const idx = positionPriority?.priorities.indexOf(attr) ?? -1;
                         const isSelected = idx !== -1;
                         let priorityColor = "";
-                        if (idx === 0) priorityColor = "bg-green-600";
-                        else if (idx === 1) priorityColor = "bg-yellow-600";
-                        else if (idx === 2) priorityColor = "bg-red-600";
+                        if (idx === 0) priorityColor = "bg-[#a78968]";
+                        else if (idx === 1) priorityColor = "bg-[#644d36]";
+                        else if (idx === 2) priorityColor = "bg-[#a8b8a7]";
                         return (
                           <button
                             key={attr}
                             onClick={() => updatePositionPriority(position, attr)}
-                            className={`px-3 py-1 rounded-full text-sm ${
+                            className={`px-3 py-1 rounded-full text-sm font-mono transition-all hover:scale-105 active:scale-95 ${
                               isSelected
-                                ? `${priorityColor} text-white`
-                                : "bg-blue-200 text-blue-800"
+                                ? `${priorityColor} text-[#3c5c34]`
+                                : "bg-[#dde1e0]/20 text-[#dde1e0] hover:bg-[#644d36]/30 hover:text-[#a78968]"
                             }`}
                           >
-                            <span className="text-black" style={isSelected ? { color: 'white' } : {}}>{attr}</span>
-                            {isSelected && <span className="ml-1 text-white">#{idx + 1}</span>}
+                            <span style={isSelected ? { color: '#3c5c34' } : {}}>{attr}</span>
+                            {isSelected && <span className="ml-1" style={{ color: '#3c5c34' }}>#{idx + 1}</span>}
                           </button>
                         );
                       })}
                     </div>
-                    <div className="text-xs text-gray-500 mt-2">
+                    <div className="text-xs text-[#644d36] mt-2 font-mono">
                       Select up to 3 attributes in order of importance.
                     </div>
                   </div>

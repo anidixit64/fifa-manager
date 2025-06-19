@@ -18,7 +18,7 @@ export default function Home() {
 
   if (!mounted) {
     return (
-      <main className="min-h-screen bg-[#1a472a] flex items-center justify-center">
+      <main className="min-h-screen bg-[#3c5c34] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-white mb-4 font-mono">FIFA MANAGER</h1>
           <button className="px-6 py-3 bg-[#4CAF50] text-white rounded-none border-2 border-white hover:bg-[#45a049] transition-colors font-mono">
@@ -30,11 +30,11 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#1a472a] relative overflow-hidden">
+    <main className="min-h-screen bg-[#3c5c34] relative overflow-hidden">
       {/* Soccer field pattern */}
       <div className="absolute inset-0">
         {/* Grass texture */}
-        <div className="absolute inset-0 bg-[#1a472a] opacity-90"></div>
+        <div className="absolute inset-0 bg-[#3c5c34] opacity-90"></div>
         
         {/* Field lines */}
         <div className="absolute inset-0">

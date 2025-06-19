@@ -155,87 +155,201 @@ export default function ManagerPage() {
   const stats = calculateTeamStats();
 
   if (!selectedTeam || isLoading) {
-    return null;
+    return (
+      <main className="min-h-screen bg-[#3c5c34] relative overflow-hidden">
+        {/* Background soccer player image */}
+        <div className="absolute inset-0">
+          <img
+            src="/soccer_player1.png"
+            alt="Soccer Player Background"
+            className="w-full h-full object-cover opacity-20 blur-sm"
+          />
+        </div>
+
+        {/* Simplified soccer field pattern overlay */}
+        <div className="absolute inset-0">
+          {/* Grass texture */}
+          <div className="absolute inset-0 bg-[#3c5c34] opacity-90"></div>
+          
+          {/* Simplified field elements */}
+          <div className="absolute inset-0">
+            {/* Center line only */}
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1 h-full bg-[#dde1e0]/20"></div>
+            
+            {/* Simple overlay for texture */}
+            <div className="absolute inset-0 bg-[#dde1e0]/5"></div>
+          </div>
+        </div>
+
+        <div className="relative z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center mb-8">
+              <h1 className="text-4xl font-bold text-[#dde1e0] font-mono tracking-wider">Manager Dashboard</h1>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-black mb-8">Manager Dashboard</h1>
-        <div className="flex items-center mb-8">
-          <button
-            onClick={() => router.push('/create-team')}
-            className="mr-4 text-black hover:text-blue-600 transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-black">{selectedTeam?.name || 'No Team Selected'}</h1>
-            <p className="text-black">{selectedTeam?.country || ''}</p>
-          </div>
-          <button
-            onClick={() => router.push('/create-team')}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 active:scale-95 transition-transform"
-          >
-            Change Team
-          </button>
+    <main className="min-h-screen bg-[#3c5c34] relative overflow-hidden">
+      {/* Background soccer player image */}
+      <div className="absolute inset-0">
+        <img
+          src="/soccer_player1.png"
+          alt="Soccer Player Background"
+          className="w-full h-full object-cover opacity-20 blur-sm"
+        />
+      </div>
+
+      {/* Simplified soccer field pattern overlay */}
+      <div className="absolute inset-0">
+        {/* Grass texture */}
+        <div className="absolute inset-0 bg-[#3c5c34] opacity-90"></div>
+        
+        {/* Simplified field elements */}
+        <div className="absolute inset-0">
+          {/* Center line only */}
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1 h-full bg-[#dde1e0]/20"></div>
+          
+          {/* Simple overlay for texture */}
+          <div className="absolute inset-0 bg-[#dde1e0]/5"></div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Squad Management - Left */}
-          <div className="lg:col-span-9 bg-white rounded-lg shadow p-6 order-1">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-black">Squad Management</h2>
-              <button
-                onClick={() => setShowPlayerForm(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:scale-95 transition-transform"
-              >
-                Add Player
-              </button>
+      <div className="relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header with back button and team info */}
+          <div className="flex items-center mb-8">
+            <button
+              onClick={() => router.push('/create-team')}
+              className="mr-4 text-[#dde1e0]/80 hover:text-[#dde1e0] transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold text-[#dde1e0] font-mono tracking-wider mb-2">Manager Dashboard</h1>
+              <h2 className="text-2xl font-bold text-[#a8b8a7] font-mono">{selectedTeam?.name || 'No Team Selected'}</h2>
             </div>
-            <PlayerList
-              players={players}
-              onDeletePlayer={handleDeletePlayer}
-              onUpdatePlayer={handleUpdatePlayer}
-            />
+            <button
+              onClick={() => router.push('/create-team')}
+              className="relative group px-6 py-3 text-[#3c5c34] overflow-hidden font-mono"
+            >
+              {/* Button background */}
+              <div className="absolute inset-0 bg-[#dde1e0] group-hover:bg-[#c8d0cf] transition-colors"></div>
+              
+              {/* Button border */}
+              <div className="absolute inset-0 border-2 border-[#3c5c34]"></div>
+              
+              {/* Button text */}
+              <span className="relative z-10 tracking-wider font-semibold">
+                Change Team
+              </span>
+
+              {/* Hover effect */}
+              <div className="absolute inset-0 bg-[#3c5c34]/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+            </button>
           </div>
 
-          {/* Team Stats Sidebar - Right */}
-          <div className="lg:col-span-3 bg-white rounded-lg shadow p-6 order-2">
-            <h2 className="text-xl font-bold text-black mb-4">Team Stats</h2>
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Overall Rating</h3>
-                <div className="text-2xl font-bold text-blue-600">{stats.avgOverall}</div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Squad Management - Left */}
+            <div className="lg:col-span-9 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg p-6 order-1 border border-[#dde1e0]/20">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-[#dde1e0] font-mono tracking-wider">Squad Management</h2>
+                <button
+                  onClick={() => setShowPlayerForm(true)}
+                  className="relative group px-6 py-3 text-[#3c5c34] overflow-hidden font-mono"
+                >
+                  {/* Button background */}
+                  <div className="absolute inset-0 bg-[#dde1e0] group-hover:bg-[#c8d0cf] transition-colors"></div>
+                  
+                  {/* Button border */}
+                  <div className="absolute inset-0 border-2 border-[#3c5c34]"></div>
+                  
+                  {/* Button text */}
+                  <span className="relative z-10 tracking-wider font-semibold">
+                    Add Player
+                  </span>
+
+                  {/* Hover effect */}
+                  <div className="absolute inset-0 bg-[#3c5c34]/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                </button>
               </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Average Age</h3>
-                <div className="text-2xl font-bold text-blue-600">{stats.avgAge}</div>
+              <PlayerList
+                players={players}
+                onDeletePlayer={handleDeletePlayer}
+                onUpdatePlayer={handleUpdatePlayer}
+              />
+            </div>
+
+            {/* Team Stats Sidebar - Right */}
+            <div className="lg:col-span-3 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg p-6 order-2 border border-[#dde1e0]/20">
+              <h2 className="text-2xl font-bold text-[#dde1e0] font-mono tracking-wider mb-6">Team Stats</h2>
+              <div className="space-y-6">
+                <div className="bg-[#dde1e0]/5 p-4 rounded-lg border border-[#dde1e0]/20">
+                  <h3 className="text-sm font-medium text-[#a8b8a7] mb-2 font-mono">Overall Rating</h3>
+                  <div className="text-3xl font-bold text-[#a8b8a7] font-mono">{stats.avgOverall}</div>
+                </div>
+                <div className="bg-[#dde1e0]/5 p-4 rounded-lg border border-[#dde1e0]/20">
+                  <h3 className="text-sm font-medium text-[#644d36] mb-2 font-mono">Average Age</h3>
+                  <div className="text-3xl font-bold text-[#644d36] font-mono">{stats.avgAge}</div>
+                </div>
+                <div className="bg-[#dde1e0]/5 p-4 rounded-lg border border-[#dde1e0]/20">
+                  <h3 className="text-sm font-medium text-[#a78968] mb-2 font-mono">Squad Size</h3>
+                  <div className="text-3xl font-bold text-[#a78968] font-mono">{players.length}</div>
+                </div>
+                <button
+                  onClick={() => router.push('/edit-tactics')}
+                  className="w-full relative group px-4 py-3 text-[#dde1e0] overflow-hidden font-mono"
+                >
+                  {/* Button background */}
+                  <div className="absolute inset-0 bg-[#a8b8a7]/20 group-hover:bg-[#a8b8a7]/30 transition-colors"></div>
+                  
+                  {/* Button border */}
+                  <div className="absolute inset-0 border border-[#a8b8a7]/30"></div>
+                  
+                  {/* Button text */}
+                  <span className="relative z-10 tracking-wider">
+                    Edit Tactics
+                  </span>
+                </button>
+                <button
+                  onClick={() => router.push('/player-stats')}
+                  className="w-full relative group px-4 py-3 text-[#dde1e0] overflow-hidden font-mono"
+                >
+                  {/* Button background */}
+                  <div className="absolute inset-0 bg-[#644d36]/20 group-hover:bg-[#644d36]/30 transition-colors"></div>
+                  
+                  {/* Button border */}
+                  <div className="absolute inset-0 border border-[#644d36]/30"></div>
+                  
+                  {/* Button text */}
+                  <span className="relative z-10 tracking-wider">
+                    Player Stats
+                  </span>
+                </button>
+                <button
+                  onClick={analyzeTeam}
+                  className="w-full relative group px-4 py-3 text-[#dde1e0] overflow-hidden font-mono"
+                >
+                  {/* Button background */}
+                  <div className="absolute inset-0 bg-[#a78968] group-hover:bg-[#8f7a5a] transition-colors"></div>
+                  
+                  {/* Button border */}
+                  <div className="absolute inset-0 border-2 border-[#dde1e0]"></div>
+                  
+                  {/* Button text */}
+                  <span className="relative z-10 tracking-wider">
+                    Analyze Team
+                  </span>
+
+                  {/* Hover effect */}
+                  <div className="absolute inset-0 bg-[#dde1e0]/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                </button>
               </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Squad Size</h3>
-                <div className="text-2xl font-bold text-blue-600">{players.length}</div>
-              </div>
-              <button
-                onClick={() => router.push('/edit-tactics')}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 active:scale-95 transition-transform"
-              >
-                Edit Tactics
-              </button>
-              <button
-                onClick={() => router.push('/player-stats')}
-                className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 active:scale-95 transition-transform"
-              >
-                Player Stats
-              </button>
-              <button
-                onClick={analyzeTeam}
-                className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 active:scale-95 transition-transform"
-              >
-                Analyze Team
-              </button>
             </div>
           </div>
         </div>

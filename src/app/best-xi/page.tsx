@@ -93,6 +93,27 @@ export default function BestXIPage() {
   const [positionCounts] = useLocalStorage<PositionCount[]>('positionCounts', []);
   const [positionPriorities] = useLocalStorage<PositionPriority[]>('positionPriorities', []);
   const [analysis, setAnalysis] = useState<TeamAnalysis | null>(null);
+  const [toggledPositions, setToggledPositions] = useState<Set<TogglePosition>>(new Set());
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Load toggled positions from localStorage
+  useEffect(() => {
+    if (isClient) {
+      const storedToggles = localStorage.getItem('toggledPositions');
+      if (storedToggles) {
+        try {
+          const parsedToggles = JSON.parse(storedToggles);
+          setToggledPositions(new Set(parsedToggles));
+        } catch (error) {
+          console.error('Error parsing toggled positions:', error);
+        }
+      }
+    }
+  }, [isClient]);
 
   useEffect(() => {
     if (!selectedTeam) {
@@ -202,83 +223,41 @@ export default function BestXIPage() {
       });
     });
 
-    // Sort players by rating for each position
+    // Sort by rating and select best XI
+    const sortedRatings = playerRatings.sort((a, b) => b.rating - a.rating);
     const bestXI: PlayerRating[] = [];
-    const bench: PlayerRating[] = [];
-    const usedPlayers = new Set<string>();
+    const usedPositions = new Set<string>();
 
-    // Select Best XI
-    POSITIONS.forEach(position => {
-      const positionPlayers = playerRatings
-        .filter(pr => pr.position === position)
-        .sort((a, b) => b.rating - a.rating);
-
-      if (positionPlayers.length > 0) {
-        bestXI.push(positionPlayers[0]);
-        usedPlayers.add(positionPlayers[0].player.id);
+    // Select best player for each position
+    sortedRatings.forEach(({ player, rating, position }) => {
+      if (bestXI.length < 11 && !usedPositions.has(position)) {
+        bestXI.push({ player, rating, position });
+        usedPositions.add(position);
       }
     });
 
-    // Select Bench
-    const benchPositions = Object.entries(BENCH_REQUIREMENTS);
-    benchPositions.forEach(([category, positions]) => {
-      const availablePlayers = playerRatings
-        .filter(pr => !usedPlayers.has(pr.player.id))
-        .filter(pr => Array.isArray(positions) ? positions.includes(pr.position) : pr.position === positions)
-        .sort((a, b) => b.rating - a.rating);
-
-      if (availablePlayers.length > 0) {
-        bench.push(availablePlayers[0]);
-        usedPlayers.add(availablePlayers[0].player.id);
-      }
-    });
+    // Select bench players (remaining top players)
+    const bench = sortedRatings
+      .filter(({ player }) => !bestXI.some(xi => xi.player.id === player.id))
+      .slice(0, 7);
 
     // Categorize players
-    const aging = players.filter(p => 
-      p.age > avgAge + (2 * ageStdDev) && 
-      p.overall < avgOverall - (2 * overallStdDev)
-    );
-
-    const veterans = players.filter(p => 
-      p.age > avgAge + (2 * ageStdDev) && 
-      p.overall > avgOverall + overallStdDev
-    );
-
-    const youngStars = players.filter(p => 
-      p.age < avgAge - (2 * ageStdDev) && 
-      p.overall > avgOverall + (2 * overallStdDev)
-    );
+    const aging = players.filter(p => p.age > avgAge + ageStdDev);
+    const veterans = players.filter(p => p.age > 30 && p.overall > avgOverall);
+    const youngStars = players.filter(p => p.age < avgAge - ageStdDev && p.overall > avgOverall);
 
     // Analyze position strengths
-    const positionStrengths: { [key: string]: any } = {};
-    const sectorStrengths: { [key: string]: any } = {};
-
-    // Analyze each sector
-    Object.entries(SECTORS).forEach(([sector, positions]) => {
-      const sectorPlayers = players.filter(p => positions.includes(p.mainPosition));
-      const count = sectorPlayers.length;
-      let message;
-
-      if (count < 4) {
-        message = `Need more ${sector.toLowerCase()} players (currently ${count})`;
-      }
-
-      sectorStrengths[sector] = { count, message };
-    });
-
-    // Analyze each position
+    const positionStrengths: TeamAnalysis['positionStrengths'] = {};
     POSITIONS.forEach(position => {
-      const positionCount = positionCounts.find(pc => pc.position === position)?.count || 0;
-      if (positionCount === 0) return; // Skip positions not selected by user
-
       const positionPlayers = players.filter(p => p.mainPosition === position);
-      const hasProspect = positionPlayers.some(p => p.role === 'P');
-      const hasVeteran = positionPlayers.some(p => p.role === 'C' || p.role === 'I');
-      const hasNormal = positionPlayers.some(p => p.role === 'R' || p.role === 'S');
-      const hasAging = positionPlayers.some(p => aging.includes(p));
       const count = positionPlayers.length;
+      
+      const hasProspect = positionPlayers.some(p => p.age < avgAge - ageStdDev);
+      const hasVeteran = positionPlayers.some(p => p.age > 30);
+      const hasNormal = positionPlayers.some(p => p.age >= avgAge - ageStdDev && p.age <= avgAge + ageStdDev);
+      const hasAging = positionPlayers.some(p => p.age > avgAge + ageStdDev);
 
-      let message;
+      let message: string | undefined;
       if (count === 0) {
         message = `No ${position} players`;
       } else if (!hasProspect) {
@@ -299,6 +278,25 @@ export default function BestXIPage() {
       };
     });
 
+    // Analyze sector strengths
+    const sectorStrengths: TeamAnalysis['sectorStrengths'] = {};
+    Object.entries(SECTORS).forEach(([sector, positions]) => {
+      const sectorPlayers = players.filter(p => positions.includes(p.mainPosition));
+      const count = sectorPlayers.length;
+      
+      let message: string | undefined;
+      if (count < 3) {
+        message = `Weak ${sector} depth`;
+      } else if (count > 8) {
+        message = `Strong ${sector} depth`;
+      }
+
+      sectorStrengths[sector] = {
+        count,
+        message
+      };
+    });
+
     setAnalysis({
       bestXI,
       bench,
@@ -311,36 +309,36 @@ export default function BestXIPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="min-h-screen bg-[#3c5c34]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center mb-8">
           <button
             onClick={() => router.push('/manager')}
-            className="mr-4 text-black hover:text-blue-600 transition-colors"
+            className="mr-4 text-[#dde1e0]/80 hover:text-[#a78968] transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="text-3xl font-bold text-black">Best XI Analysis</h1>
+          <h1 className="text-3xl font-bold text-[#dde1e0] font-mono tracking-wider">Best XI Analysis</h1>
         </div>
 
         {analysis && (
           <div className="space-y-8">
             {/* Best XI */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-2xl font-bold text-black mb-6">Best XI</h2>
+            <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
+              <h2 className="text-2xl font-bold text-[#dde1e0] font-mono tracking-wider mb-6">Best XI</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {analysis.bestXI.map(({ player, position }) => (
-                  <div key={player.id} className="bg-gray-50 p-4 rounded-lg">
+                  <div key={player.id} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
                     <div className="flex justify-between items-center">
                       <div>
-                        <h3 className="font-semibold text-black">{player.name}</h3>
-                        <p className="text-sm text-gray-600">{position}</p>
+                        <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
+                        <p className="text-sm text-[#a78968] font-mono">{position}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-blue-600">{player.overall}</p>
-                        <p className="text-sm text-gray-600">{player.role}</p>
+                        <p className="text-lg font-bold text-[#a78968] font-mono">{player.overall}</p>
+                        <p className="text-sm text-[#644d36] font-mono">{player.role}</p>
                       </div>
                     </div>
                   </div>
@@ -349,19 +347,19 @@ export default function BestXIPage() {
             </div>
 
             {/* Bench */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-2xl font-bold text-black mb-6">Bench</h2>
+            <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
+              <h2 className="text-2xl font-bold text-[#dde1e0] font-mono tracking-wider mb-6">Bench</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {analysis.bench.map(({ player, position }) => (
-                  <div key={player.id} className="bg-gray-50 p-4 rounded-lg">
+                  <div key={player.id} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
                     <div className="flex justify-between items-center">
                       <div>
-                        <h3 className="font-semibold text-black">{player.name}</h3>
-                        <p className="text-sm text-gray-600">{position}</p>
+                        <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
+                        <p className="text-sm text-[#a78968] font-mono">{position}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-blue-600">{player.overall}</p>
-                        <p className="text-sm text-gray-600">{player.role}</p>
+                        <p className="text-lg font-bold text-[#a78968] font-mono">{player.overall}</p>
+                        <p className="text-sm text-[#644d36] font-mono">{player.role}</p>
                       </div>
                     </div>
                   </div>
@@ -372,19 +370,19 @@ export default function BestXIPage() {
             {/* Player Categories */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Young Stars */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-black mb-4">Young Stars</h2>
+              <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
+                <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Young Stars</h2>
                 <div className="space-y-2">
                   {analysis.youngStars.map(player => (
-                    <div key={player.id} className="bg-gray-50 p-3 rounded-lg">
+                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
                       <div className="flex justify-between items-center">
                         <div>
-                          <h3 className="font-semibold text-black">{player.name}</h3>
-                          <p className="text-sm text-gray-600">{player.mainPosition}</p>
+                          <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
+                          <p className="text-sm text-[#a78968] font-mono">{player.mainPosition}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-blue-600">{player.overall}</p>
-                          <p className="text-sm text-gray-600">Age: {player.age}</p>
+                          <p className="font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          <p className="text-sm text-[#644d36] font-mono">Age: {player.age}</p>
                         </div>
                       </div>
                     </div>
@@ -393,19 +391,19 @@ export default function BestXIPage() {
               </div>
 
               {/* Veterans */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-black mb-4">Veterans</h2>
+              <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
+                <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Veterans</h2>
                 <div className="space-y-2">
                   {analysis.veterans.map(player => (
-                    <div key={player.id} className="bg-gray-50 p-3 rounded-lg">
+                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
                       <div className="flex justify-between items-center">
                         <div>
-                          <h3 className="font-semibold text-black">{player.name}</h3>
-                          <p className="text-sm text-gray-600">{player.mainPosition}</p>
+                          <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
+                          <p className="text-sm text-[#a78968] font-mono">{player.mainPosition}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-blue-600">{player.overall}</p>
-                          <p className="text-sm text-gray-600">Age: {player.age}</p>
+                          <p className="font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          <p className="text-sm text-[#644d36] font-mono">Age: {player.age}</p>
                         </div>
                       </div>
                     </div>
@@ -414,19 +412,19 @@ export default function BestXIPage() {
               </div>
 
               {/* Aging Players */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-black mb-4">Aging Players</h2>
+              <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
+                <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Aging Players</h2>
                 <div className="space-y-2">
                   {analysis.aging.map(player => (
-                    <div key={player.id} className="bg-gray-50 p-3 rounded-lg">
+                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
                       <div className="flex justify-between items-center">
                         <div>
-                          <h3 className="font-semibold text-black">{player.name}</h3>
-                          <p className="text-sm text-gray-600">{player.mainPosition}</p>
+                          <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
+                          <p className="text-sm text-[#a78968] font-mono">{player.mainPosition}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-blue-600">{player.overall}</p>
-                          <p className="text-sm text-gray-600">Age: {player.age}</p>
+                          <p className="font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          <p className="text-sm text-[#644d36] font-mono">Age: {player.age}</p>
                         </div>
                       </div>
                     </div>
@@ -438,17 +436,17 @@ export default function BestXIPage() {
             {/* Team Strengths */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Sector Strengths */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-black mb-4">Sector Strengths</h2>
+              <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
+                <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Sector Strengths</h2>
                 <div className="space-y-4">
                   {Object.entries(analysis.sectorStrengths).map(([sector, data]) => (
-                    <div key={sector} className="bg-gray-50 p-4 rounded-lg">
+                    <div key={sector} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
                       <div className="flex justify-between items-center">
-                        <h3 className="font-semibold text-black">{sector}</h3>
-                        <p className="text-sm text-gray-600">Players: {data.count}</p>
+                        <h3 className="font-semibold text-[#dde1e0] font-mono">{sector}</h3>
+                        <p className="text-sm text-[#a78968] font-mono">Players: {data.count}</p>
                       </div>
                       {data.message && (
-                        <p className="mt-2 text-sm text-red-600">{data.message}</p>
+                        <p className="mt-2 text-sm text-[#a78968] font-mono">{data.message}</p>
                       )}
                     </div>
                   ))}
@@ -456,17 +454,17 @@ export default function BestXIPage() {
               </div>
 
               {/* Position Strengths */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-black mb-4">Position Strengths</h2>
+              <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
+                <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Position Strengths</h2>
                 <div className="space-y-4">
                   {Object.entries(analysis.positionStrengths).map(([position, data]) => (
-                    <div key={position} className="bg-gray-50 p-4 rounded-lg">
+                    <div key={position} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
                       <div className="flex justify-between items-center">
-                        <h3 className="font-semibold text-black">{position}</h3>
-                        <p className="text-sm text-gray-600">Players: {data.count}</p>
+                        <h3 className="font-semibold text-[#dde1e0] font-mono">{position}</h3>
+                        <p className="text-sm text-[#a78968] font-mono">Players: {data.count}</p>
                       </div>
                       {data.message && (
-                        <p className="mt-2 text-sm text-red-600">{data.message}</p>
+                        <p className="mt-2 text-sm text-[#a78968] font-mono">{data.message}</p>
                       )}
                     </div>
                   ))}

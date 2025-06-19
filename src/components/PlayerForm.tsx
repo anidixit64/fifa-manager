@@ -50,6 +50,11 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
       role: 'S',
       alternatePositions: [],
       overall: 50,
+      preferred_foot: 'Right',
+      stats: {
+        goals: 0,
+        assists: 0,
+      },
       attributes: {
         pace: 50,
         shooting: 50,
@@ -171,15 +176,15 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg p-8 w-full max-w-2xl shadow-xl">
-        <h2 className="text-2xl font-bold text-black mb-6">
+    <div className="fixed inset-0 bg-[#3c5c34]/80 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
+      <div className="bg-[#dde1e0]/95 backdrop-blur-sm rounded-lg p-8 w-full max-w-2xl shadow-xl border border-[#dde1e0]/20">
+        <h2 className="text-2xl font-bold text-[#3c5c34] mb-6 font-mono">
           {initialData ? 'Edit Player' : 'Add Player'}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="relative">
-              <label htmlFor="name" className="block text-sm font-medium text-black mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-[#644d36] mb-2 font-mono">
                 Name
               </label>
               <input
@@ -187,17 +192,17 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
                 id="name"
                 value={formData.name}
                 onChange={handleNameChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black bg-gray-50"
+                className="w-full px-4 py-2 border border-[#a8b8a7]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a8b8a7] text-[#3c5c34] bg-[#dde1e0]/50"
                 required
               />
               {playerSuggestions.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                <div className="absolute z-10 w-full mt-1 bg-[#dde1e0]/95 border border-[#a8b8a7]/30 rounded-md shadow-lg">
                   {playerSuggestions.map((player, index) => (
                     <button
                       key={index}
                       type="button"
                       onClick={() => handlePlayerSuggestionClick(player)}
-                      className="w-full px-4 py-2 text-left text-black hover:bg-gray-100 focus:outline-none"
+                      className="w-full px-4 py-2 text-left text-[#3c5c34] hover:bg-[#a8b8a7]/20 focus:outline-none font-mono"
                     >
                       {player.long_name}
                     </button>
@@ -207,14 +212,14 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
             </div>
 
             <div>
-              <label htmlFor="age" className="block text-sm font-medium text-black mb-2">
+              <label htmlFor="age" className="block text-sm font-medium text-[#644d36] mb-2 font-mono">
                 Age
               </label>
               <select
                 id="age"
                 value={formData.age}
                 onChange={(e) => setFormData({ ...formData, age: parseInt(e.target.value) })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black bg-gray-50"
+                className="w-full px-4 py-2 border border-[#a8b8a7]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a8b8a7] text-[#3c5c34] bg-[#dde1e0]/50"
                 required
               >
                 {Array.from({ length: 33 }, (_, i) => i + 18).map((age) => (
@@ -226,7 +231,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
             </div>
 
             <div className="relative">
-              <label htmlFor="nationality" className="block text-sm font-medium text-black mb-2">
+              <label htmlFor="nationality" className="block text-sm font-medium text-[#644d36] mb-2 font-mono">
                 Nationality
               </label>
               <input
@@ -234,17 +239,17 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
                 id="nationality"
                 value={formData.nationality}
                 onChange={handleCountryChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black bg-gray-50"
+                className="w-full px-4 py-2 border border-[#a8b8a7]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a8b8a7] text-[#3c5c34] bg-[#dde1e0]/50"
                 required
               />
               {countrySuggestions.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                <div className="absolute z-10 w-full mt-1 bg-[#dde1e0]/95 border border-[#a8b8a7]/30 rounded-md shadow-lg">
                   {countrySuggestions.map((country, index) => (
                     <button
                       key={index}
                       type="button"
                       onClick={() => handleCountrySuggestionClick(country)}
-                      className="w-full px-4 py-2 text-left text-black hover:bg-gray-100 focus:outline-none"
+                      className="w-full px-4 py-2 text-left text-[#3c5c34] hover:bg-[#a8b8a7]/20 focus:outline-none font-mono"
                     >
                       {country.Country}
                     </button>
@@ -254,14 +259,14 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
             </div>
 
             <div>
-              <label htmlFor="position" className="block text-sm font-medium text-black mb-2">
+              <label htmlFor="position" className="block text-sm font-medium text-[#644d36] mb-2 font-mono">
                 Position
               </label>
               <select
                 id="position"
                 value={formData.mainPosition}
                 onChange={(e) => setFormData({ ...formData, mainPosition: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black bg-gray-50"
+                className="w-full px-4 py-2 border border-[#a8b8a7]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a8b8a7] text-[#3c5c34] bg-[#dde1e0]/50"
                 required
               >
                 {POSITIONS.map((pos) => (
@@ -273,14 +278,14 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
             </div>
 
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-black mb-2">
+              <label htmlFor="role" className="block text-sm font-medium text-[#644d36] mb-2 font-mono">
                 Role
               </label>
               <select
                 id="role"
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value as PlayerRole })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black bg-gray-50"
+                className="w-full px-4 py-2 border border-[#a8b8a7]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a8b8a7] text-[#3c5c34] bg-[#dde1e0]/50"
                 required
               >
                 {ROLES.map((role) => (
@@ -293,18 +298,18 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
           </div>
 
           <div>
-            <h3 className="text-lg font-medium text-black mb-4">Attributes</h3>
+            <h3 className="text-lg font-medium text-[#3c5c34] mb-4 font-mono">Attributes</h3>
             <div className="grid grid-cols-3 gap-6">
               {Object.entries(formData.attributes).map(([attr, value]) => (
                 <div key={attr} className="flex flex-col space-y-2">
-                  <label htmlFor={attr} className="block text-sm font-medium text-black">
+                  <label htmlFor={attr} className="block text-sm font-medium text-[#644d36] font-mono">
                     {attr.charAt(0).toUpperCase() + attr.slice(1)}
                   </label>
                   <div className="flex items-center space-x-2">
                     <button
                       type="button"
                       onClick={() => handleAttributeChange(attr as keyof Player['attributes'], value - 1)}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-200 text-gray-600 hover:bg-gray-300 active:scale-95 transition-all"
+                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30"
                     >
                       -
                     </button>
@@ -315,12 +320,12 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
                       max="99"
                       value={value}
                       onChange={(e) => handleAttributeChange(attr as keyof Player['attributes'], parseInt(e.target.value))}
-                      className="w-16 px-2 py-1 text-center border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black bg-gray-50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className="w-16 px-2 py-1 text-center border border-[#a8b8a7]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a8b8a7] text-[#3c5c34] bg-[#dde1e0]/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                     <button
                       type="button"
                       onClick={() => handleAttributeChange(attr as keyof Player['attributes'], value + 1)}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-200 text-gray-600 hover:bg-gray-300 active:scale-95 transition-all"
+                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30"
                     >
                       +
                     </button>
@@ -334,13 +339,13 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
             <button
               type="button"
               onClick={onCancel}
-              className="px-6 py-2 text-black hover:text-gray-700 active:scale-95 transition-transform"
+              className="px-6 py-2 bg-[#a78968]/20 text-[#a78968] rounded-lg hover:bg-[#a78968]/30 active:scale-95 transition-all border border-[#a78968]/30 font-mono"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:scale-95 transition-transform"
+              className="px-6 py-2 bg-[#a8b8a7] text-[#dde1e0] rounded-lg hover:bg-[#8fa08e] active:scale-95 transition-all font-mono"
             >
               {initialData ? 'Update Player' : 'Add Player'}
             </button>
