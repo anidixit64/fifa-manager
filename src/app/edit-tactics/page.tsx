@@ -41,6 +41,38 @@ interface PositionPriority {
   priorities: Attribute[];
 }
 
+interface Formation {
+  name: string;
+  positions: Record<Position, number>;
+}
+
+const FORMATIONS: Formation[] = [
+  {
+    name: '4-3-3',
+    positions: {
+      RB: 1, RWB: 0, CB: 2, LB: 1, LWB: 0, CM: 2, RM: 0, LM: 0, CDM: 0, CAM: 1, RF: 0, RW: 1, LF: 0, LW: 1, ST: 1, CF: 0,
+    }
+  },
+  {
+    name: '4-2-3-1',
+    positions: {
+      RB: 1, RWB: 0, CB: 2, LB: 1, LWB: 0, CM: 0, RM: 0, LM: 0, CDM: 2, CAM: 1, RF: 0, RW: 1, LF: 0, LW: 1, ST: 1, CF: 0,
+    }
+  },
+  {
+    name: '4-4-2',
+    positions: {
+      RB: 1, RWB: 0, CB: 2, LB: 1, LWB: 0, CM: 2, RM: 1, LM: 1, CDM: 0, CAM: 0, RF: 0, RW: 0, LF: 0, LW: 0, ST: 2, CF: 0,
+    }
+  },
+  {
+    name: '5-3-2',
+    positions: {
+      RB: 0, RWB: 1, CB: 3, LB: 0, LWB: 1, CM: 2, RM: 0, LM: 0, CDM: 0, CAM: 1, RF: 0, RW: 0, LF: 0, LW: 0, ST: 2, CF: 0,
+    }
+  },
+];
+
 const DEFAULT_COUNTS: Record<Position, number> = {
   RB: 0,
   RWB: 0,
@@ -67,6 +99,7 @@ export default function EditTacticsPage() {
   const [positionPriorities, setPositionPriorities] = useLocalStorage<PositionPriority[]>('positionPriorities', []);
   const [toggledPositions, setToggledPositions] = useState<Set<TogglePosition>>(new Set());
   const [isClient, setIsClient] = useState(false);
+  const [selectedFormation, setSelectedFormation] = useState<string>('');
   const styles = useTeamThemeStyles();
 
   // Set isClient to true after mount
@@ -152,6 +185,18 @@ export default function EditTacticsPage() {
     setPositionCounts(newCounts);
   };
 
+  const applyFormation = (formationName: string) => {
+    const formation = FORMATIONS.find(f => f.name === formationName);
+    if (!formation) return;
+    
+    const newCounts = POSITIONS.map(pos => ({
+      position: pos,
+      count: formation.positions[pos]
+    }));
+    setPositionCounts(newCounts);
+    setSelectedFormation(formationName);
+  };
+
   const updatePositionPriority = (position: Position, attribute: Attribute) => {
     const positionPriority = positionPriorities.find((pp) => pp.position === position);
     if (!positionPriority) return;
@@ -223,6 +268,36 @@ export default function EditTacticsPage() {
           {/* Sidebar */}
           <div className="lg:col-span-3 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-[#a78968]/30">
             <h2 className="text-xl font-bold mb-4 text-[#dde1e0] font-mono tracking-wider">Position Counts</h2>
+            
+            {/* Formation Dropdown */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-[#a78968] mb-2 font-mono">Quick Formation</label>
+              <select
+                value={selectedFormation}
+                onChange={(e) => applyFormation(e.target.value)}
+                className="w-full px-3 py-2 bg-[#dde1e0]/10 border border-[#a78968]/30 rounded-lg text-[#dde1e0] font-mono focus:outline-none focus:border-[#a78968] focus:ring-1 focus:ring-[#a78968] transition-colors"
+              >
+                <option value="">Select Formation</option>
+                {FORMATIONS.map((formation) => (
+                  <option key={formation.name} value={formation.name} className="bg-[#3c5c34] text-[#dde1e0]">
+                    {formation.name}
+                  </option>
+                ))}
+              </select>
+              
+              {selectedFormation && (
+                <button
+                  onClick={() => {
+                    setSelectedFormation('');
+                    handleReset();
+                  }}
+                  className="mt-2 w-full px-3 py-1 text-xs bg-[#644d36]/30 hover:bg-[#644d36]/50 text-[#dde1e0] font-mono rounded transition-colors"
+                >
+                  Clear Formation
+                </button>
+              )}
+            </div>
+            
             <div className="space-y-2">
               {positionCounts.map(({ position, count }) => (
                 <div
@@ -331,4 +406,4 @@ export default function EditTacticsPage() {
       </div>
     </main>
   );
-} 
+}

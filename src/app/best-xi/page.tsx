@@ -212,7 +212,18 @@ export default function BestXIPage() {
 
     // Rate players for each position
     const playerRatings: PlayerRating[] = [];
-    POSITIONS.forEach(position => {
+    
+    // Only rate players for positions that are configured in tactics
+    const tacticsPositions = positionCounts
+      .filter(pc => pc.count > 0)
+      .map(pc => pc.position);
+    
+    // Always include GK if there are GK players
+    const positionsToRate = players.some(p => p.mainPosition === 'GK') 
+      ? ['GK', ...tacticsPositions]
+      : tacticsPositions;
+    
+    positionsToRate.forEach(position => {
       players.forEach(player => {
         if (player.mainPosition === position) {
           const rating = position === 'GK' 
@@ -248,7 +259,13 @@ export default function BestXIPage() {
 
     // Analyze position strengths
     const positionStrengths: TeamAnalysis['positionStrengths'] = {};
-    POSITIONS.forEach(position => {
+    
+    // Only analyze positions that the user has set in edit tactics
+    const configuredPositions = positionCounts
+      .filter(pc => pc.count > 0)
+      .map(pc => pc.position);
+    
+    configuredPositions.forEach(position => {
       const positionPlayers = players.filter(p => p.mainPosition === position);
       const count = positionPlayers.length;
       
@@ -259,13 +276,11 @@ export default function BestXIPage() {
 
       let message: string | undefined;
       if (count === 0) {
-        message = `No ${position} players`;
+        message = `No players at ${position}`;
+      } else if (count < 2) {
+        message = `Need more players at ${position}`;
       } else if (!hasProspect) {
-        message = `No prospect ${position} players`;
-      } else if (!hasVeteran && !hasNormal) {
-        message = `Only prospects at ${position}`;
-      } else if (hasAging && count <= 2) {
-        message = `Aging players at ${position}`;
+        message = `Need ${position} prospects`;
       }
 
       positionStrengths[position] = {

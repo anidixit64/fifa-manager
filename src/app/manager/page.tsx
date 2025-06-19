@@ -79,6 +79,11 @@ export default function ManagerPage() {
   };
 
   const analyzeTeam = () => {
+    // Check if user has exactly 10 players selected
+    if (!hasValidTactics()) {
+      alert(getTacticsValidationMessage());
+      return;
+    }
     const formationSlots = {
       '4-3-3': {
         GK: 1,
@@ -150,6 +155,36 @@ export default function ManagerPage() {
       avgOverall: Math.round(totalOverall / players.length),
       avgAge: Math.round(totalAge / players.length),
     };
+  };
+
+  // Check if user has exactly 10 players selected for tactics
+  const hasValidTactics = () => {
+    if (typeof window === 'undefined') return false;
+    if (players.length === 0) return false;
+    const storedPositionCounts = localStorage.getItem("positionCounts");
+    if (!storedPositionCounts) return false;
+    try {
+      const positionCounts = JSON.parse(storedPositionCounts);
+      const totalCount = positionCounts.reduce((sum: number, pc: any) => sum + pc.count, 0);
+      return totalCount === 10;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  // Get the reason why tactics are invalid
+  const getTacticsValidationMessage = () => {
+    if (players.length === 0) return 'Add players to your squad first';
+    const storedPositionCounts = localStorage.getItem("positionCounts");
+    if (!storedPositionCounts) return 'Configure tactics in Edit Tactics first';
+    try {
+      const positionCounts = JSON.parse(storedPositionCounts);
+      const totalCount = positionCounts.reduce((sum: number, pc: any) => sum + pc.count, 0);
+      if (totalCount !== 10) return `Select exactly 10 players (currently ${totalCount}/10)`;
+      return '';
+    } catch (error) {
+      return 'Configure tactics in Edit Tactics first';
+    }
   };
 
   const stats = calculateTeamStats();
@@ -333,21 +368,29 @@ export default function ManagerPage() {
                 </button>
                 <button
                   onClick={analyzeTeam}
-                  className="w-full relative group px-4 py-3 text-[#dde1e0] overflow-hidden font-mono"
+                  disabled={!hasValidTactics()}
+                  className={`w-full relative group px-4 py-3 text-[#dde1e0] overflow-hidden font-mono ${
+                    !hasValidTactics() ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                  title={getTacticsValidationMessage()}
                 >
                   {/* Button background */}
-                  <div className="absolute inset-0 bg-[#a78968] group-hover:bg-[#8f7a5a] transition-colors"></div>
+                  <div className={`absolute inset-0 transition-colors ${
+                    hasValidTactics() ? 'bg-[#a78968] group-hover:bg-[#8f7a5a]' : 'bg-[#644d36]/50'
+                  }`}></div>
                   
                   {/* Button border */}
                   <div className="absolute inset-0 border-2 border-[#dde1e0]"></div>
                   
                   {/* Button text */}
                   <span className="relative z-10 tracking-wider">
-                    Analyze Team
+                    {hasValidTactics() ? 'Analyze Team' : getTacticsValidationMessage()}
                   </span>
 
                   {/* Hover effect */}
-                  <div className="absolute inset-0 bg-[#dde1e0]/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                  {hasValidTactics() && (
+                    <div className="absolute inset-0 bg-[#dde1e0]/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                  )}
                 </button>
               </div>
             </div>
