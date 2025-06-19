@@ -343,21 +343,251 @@ export default function BestXIPage() {
             {/* Best XI */}
             <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
               <h2 className="text-2xl font-bold text-[#dde1e0] font-mono tracking-wider mb-6">Best XI</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {analysis.bestXI.map(({ player, position }) => (
-                  <div key={player.id} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
-                        <p className="text-sm text-[#a78968] font-mono">{position}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-[#a78968] font-mono">{player.overall}</p>
-                        <p className="text-sm text-[#644d36] font-mono">{player.role}</p>
-                      </div>
-                    </div>
+              
+              {/* Best XI Row Layout */}
+              <div className="space-y-6">
+                {/* Row 6: RW, ST, CF, LW */}
+                <div className="flex justify-between items-center w-full min-h-[70px]">
+                  {/* Left wing positions */}
+                  <div className="flex space-x-2">
+                    {analysis.bestXI
+                      .filter(({ position }) => position === 'LW')
+                      .map(({ player, position }) => (
+                        <div
+                          key={player.id}
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                        >
+                          <div className="text-center">
+                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
+                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          </div>
+                        </div>
+                      ))}
                   </div>
-                ))}
+
+                  {/* Center positions */}
+                  <div className="flex justify-center space-x-2">
+                    {analysis.bestXI
+                      .filter(({ position }) => ['ST', 'CF'].includes(position))
+                      .sort((a, b) => {
+                        const order = { 'ST': 0, 'CF': 1 };
+                        return order[a.position as keyof typeof order] - order[b.position as keyof typeof order];
+                      })
+                      .map(({ player, position }) => (
+                        <div
+                          key={player.id}
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                        >
+                          <div className="text-center">
+                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
+                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* Right wing positions */}
+                  <div className="flex space-x-2">
+                    {analysis.bestXI
+                      .filter(({ position }) => position === 'RW')
+                      .map(({ player, position }) => (
+                        <div
+                          key={player.id}
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                        >
+                          <div className="text-center">
+                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
+                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Row 5: CAM */}
+                <div className="flex justify-center w-full min-h-[70px]">
+                  <div className="flex justify-center space-x-2">
+                    {analysis.bestXI
+                      .filter(({ position }) => position === 'CAM')
+                      .map(({ player, position }) => (
+                        <div
+                          key={player.id}
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                        >
+                          <div className="text-center">
+                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
+                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Row 4: RM, CM, LM */}
+                <div className="flex justify-between items-center w-full min-h-[70px]">
+                  {/* Left midfield */}
+                  <div className="flex space-x-2">
+                    {analysis.bestXI
+                      .filter(({ position }) => position === 'LM')
+                      .map(({ player, position }) => (
+                        <div
+                          key={player.id}
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                        >
+                          <div className="text-center">
+                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
+                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* Center midfield */}
+                  <div className="flex justify-center space-x-2">
+                    {analysis.bestXI
+                      .filter(({ position }) => position === 'CM')
+                      .map(({ player, position }) => (
+                        <div
+                          key={player.id}
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                        >
+                          <div className="text-center">
+                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
+                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* Right midfield */}
+                  <div className="flex space-x-2">
+                    {analysis.bestXI
+                      .filter(({ position }) => position === 'RM')
+                      .map(({ player, position }) => (
+                        <div
+                          key={player.id}
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                        >
+                          <div className="text-center">
+                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
+                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Row 3: CDM */}
+                <div className="flex justify-center w-full min-h-[70px]">
+                  <div className="flex justify-center space-x-2">
+                    {analysis.bestXI
+                      .filter(({ position }) => position === 'CDM')
+                      .map(({ player, position }) => (
+                        <div
+                          key={player.id}
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                        >
+                          <div className="text-center">
+                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
+                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Row 2: RWB, RB, CB, LB, LWB */}
+                <div className="flex justify-between items-center w-full min-h-[70px]">
+                  {/* Left back positions */}
+                  <div className="flex space-x-2">
+                    {analysis.bestXI
+                      .filter(({ position }) => ['LB', 'LWB'].includes(position))
+                      .sort((a, b) => {
+                        const order = { 'LB': 0, 'LWB': 1 };
+                        return order[a.position as keyof typeof order] - order[b.position as keyof typeof order];
+                      })
+                      .map(({ player, position }) => (
+                        <div
+                          key={player.id}
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                        >
+                          <div className="text-center">
+                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
+                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* Center back positions */}
+                  <div className="flex justify-center space-x-2">
+                    {analysis.bestXI
+                      .filter(({ position }) => position === 'CB')
+                      .map(({ player, position }) => (
+                        <div
+                          key={player.id}
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                        >
+                          <div className="text-center">
+                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
+                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* Right back positions */}
+                  <div className="flex space-x-2">
+                    {analysis.bestXI
+                      .filter(({ position }) => ['RB', 'RWB'].includes(position))
+                      .sort((a, b) => {
+                        const order = { 'RB': 0, 'RWB': 1 };
+                        return order[a.position as keyof typeof order] - order[b.position as keyof typeof order];
+                      })
+                      .map(({ player, position }) => (
+                        <div
+                          key={player.id}
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                        >
+                          <div className="text-center">
+                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
+                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Row 1: GK */}
+                <div className="flex justify-center w-full min-h-[70px]">
+                  <div className="flex justify-center space-x-2">
+                    {analysis.bestXI
+                      .filter(({ position }) => position === 'GK')
+                      .map(({ player, position }) => (
+                        <div
+                          key={player.id}
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                        >
+                          <div className="text-center">
+                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
+                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
               </div>
             </div>
 
