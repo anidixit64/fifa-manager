@@ -21,6 +21,7 @@ export interface Player {
   role: PlayerRole;
   attributes: PlayerAttributes;
   overall: number;
+  potential: number;
   preferred_foot: 'Left' | 'Right';
   stats: {
     goals: number;

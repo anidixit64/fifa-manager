@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import PlayerForm from '@/components/PlayerForm';
 import PlayerList from '@/components/PlayerList';
-import TeamStats from '@/components/TeamStats';
 import { Player, PositionCategory, POSITION_CATEGORIES } from '@/types/player';
 import { useTeamTheme } from '@/contexts/TeamThemeContext';
 
@@ -23,13 +22,11 @@ interface Team {
 
 export default function ManagerPage() {
   const router = useRouter();
-  const [teams, setTeams] = useLocalStorage<Team[]>('fifaTeams', []);
   const [selectedTeam] = useLocalStorage<Team | null>('selectedTeam', null);
   const [players, setPlayers] = useLocalStorage<Player[]>('fifaPlayers', []);
   const [showPlayerForm, setShowPlayerForm] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
-  const [formation, setFormation] = useLocalStorage<string>('formation', '4-4-2');
-  const [bestXI, setBestXI] = useState<Player[]>([]);
+  const [formation] = useLocalStorage<string>('formation', '4-4-2');
   const [isLoading, setIsLoading] = useState(true);
   const { setTheme } = useTeamTheme();
 
@@ -143,7 +140,6 @@ export default function ManagerPage() {
       usedPlayerIds.add(fwdPlayers[i].id);
     }
 
-    setBestXI(selectedPlayers);
     router.push('/best-xi');
   };
 
@@ -165,7 +161,7 @@ export default function ManagerPage() {
     if (!storedPositionCounts) return false;
     try {
       const positionCounts = JSON.parse(storedPositionCounts);
-      const totalCount = positionCounts.reduce((sum: number, pc: any) => sum + pc.count, 0);
+      const totalCount = positionCounts.reduce((sum: number, pc: { count: number }) => sum + pc.count, 0);
       return totalCount === 10;
     } catch (error) {
       return false;
@@ -179,7 +175,7 @@ export default function ManagerPage() {
     if (!storedPositionCounts) return 'Configure tactics in Edit Tactics first';
     try {
       const positionCounts = JSON.parse(storedPositionCounts);
-      const totalCount = positionCounts.reduce((sum: number, pc: any) => sum + pc.count, 0);
+      const totalCount = positionCounts.reduce((sum: number, pc: { count: number }) => sum + pc.count, 0);
       if (totalCount !== 10) return `Select exactly 10 players (currently ${totalCount}/10)`;
       return '';
     } catch (error) {

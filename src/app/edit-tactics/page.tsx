@@ -100,7 +100,6 @@ export default function EditTacticsPage() {
   const [toggledPositions, setToggledPositions] = useState<Set<TogglePosition>>(new Set());
   const [isClient, setIsClient] = useState(false);
   const [selectedFormation, setSelectedFormation] = useState<string>('');
-  const styles = useTeamThemeStyles();
 
   // Set isClient to true after mount
   useEffect(() => {

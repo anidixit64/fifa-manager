@@ -144,6 +144,15 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
     onUpdatePlayer(updatedPlayer);
   };
 
+  const updatePotential = (player: Player, delta: number) => {
+    const newPotential = Math.max(0, Math.min(99, player.potential + delta));
+    const updatedPlayer = {
+      ...player,
+      potential: newPotential
+    };
+    onUpdatePlayer(updatedPlayer);
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-bold text-[#dde1e0] font-mono">Squad</h2>

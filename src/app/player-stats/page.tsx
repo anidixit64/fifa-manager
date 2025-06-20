@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import { Player, PositionCategory, POSITION_CATEGORIES } from '@/types/player';
+import { Player, POSITION_CATEGORIES } from '@/types/player';
 
 interface Team {
   id: string;
@@ -81,10 +81,6 @@ export default function PlayerStatsPage() {
   };
 
   const calculateStatsScore = (player: Player): { positionScore: number; sectorScore: number; combinedScore: number } => {
-    const weights = POSITION_WEIGHTS[player.mainPosition as keyof typeof POSITION_WEIGHTS] || { goals: 0.5, assists: 0.5 };
-    const goals = player.stats?.goals || 0;
-    const assists = player.stats?.assists || 0;
-    
     // Get all non-GK players
     const allPlayers = players.filter(p => p.mainPosition !== 'GK');
     

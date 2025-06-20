@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import { Player, PositionCategory, POSITION_CATEGORIES } from '@/types/player';
+import { Player } from '@/types/player';
 
 interface Team {
   id: string;
@@ -56,12 +56,6 @@ interface TeamAnalysis {
   };
 }
 
-const POSITIONS = [
-  'GK', 'LB', 'CB', 'RB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST'
-];
-
-const ATTRIBUTES = ['Pace', 'Shooting', 'Passing', 'Dribbling', 'Defending', 'Physical'];
-
 const ROLE_WEIGHTS = {
   'C': 1.0,  // Crucial
   'I': 0.8,  // Important
@@ -75,15 +69,6 @@ const SECTORS = {
   'Midfield': ['CDM', 'CM', 'CAM', 'LM', 'RM'],
   'Forward': ['LW', 'RW', 'ST'],
   'Goalkeeper': ['GK']
-};
-
-const BENCH_REQUIREMENTS = {
-  'GK': 1,
-  'Fullback': ['LB', 'RB'],
-  'CB': 1,
-  'Mid': ['CDM', 'CM', 'CAM', 'LM', 'RM'],
-  'Winger': ['LW', 'RW'],
-  'Striker': ['ST']
 };
 
 export default function BestXIPage() {
@@ -161,6 +146,10 @@ export default function BestXIPage() {
     const roleWeight = ROLE_WEIGHTS[player.role] || 0.2;
     rating += roleWeight * 0.15;
 
+    // Potential boost - slight boost for higher potential
+    const potentialBoost = (player.potential - player.overall) * 0.02; // 2% boost per point of potential above overall
+    rating += Math.max(0, potentialBoost);
+
     // Foot preference boost for wing positions
     if (TOGGLE_POSITIONS.includes(position as TogglePosition)) {
       const isInverted = toggledPositions.has(position as TogglePosition);
@@ -194,6 +183,10 @@ export default function BestXIPage() {
     const roleWeight = ROLE_WEIGHTS[player.role] || 0.2;
     rating += roleWeight * 0.25;
 
+    // Potential boost - slight boost for higher potential
+    const potentialBoost = (player.potential - player.overall) * 0.02; // 2% boost per point of potential above overall
+    rating += Math.max(0, potentialBoost);
+
     return rating;
   };
 
@@ -205,9 +198,6 @@ export default function BestXIPage() {
     // Calculate standard deviations
     const ageStdDev = Math.sqrt(
       players.reduce((sum, p) => sum + Math.pow(p.age - avgAge, 2), 0) / players.length
-    );
-    const overallStdDev = Math.sqrt(
-      players.reduce((sum, p) => sum + Math.pow(p.overall - avgOverall, 2), 0) / players.length
     );
 
     // Rate players for each position
@@ -268,7 +258,7 @@ export default function BestXIPage() {
     configuredPositions.forEach(position => {
       const positionPlayers = players.filter(p => p.mainPosition === position);
       const count = positionPlayers.length;
-      
+
       const hasProspect = positionPlayers.some(p => p.age < avgAge - ageStdDev);
       const hasVeteran = positionPlayers.some(p => p.age > 30);
       const hasNormal = positionPlayers.some(p => p.age >= avgAge - ageStdDev && p.age <= avgAge + ageStdDev);
@@ -544,7 +534,7 @@ export default function BestXIPage() {
                           </div>
                         </div>
                       ))}
-                  </div>
+                      </div>
 
                   {/* Right back positions */}
                   <div className="flex space-x-2">
@@ -563,7 +553,7 @@ export default function BestXIPage() {
                             <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
                             <p className="text-xs text-[#a78968] font-mono">{position}</p>
                             <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                      </div>
                         </div>
                       ))}
                   </div>
@@ -583,9 +573,9 @@ export default function BestXIPage() {
                             <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
                             <p className="text-xs text-[#a78968] font-mono">{position}</p>
                             <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
-                        </div>
-                      ))}
+                    </div>
+                  </div>
+                ))}
                   </div>
                 </div>
               </div>

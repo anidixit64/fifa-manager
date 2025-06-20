@@ -18,6 +18,7 @@ interface PlayerSuggestion {
   long_name: string;
   short_name: string;
   nationality_name: string;
+  potential: string;
 }
 
 const POSITIONS = [
@@ -49,7 +50,8 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
       mainPosition: 'ST',
       role: 'S',
       alternatePositions: [],
-      overall: 50,
+      overall: 0,
+      potential: 50,
       preferred_foot: 'Right',
       stats: {
         goals: 0,
@@ -69,6 +71,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
   const [allCountries, setAllCountries] = useState<Country[]>([]);
   const [playerSuggestions, setPlayerSuggestions] = useState<PlayerSuggestion[]>([]);
   const [allPlayers, setAllPlayers] = useState<PlayerSuggestion[]>([]);
+  const [overallFocused, setOverallFocused] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -130,7 +133,8 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
       name: player.long_name,
       shortName: player.short_name,
       nationality: player.nationality_name,
-      fifaCode: country?.FIFA || ''
+      fifaCode: country?.FIFA || '',
+      potential: parseInt(player.potential) || 50
     }));
     setPlayerSuggestions([]);
   };
@@ -161,9 +165,9 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Calculate overall from attributes if no overall is entered
+    // Calculate overall from attributes if overall is explicitly 0 (user left it blank)
     let finalOverall = formData.overall;
-    if (!finalOverall || finalOverall === 0) {
+    if (finalOverall === 0) {
       const avgAttribute = Object.values(formData.attributes).reduce((sum, val) => sum + val, 0) / 
         Object.keys(formData.attributes).length;
       finalOverall = Math.round(avgAttribute);
@@ -319,10 +323,15 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
                 id="overall"
                 min="0"
                 max="99"
-                value={formData.overall}
-                onChange={(e) => setFormData({ ...formData, overall: parseInt(e.target.value) || 0 })}
+                value={overallFocused ? (formData.overall || '') : (formData.overall || 50)}
+                onChange={(e) => {
+                  const value = e.target.value === '' ? 0 : parseInt(e.target.value);
+                  setFormData({ ...formData, overall: value });
+                }}
                 className="w-full px-4 py-2 border border-[#a8b8a7]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a8b8a7] text-[#3c5c34] bg-[#dde1e0]/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 placeholder="Leave empty to calculate from attributes"
+                onFocus={() => setOverallFocused(true)}
+                onBlur={() => setOverallFocused(false)}
               />
             </div>
           </div>
