@@ -25,7 +25,7 @@ export default function TeamStats({ players }: TeamStatsProps) {
     shooting: calculateAverage(players.map(p => p.attributes.shooting)),
     dribbling: calculateAverage(players.map(p => p.attributes.dribbling)),
     pace: calculateAverage(players.map(p => p.attributes.pace)),
-    strength: calculateAverage(players.map(p => p.attributes.strength)),
+    physical: calculateAverage(players.map(p => p.attributes.physical)),
     defending: calculateAverage(players.map(p => p.attributes.defending)),
   };
 
