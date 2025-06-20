@@ -1,36 +1,200 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FIFA Manager
 
-## Getting Started
+A comprehensive football team management application built with Next.js, TypeScript, and Tailwind CSS. Create teams, manage players, analyze tactics, and build your dream squad with advanced statistics and Best XI analysis.
 
-First, run the development server:
+🌐 **Live Demo**: [https://fifa-manager-rtib.vercel.app](https://fifa-manager-rtib.vercel.app)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Features
+
+### Team Management
+- **Create Custom Teams**: Build your own football team with custom logos and themes
+- **Team Selection**: Choose from a database of real football teams with autocomplete suggestions
+- **Team Theming**: Automatic color extraction from team logos for consistent branding
+- **Team Switching**: Easily switch between different teams
+
+### Player Management
+- **Player Database**: Access to a comprehensive database of real football players
+- **Player Creation**: Add custom players with detailed attributes
+- **Player Statistics**: Track goals, assists, and performance metrics
+- **Player Potential**: Advanced scoring system that considers player potential for Best XI selection
+- **Attribute System**: Manage pace, shooting, passing, dribbling, defending, and physical attributes
+
+### Tactical Analysis
+- **Formation Editor**: Configure custom formations with position-specific player counts
+- **Position Priorities**: Set attribute priorities for each position (e.g., pace for wingers, defending for center-backs)
+- **Tactical Flexibility**: Support for inverted wingers and position-specific tactics
+- **Formation Presets**: Quick setup with popular formations (4-3-3, 4-4-2, 3-5-2)
+
+### Best XI Analysis
+- **Intelligent Selection**: Advanced algorithm that considers:
+  - Player overall rating
+  - Position-specific attribute priorities
+  - Age and experience factors
+  - Player potential for future development
+  - Role importance (Crucial, Important, Rotation, Squad, Prospect)
+  - Preferred foot for wing positions
+- **Bench Selection**: Automatic selection of substitute players
+- **Team Analysis**: Comprehensive breakdown of team strengths and weaknesses
+- **Position Analysis**: Detailed analysis of each position's depth and quality
+
+### Statistics & Analytics
+- **Player Performance**: Track individual player statistics and performance scores
+- **Team Statistics**: Overall team ratings, average age, and squad size
+- **Position-based Scoring**: Weighted scoring system based on position requirements
+- **Sector Analysis**: Defense, midfield, and forward line strength assessment
+
+## 🛠️ Technology Stack
+
+### Frontend
+- **Next.js 15.3.3**: React framework with App Router
+- **TypeScript**: Type-safe development
+- **Tailwind CSS**: Utility-first CSS framework
+- **React Hooks**: State management and side effects
+
+### Data Management
+- **Local Storage**: Persistent data storage for teams and players
+- **JSON Data**: Real football data from FIFA database
+- **Custom Hooks**: Reusable logic for data management
+
+### Styling & UI
+- **Custom Color Scheme**: Forest green (#3c5c34), light gray (#dde1e0), and accent colors
+- **Responsive Design**: Mobile-first approach with responsive layouts
+- **Smooth Animations**: CSS transitions and custom animations
+- **Modern UI**: Clean, professional interface with soccer-themed elements
+
+### Deployment
+- **Vercel**: Production deployment and hosting
+- **GitHub**: Version control and CI/CD
+
+## 📁 Project Structure
+
+```
+fifa-manager/
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── best-xi/           # Best XI analysis page
+│   │   ├── create-team/       # Team creation page
+│   │   ├── edit-tactics/      # Tactics configuration
+│   │   ├── manager/           # Main dashboard
+│   │   ├── player-stats/      # Player statistics
+│   │   └── page.tsx           # Landing page
+│   ├── components/            # Reusable React components
+│   │   ├── BestXI.tsx         # Best XI display component
+│   │   ├── PlayerForm.tsx     # Player creation/editing form
+│   │   ├── PlayerList.tsx     # Player list with sorting
+│   │   ├── TeamForm.tsx       # Team creation form
+│   │   └── TeamStats.tsx      # Team statistics display
+│   ├── contexts/              # React contexts
+│   │   └── TeamThemeContext.tsx
+│   ├── hooks/                 # Custom React hooks
+│   │   ├── useLocalStorage.ts
+│   │   └── useTeamThemeStyles.ts
+│   ├── types/                 # TypeScript type definitions
+│   │   └── player.ts
+│   └── utils/                 # Utility functions
+│       └── colorUtils.ts
+├── public/
+│   ├── data/                  # JSON data files
+│   │   ├── countries.json
+│   │   ├── players.json
+│   │   └── teams.json
+│   └── images/                # Static images
+└── package.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎮 How to Use
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Getting Started
+1. Visit [https://fifa-manager-rtib.vercel.app](https://fifa-manager-rtib.vercel.app)
+2. Click "START MANAGING" to begin
+3. Create or select a team from the available options
+4. Start building your squad by adding players
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Creating a Team
+1. Navigate to the Create Team page
+2. Enter a team name (with autocomplete suggestions)
+3. Optionally upload a team logo
+4. Click on your team card to proceed to management
 
-## Learn More
+### Adding Players
+1. In the Manager Dashboard, click "Add Player"
+2. Enter player details or search from the database
+3. Set player attributes and statistics
+4. Save the player to your squad
 
-To learn more about Next.js, take a look at the following resources:
+### Configuring Tactics
+1. Go to "Edit Tactics" from the Manager Dashboard
+2. Set the number of players for each position
+3. Configure position-specific attribute priorities
+4. Save your tactical configuration
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Analyzing Best XI
+1. Ensure you have exactly 10 players configured in tactics
+2. Click "Analyze Team" from the Manager Dashboard
+3. View your optimal starting lineup and bench
+4. Review detailed analysis of team strengths
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔧 Development
 
-## Deploy on Vercel
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/anidixit64/fifa-manager.git
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Navigate to project directory
+cd fifa-manager
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+### Available Scripts
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+```
+
+### Environment Setup
+The application uses local storage for data persistence, so no additional environment variables are required for basic functionality.
+
+## 📊 Data Sources
+
+- **Players Database**: Comprehensive FIFA player database with real player statistics
+- **Teams Database**: Real football teams with official names and data
+- **Countries Database**: FIFA country codes and national team information
+
+## 🎨 Design Philosophy
+
+The application follows a modern, clean design philosophy with:
+- **Soccer-themed aesthetics**: Green color scheme reminiscent of football fields
+- **Intuitive navigation**: Clear, logical flow between different sections
+- **Responsive design**: Works seamlessly on desktop and mobile devices
+- **Performance focus**: Optimized for fast loading and smooth interactions
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- FIFA for the comprehensive player and team data
+- Next.js team for the excellent framework
+- Vercel for seamless deployment and hosting
+- The football community for inspiration and feedback
+
+---
+
+**Ready to build your dream team?** Visit [https://fifa-manager-rtib.vercel.app](https://fifa-manager-rtib.vercel.app) and start managing! ⚽
