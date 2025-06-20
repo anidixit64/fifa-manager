@@ -1,5 +1,3 @@
-import { createWorker } from 'tesseract.js';
-
 export interface ColorTheme {
   primary: string;
   secondary: string;
