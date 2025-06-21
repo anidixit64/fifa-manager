@@ -25,7 +25,7 @@ def remove_duplicates_by_team_name(data_list):
             unique_list.append(item) # Optionally include non-dict items as is
             continue
 
-        team_name = item.get("Team Name") # Use .get() to avoid KeyError if field is missing
+        team_name = item.get("long_name") # Use .get() to avoid KeyError if field is missing
 
         # If team_name is None (due to missing key or "Team Name": null),
         # it will be added to seen_team_names and only the first such item will be kept.
@@ -37,7 +37,7 @@ def remove_duplicates_by_team_name(data_list):
             
     return unique_list
 
-def process_teams_json(input_filepath="teams.json", output_filepath="unique_teams.json"):
+def process_teams_json(input_filepath="players.json", output_filepath="unique_players.json"):
     """
     Reads a JSON file, removes duplicates based on "Team Name",
     and saves the result to a new JSON file.
@@ -81,4 +81,4 @@ def process_teams_json(input_filepath="teams.json", output_filepath="unique_team
 if __name__ == "__main__":
     # Call the processing function.
     # You can change the input and output filenames here if needed.
-    process_teams_json(input_filepath="teams.json", output_filepath="unique_teams.json")
+    process_teams_json(input_filepath="players.json", output_filepath="unique_players.json")
