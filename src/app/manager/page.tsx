@@ -75,6 +75,13 @@ export default function ManagerPage() {
     setPlayers(players.filter(p => p.id !== playerId));
   };
 
+  const handleDeleteAllPlayers = () => {
+    if (players.length === 0) return;
+    if (confirm("Are you sure you want to delete all players? This action cannot be undone.")) {
+      setPlayers([]);
+    }
+  };
+
   const analyzeTeam = () => {
     // Check if user has exactly 10 players selected
     if (!hasValidTactics()) {
@@ -290,24 +297,41 @@ export default function ManagerPage() {
             <div className="lg:col-span-9 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg p-6 order-1 border border-[#dde1e0]/20">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-[#dde1e0] font-mono tracking-wider">Squad Management</h2>
-                <button
-                  onClick={() => setShowPlayerForm(true)}
-                  className="relative group px-6 py-3 text-[#3c5c34] overflow-hidden font-mono"
-                >
-                  {/* Button background */}
-                  <div className="absolute inset-0 bg-[#dde1e0] group-hover:bg-[#c8d0cf] transition-colors"></div>
-                  
-                  {/* Button border */}
-                  <div className="absolute inset-0 border-2 border-[#3c5c34]"></div>
-                  
-                  {/* Button text */}
-                  <span className="relative z-10 tracking-wider font-semibold">
-                    Add Player
-                  </span>
-
-                  {/* Hover effect */}
-                  <div className="absolute inset-0 bg-[#3c5c34]/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
-                </button>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => setShowPlayerForm(true)}
+                    className="relative group px-6 py-3 text-[#3c5c34] overflow-hidden font-mono"
+                  >
+                    {/* Button background */}
+                    <div className="absolute inset-0 bg-[#dde1e0] group-hover:bg-[#c8d0cf] transition-colors"></div>
+                    {/* Button border */}
+                    <div className="absolute inset-0 border-2 border-[#3c5c34]"></div>
+                    {/* Button text */}
+                    <span className="relative z-10 tracking-wider font-semibold">
+                      Add Player
+                    </span>
+                    {/* Hover effect */}
+                    <div className="absolute inset-0 bg-[#3c5c34]/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                  </button>
+                  <button
+                    onClick={handleDeleteAllPlayers}
+                    disabled={players.length === 0}
+                    className={`relative group px-6 py-3 text-[#dde1e0] overflow-hidden font-mono ${players.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {/* Button background */}
+                    <div className={`absolute inset-0 transition-colors ${players.length === 0 ? 'bg-[#644d36]/50' : 'bg-[#644d36] group-hover:bg-[#8f7a5a]'}`}></div>
+                    {/* Button border */}
+                    <div className="absolute inset-0 border-2 border-[#dde1e0]"></div>
+                    {/* Button text */}
+                    <span className="relative z-10 tracking-wider font-semibold">
+                      Delete All
+                    </span>
+                    {/* Hover effect */}
+                    {players.length > 0 && (
+                      <div className="absolute inset-0 bg-[#dde1e0]/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                    )}
+                  </button>
+                </div>
               </div>
               <PlayerList
                 players={players}
