@@ -276,146 +276,302 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                       <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
                   </button>
-                  <div className="grid grid-cols-2 gap-8">
-                    <div className="grid grid-cols-1 gap-6">
-                      <div className="flex flex-col items-center space-y-2">
-                        <span className="text-lg font-medium text-[#644d36] font-mono">Age</span>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateAge(player, -1);
-                            }}
-                            className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30"
-                          >
-                            -
-                          </button>
-                          <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
-                            {player.age}
-                          </span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateAge(player, 1);
-                            }}
-                            className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-center space-y-2">
-                        <span className="text-lg font-medium text-[#644d36] font-mono">Nationality</span>
-                        <span className="text-sm font-medium text-[#dde1e0] font-mono">
-                          {player.nationality}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-x-24 gap-y-2 mr-32">
-                      {ATTRIBUTES.map(attr => (
-                        <div key={attr} className="flex flex-col items-center space-y-0.5">
-                          <span className="text-sm text-[#644d36] font-mono">{attr.charAt(0).toUpperCase() + attr.slice(1)}</span>
-                          <div className="flex items-center space-x-1">
+                  <div className="flex justify-center items-center min-h-[160px]">
+                    <div className="grid grid-cols-5 gap-6 items-center">
+                      {/* Column 1: Overall (top) and Age (bottom) */}
+                      <div className="flex flex-col space-y-6">
+                        {/* Overall */}
+                        <div className="flex flex-col items-center space-y-2">
+                          <span className="text-base font-medium text-[#644d36] font-mono">Overall</span>
+                          <div className="flex items-center space-x-2">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                updateAttribute(player, attr, -1);
+                                const newOverall = Math.max(0, Math.min(99, player.overall - 1));
+                                onUpdatePlayer({ ...player, overall: newOverall });
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
                             >
                               -
                             </button>
                             <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
-                              {player.attributes[attr]}
+                              {player.overall}
                             </span>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                updateAttribute(player, attr, 1);
+                                const newOverall = Math.max(0, Math.min(99, player.overall + 1));
+                                onUpdatePlayer({ ...player, overall: newOverall });
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
                             >
                               +
                             </button>
                           </div>
                         </div>
-                      ))}
-                      <div className="flex flex-col items-center space-y-0.5">
-                        <span className="text-sm text-[#644d36] font-mono">Overall</span>
-                        <div className="flex items-center space-x-1">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateAttribute(player, 'pace', -1);
-                            }}
-                            className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30"
-                          >
-                            -
-                          </button>
-                          <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
-                            {player.overall}
-                          </span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateAttribute(player, 'pace', 1);
-                            }}
-                            className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30"
-                          >
-                            +
-                          </button>
+
+                        {/* Age */}
+                        <div className="flex flex-col items-center space-y-2">
+                          <span className="text-base font-medium text-[#644d36] font-mono">Age</span>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAge(player, -1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
+                              {player.age}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAge(player, 1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex flex-col items-center space-y-0.5">
-                        <span className="text-sm text-[#644d36] font-mono">Position</span>
-                        <div className="flex items-center space-x-1">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updatePosition(player, 'prev');
-                            }}
-                            className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30"
-                          >
-                            &lt;
-                          </button>
-                          <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
-                            {player.mainPosition}
-                          </span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updatePosition(player, 'next');
-                            }}
-                            className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30"
-                          >
-                            &gt;
-                          </button>
+
+                      {/* Column 2: Position (top) and Role (bottom) */}
+                      <div className="flex flex-col space-y-6">
+                        {/* Position */}
+                        <div className="flex flex-col items-center space-y-2">
+                          <span className="text-base font-medium text-[#644d36] font-mono">Position</span>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updatePosition(player, 'prev');
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              &lt;
+                            </button>
+                            <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
+                              {player.mainPosition}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updatePosition(player, 'next');
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              &gt;
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Role */}
+                        <div className="flex flex-col items-center space-y-2">
+                          <span className="text-base font-medium text-[#644d36] font-mono">Role</span>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateRole(player, 'prev');
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              &lt;
+                            </button>
+                            <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
+                              {player.role}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateRole(player, 'next');
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              &gt;
+                            </button>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex flex-col items-center space-y-0.5">
-                        <span className="text-sm text-[#644d36] font-mono">Role</span>
-                        <div className="flex items-center space-x-1">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateRole(player, 'prev');
-                            }}
-                            className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30"
-                          >
-                            &lt;
-                          </button>
-                          <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
-                            {player.role}
-                          </span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateRole(player, 'next');
-                            }}
-                            className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30"
-                          >
-                            &gt;
-                          </button>
+
+                      {/* Column 3: Pace and Dribbling */}
+                      <div className="flex flex-col justify-center space-y-6">
+                        {/* Pace */}
+                        <div className="flex flex-col items-center space-y-2">
+                          <span className="text-base font-medium text-[#644d36] font-mono">Pace</span>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAttribute(player, 'pace', -1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
+                              {player.attributes.pace}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAttribute(player, 'pace', 1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Dribbling */}
+                        <div className="flex flex-col items-center space-y-2">
+                          <span className="text-base font-medium text-[#644d36] font-mono">Dribbling</span>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAttribute(player, 'dribbling', -1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
+                              {player.attributes.dribbling}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAttribute(player, 'dribbling', 1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Column 4: Shooting and Passing */}
+                      <div className="flex flex-col justify-center space-y-6">
+                        {/* Shooting */}
+                        <div className="flex flex-col items-center space-y-2">
+                          <span className="text-base font-medium text-[#644d36] font-mono">Shooting</span>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAttribute(player, 'shooting', -1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
+                              {player.attributes.shooting}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAttribute(player, 'shooting', 1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Passing */}
+                        <div className="flex flex-col items-center space-y-2">
+                          <span className="text-base font-medium text-[#644d36] font-mono">Passing</span>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAttribute(player, 'passing', -1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
+                              {player.attributes.passing}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAttribute(player, 'passing', 1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Column 5: Defending and Physical */}
+                      <div className="flex flex-col justify-center space-y-6">
+                        {/* Defending */}
+                        <div className="flex flex-col items-center space-y-2">
+                          <span className="text-base font-medium text-[#644d36] font-mono">Defending</span>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAttribute(player, 'defending', -1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
+                              {player.attributes.defending}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAttribute(player, 'defending', 1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Physical */}
+                        <div className="flex flex-col items-center space-y-2">
+                          <span className="text-base font-medium text-[#644d36] font-mono">Physical</span>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAttribute(player, 'physical', -1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-medium text-[#dde1e0] w-8 text-center font-mono">
+                              {player.attributes.physical}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateAttribute(player, 'physical', 1);
+                              }}
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
