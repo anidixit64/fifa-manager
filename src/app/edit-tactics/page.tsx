@@ -303,11 +303,18 @@ export default function EditTacticsPage() {
               <select
                 value={selectedFormation}
                 onChange={(e) => applyFormation(e.target.value)}
-                className="w-full px-3 py-2 bg-[#dde1e0]/10 border border-[#a78968]/30 rounded-lg text-[#dde1e0] font-mono focus:outline-none focus:border-[#a78968] focus:ring-1 focus:ring-[#a78968] transition-colors"
+                className="w-full px-3 py-2 bg-[#3c5c34]/80 border-2 border-[#a78968]/50 rounded-lg text-[#dde1e0] font-mono focus:outline-none focus:border-[#a78968] focus:ring-2 focus:ring-[#a78968]/30 transition-all hover:bg-[#3c5c34]/90 hover:border-[#a78968]/70 cursor-pointer appearance-none relative"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a78968' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                  backgroundPosition: 'right 0.5rem center',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: '1.5em 1.5em',
+                  paddingRight: '2.5rem'
+                }}
               >
-                <option value="">Select Formation</option>
+                <option value="" className="bg-[#3c5c34] text-[#dde1e0]">Select Formation</option>
                 {FORMATIONS.map((formation) => (
-                  <option key={formation.name} value={formation.name} className="bg-[#3c5c34] text-[#dde1e0]">
+                  <option key={formation.name} value={formation.name} className="bg-[#3c5c34] text-[#dde1e0] hover:bg-[#a78968]/20">
                     {formation.name}
                   </option>
                 ))}
