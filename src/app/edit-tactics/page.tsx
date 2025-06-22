@@ -374,21 +374,21 @@ export default function EditTacticsPage() {
                         const idx = positionPriority?.priorities.indexOf(attr) ?? -1;
                         const isSelected = idx !== -1;
                         let priorityColor = "";
-                        if (idx === 0) priorityColor = "bg-[#a78968]";
-                        else if (idx === 1) priorityColor = "bg-[#644d36]";
-                        else if (idx === 2) priorityColor = "bg-[#a8b8a7]";
+                        if (idx === 0) priorityColor = "bg-green-500";
+                        else if (idx === 1) priorityColor = "bg-yellow-500";
+                        else if (idx === 2) priorityColor = "bg-red-500";
                         return (
                           <button
                             key={attr}
                             onClick={() => updatePositionPriority(position, attr)}
                             className={`px-3 py-1 rounded-full text-sm font-mono transition-all hover:scale-105 active:scale-95 ${
                               isSelected
-                                ? `${priorityColor} text-[#3c5c34]`
+                                ? `${priorityColor} text-white`
                                 : "bg-[#dde1e0]/20 text-[#dde1e0] hover:bg-[#644d36]/30 hover:text-[#a78968]"
                             }`}
                           >
-                            <span style={isSelected ? { color: '#3c5c34' } : {}}>{attr}</span>
-                            {isSelected && <span className="ml-1" style={{ color: '#3c5c34' }}>#{idx + 1}</span>}
+                            <span style={isSelected ? { color: 'white' } : {}}>{attr}</span>
+                            {isSelected && <span className="ml-1" style={{ color: 'white' }}>#{idx + 1}</span>}
                           </button>
                         );
                       })}
