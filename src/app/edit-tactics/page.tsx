@@ -125,7 +125,7 @@ export default function EditTacticsPage() {
     }
   }, [positionCounts.length, positionPriorities.length, setPositionCounts, setPositionPriorities]);
 
-  // Load toggled positions from localStorage
+  // Load toggled positions and selected formation from localStorage
   useEffect(() => {
     if (isClient) {
       const storedToggles = localStorage.getItem('toggledPositions');
@@ -137,8 +137,33 @@ export default function EditTacticsPage() {
           console.error('Error parsing toggled positions:', error);
         }
       }
+
+      // Load selected formation from localStorage
+      const storedFormation = localStorage.getItem('selectedFormation');
+      if (storedFormation) {
+        setSelectedFormation(storedFormation);
+      }
     }
   }, [isClient]);
+
+  // Detect current formation based on position counts
+  useEffect(() => {
+    if (isClient && positionCounts.length > 0 && !selectedFormation) {
+      // Check if current position counts match any formation
+      const currentFormation = FORMATIONS.find(formation => {
+        return POSITIONS.every(pos => {
+          const currentCount = positionCounts.find(pc => pc.position === pos)?.count || 0;
+          const formationCount = formation.positions[pos];
+          return currentCount === formationCount;
+        });
+      });
+      
+      if (currentFormation) {
+        setSelectedFormation(currentFormation.name);
+        localStorage.setItem('selectedFormation', currentFormation.name);
+      }
+    }
+  }, [isClient, positionCounts, selectedFormation]);
 
   // Handle navigation
   useEffect(() => {
@@ -194,6 +219,11 @@ export default function EditTacticsPage() {
     }));
     setPositionCounts(newCounts);
     setSelectedFormation(formationName);
+    
+    // Save to localStorage
+    if (isClient) {
+      localStorage.setItem('selectedFormation', formationName);
+    }
   };
 
   const updatePositionPriority = (position: Position, attribute: Attribute) => {
@@ -270,7 +300,6 @@ export default function EditTacticsPage() {
             
             {/* Formation Dropdown */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-[#a78968] mb-2 font-mono">Quick Formation</label>
               <select
                 value={selectedFormation}
                 onChange={(e) => applyFormation(e.target.value)}
@@ -289,6 +318,10 @@ export default function EditTacticsPage() {
                   onClick={() => {
                     setSelectedFormation('');
                     handleReset();
+                    // Clear from localStorage
+                    if (isClient) {
+                      localStorage.removeItem('selectedFormation');
+                    }
                   }}
                   className="mt-2 w-full px-3 py-1 text-xs bg-[#644d36]/30 hover:bg-[#644d36]/50 text-[#dde1e0] font-mono rounded transition-colors"
                 >
