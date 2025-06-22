@@ -26,6 +26,7 @@ export default function ManagerPage() {
   const [players, setPlayers] = useLocalStorage<Player[]>('fifaPlayers', []);
   const [showPlayerForm, setShowPlayerForm] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
+  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
   const [formation] = useLocalStorage<string>('formation', '4-4-2');
   const [isLoading, setIsLoading] = useState(true);
   const { setTheme } = useTeamTheme();
@@ -77,9 +78,29 @@ export default function ManagerPage() {
 
   const handleDeleteAllPlayers = () => {
     if (players.length === 0) return;
-    if (confirm("Are you sure you want to delete all players? This action cannot be undone.")) {
-      setPlayers([]);
-    }
+    setShowDeleteAllModal(true);
+  };
+
+  const confirmDeleteAll = () => {
+    setPlayers([]);
+    
+    // Clear position priorities (desired attributes per position)
+    const initialPriorities = [
+      'RB', 'RWB', 'CB', 'LB', 'LWB', 'CM', 'RM', 'LM', 'CDM', 'CAM', 'RF', 'RW', 'LF', 'LW', 'ST', 'CF'
+    ].map((pos) => ({
+      position: pos,
+      priorities: [],
+    }));
+    localStorage.setItem('positionPriorities', JSON.stringify(initialPriorities));
+    
+    // Clear toggled positions (inversion toggles)
+    localStorage.setItem('toggledPositions', JSON.stringify([]));
+    
+    setShowDeleteAllModal(false);
+  };
+
+  const cancelDeleteAll = () => {
+    setShowDeleteAllModal(false);
   };
 
   const analyzeTeam = () => {
@@ -427,6 +448,71 @@ export default function ManagerPage() {
           }}
           initialData={editingPlayer || undefined}
         />
+      )}
+
+      {/* Custom Delete All Confirmation Modal */}
+      {showDeleteAllModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#3c5c34] border-2 border-[#a78968] rounded-lg shadow-2xl max-w-md w-full p-6 relative">
+            {/* Modal Header */}
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-[#a78968] rounded-full flex items-center justify-center mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#3c5c34]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider">Delete All Players</h3>
+            </div>
+
+            {/* Modal Content */}
+            <div className="mb-6">
+              <p className="text-[#dde1e0]/90 font-mono leading-relaxed">
+                Are you sure you want to delete all players from your squad? This action cannot be undone and will remove all player data.
+              </p>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex space-x-3">
+              <button
+                onClick={cancelDeleteAll}
+                className="flex-1 relative group px-4 py-3 text-[#3c5c34] overflow-hidden font-mono"
+              >
+                {/* Button background */}
+                <div className="absolute inset-0 bg-[#dde1e0] group-hover:bg-[#c8d0cf] transition-colors"></div>
+                
+                {/* Button border */}
+                <div className="absolute inset-0 border-2 border-[#3c5c34]"></div>
+                
+                {/* Button text */}
+                <span className="relative z-10 tracking-wider font-semibold">
+                  Cancel
+                </span>
+
+                {/* Hover effect */}
+                <div className="absolute inset-0 bg-[#3c5c34]/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+              </button>
+
+              <button
+                onClick={confirmDeleteAll}
+                className="flex-1 relative group px-4 py-3 text-[#dde1e0] overflow-hidden font-mono"
+              >
+                {/* Button background */}
+                <div className="absolute inset-0 bg-[#a78968] group-hover:bg-[#8f7a5a] transition-colors"></div>
+                
+                {/* Button border */}
+                <div className="absolute inset-0 border-2 border-[#dde1e0]"></div>
+                
+                {/* Button text */}
+                <span className="relative z-10 tracking-wider font-semibold">
+                  Delete All
+                </span>
+
+                {/* Hover effect */}
+                <div className="absolute inset-0 bg-[#dde1e0]/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </main>
   );
