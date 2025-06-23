@@ -200,14 +200,14 @@ export default function ManagerPage() {
   const getTacticsValidationMessage = () => {
     if (players.length === 0) return 'Add players to your squad first';
     const storedPositionCounts = localStorage.getItem("positionCounts");
-    if (!storedPositionCounts) return 'Configure tactics in Edit Tactics first';
+    if (!storedPositionCounts) return 'No selected formation';
     try {
       const positionCounts = JSON.parse(storedPositionCounts);
       const totalCount = positionCounts.reduce((sum: number, pc: { count: number }) => sum + pc.count, 0);
-      if (totalCount !== 10) return `Select exactly 10 players (currently ${totalCount}/10)`;
+      if (totalCount !== 10) return 'No selected formation';
       return '';
     } catch (error) {
-      return 'Configure tactics in Edit Tactics first';
+      return 'No selected formation';
     }
   };
 
