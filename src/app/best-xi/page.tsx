@@ -82,6 +82,7 @@ export default function BestXIPage() {
   const [analysis, setAnalysis] = useState<TeamAnalysis | null>(null);
   const [toggledPositions, setToggledPositions] = useState<Set<TogglePosition>>(new Set());
   const [isClient, setIsClient] = useState(false);
+  const [bestXIToggle, setBestXIToggle] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -364,7 +365,21 @@ export default function BestXIPage() {
           <div className="space-y-8">
             {/* Best XI */}
             <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
-              <h2 className="text-2xl font-bold text-[#dde1e0] font-mono tracking-wider mb-6">Best XI</h2>
+              <div className="flex items-center gap-4 mb-6">
+                <h2 className="text-2xl font-bold text-[#dde1e0] font-mono tracking-wider">Best XI</h2>
+                <button
+                  onClick={() => setBestXIToggle(!bestXIToggle)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#a78968] focus:ring-offset-2 focus:ring-offset-[#2a2a2a] ${
+                    bestXIToggle ? 'bg-[#a78968]' : 'bg-[#644d36]'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      bestXIToggle ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
               
               {/* Best XI Row Layout */}
               <div className="space-y-6">
