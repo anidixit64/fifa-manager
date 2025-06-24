@@ -144,11 +144,19 @@ export default function PlayerStatsPage() {
         <div className="flex items-center mb-8">
           <button
             onClick={() => router.push('/manager')}
-            className="mr-4 text-[#dde1e0]/80 hover:text-[#a78968] transition-colors"
+            className="relative group p-2 rounded-full bg-[#dde1e0]/10 hover:bg-[#dde1e0]/20 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/50 mr-4"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-6 w-6 text-[#dde1e0]/80 group-hover:text-[#a78968] transition-all duration-300 group-hover:rotate-12 group-active:-rotate-6" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
+            {/* Hover glow effect */}
+            <div className="absolute inset-0 rounded-full bg-[#a78968]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
           </button>
           <h1 className="text-3xl font-bold text-[#dde1e0] font-mono tracking-wider">Player Stats</h1>
         </div>

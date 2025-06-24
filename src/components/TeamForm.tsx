@@ -120,9 +120,15 @@ export default function TeamForm({ onSubmit, isSubmitting }: TeamFormProps) {
       <motion.button
         type="submit"
         disabled={isSubmitting}
-        className="retro-button w-full"
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        className="retro-button w-full shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/60"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        animate={isSubmitting ? { scale: [1, 1.04, 1], boxShadow: [
+          '0 0 0 0 #a78968',
+          '0 0 12px 4px #a78968',
+          '0 0 0 0 #a78968'
+        ] } : {}}
+        transition={{ duration: 0.3, repeat: isSubmitting ? Infinity : 0 }}
       >
         {isSubmitting ? 'Creating...' : 'Create Team'}
       </motion.button>

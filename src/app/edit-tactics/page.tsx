@@ -274,11 +274,11 @@ export default function EditTacticsPage() {
         <div className="flex items-center mb-8">
           <button
             onClick={() => router.push('/manager')}
-            className="mr-4 text-[#dde1e0]/80 hover:text-[#a78968] transition-colors"
+            className="relative group p-2 rounded-full bg-[#dde1e0]/10 hover:bg-[#dde1e0]/20 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/50 mr-4"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
+              className="h-6 w-6 text-[#dde1e0]/80 group-hover:text-[#a78968] transition-all duration-300 group-hover:rotate-12 group-active:-rotate-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -290,6 +290,8 @@ export default function EditTacticsPage() {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
+            {/* Hover glow effect */}
+            <div className="absolute inset-0 rounded-full bg-[#a78968]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
           </button>
           <h1 className="text-4xl font-bold text-[#dde1e0] font-mono tracking-wider">Edit Tactics</h1>
         </div>
@@ -347,14 +349,14 @@ export default function EditTacticsPage() {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => handleDecrement(position)}
-                      className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a78968]/40 text-[#dde1e0] hover:bg-[#a78968]/60 active:scale-95 transition-all"
+                      className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a78968]/40 text-[#dde1e0] hover:bg-[#a78968]/60 active:scale-90 transition-all shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                     >
                       -
                     </button>
                     <span className="w-8 text-center text-[#a78968] font-mono font-bold">{count}</span>
                     <button
                       onClick={() => handleIncrement(position)}
-                      className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a78968]/40 text-[#dde1e0] hover:bg-[#a78968]/60 active:scale-95 transition-all"
+                      className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a78968]/40 text-[#dde1e0] hover:bg-[#a78968]/60 active:scale-90 transition-all shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                     >
                       +
                     </button>
@@ -367,7 +369,7 @@ export default function EditTacticsPage() {
               </div>
               <button
                 onClick={handleReset}
-                className="mt-4 w-full relative group px-4 py-2 text-[#dde1e0] overflow-hidden font-mono"
+                className="mt-4 w-full relative group px-4 py-2 text-[#dde1e0] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/60"
               >
                 {/* Button background */}
                 <div className="absolute inset-0 bg-[#644d36]/30 group-hover:bg-[#644d36]/50 transition-colors"></div>
@@ -421,11 +423,7 @@ export default function EditTacticsPage() {
                           <button
                             key={attr}
                             onClick={() => updatePositionPriority(position, attr)}
-                            className={`px-3 py-1 rounded-full text-sm font-mono transition-all hover:scale-105 active:scale-95 ${
-                              isSelected
-                                ? `${priorityColor} text-white`
-                                : "bg-[#dde1e0]/20 text-[#dde1e0] hover:bg-[#644d36]/30 hover:text-[#a78968]"
-                            }`}
+                            className={`px-3 py-1 rounded-full text-sm font-mono transition-all hover:scale-110 active:scale-95 shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40 ${isSelected ? `${priorityColor} text-white` : "bg-[#dde1e0]/20 text-[#dde1e0] hover:bg-[#644d36]/30 hover:text-[#a78968]"}`}
                           >
                             <span style={isSelected ? { color: 'white' } : {}}>{attr}</span>
                             {isSelected && <span className="ml-1" style={{ color: 'white' }}>#{idx + 1}</span>}

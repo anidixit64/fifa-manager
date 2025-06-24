@@ -270,7 +270,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                       e.stopPropagation();
                       onDeletePlayer(player.id);
                     }}
-                    className="absolute top-2 right-2 text-[#644d36] hover:text-[#8f7a5a] active:scale-95 transition-all"
+                    className="absolute top-2 right-2 text-[#644d36] hover:text-[#8f7a5a] active:scale-90 transition-all hover:rotate-12 focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -290,7 +290,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 const newOverall = Math.max(0, Math.min(99, player.overall - 1));
                                 onUpdatePlayer({ ...player, overall: newOverall });
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               -
                             </button>
@@ -303,7 +303,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 const newOverall = Math.max(0, Math.min(99, player.overall + 1));
                                 onUpdatePlayer({ ...player, overall: newOverall });
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               +
                             </button>
@@ -319,7 +319,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAge(player, -1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               -
                             </button>
@@ -331,7 +331,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAge(player, 1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               +
                             </button>
@@ -350,7 +350,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updatePosition(player, 'prev');
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               &lt;
                             </button>
@@ -362,7 +362,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updatePosition(player, 'next');
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               &gt;
                             </button>
@@ -378,7 +378,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateRole(player, 'prev');
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               &lt;
                             </button>
@@ -390,7 +390,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateRole(player, 'next');
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               &gt;
                             </button>
@@ -409,7 +409,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAttribute(player, 'pace', -1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               -
                             </button>
@@ -421,7 +421,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAttribute(player, 'pace', 1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               +
                             </button>
@@ -437,7 +437,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAttribute(player, 'dribbling', -1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               -
                             </button>
@@ -449,7 +449,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAttribute(player, 'dribbling', 1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               +
                             </button>
@@ -468,7 +468,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAttribute(player, 'shooting', -1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               -
                             </button>
@@ -480,7 +480,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAttribute(player, 'shooting', 1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               +
                             </button>
@@ -496,7 +496,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAttribute(player, 'passing', -1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               -
                             </button>
@@ -508,7 +508,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAttribute(player, 'passing', 1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               +
                             </button>
@@ -527,7 +527,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAttribute(player, 'defending', -1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               -
                             </button>
@@ -539,7 +539,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAttribute(player, 'defending', 1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               +
                             </button>
@@ -555,7 +555,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAttribute(player, 'physical', -1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               -
                             </button>
@@ -567,7 +567,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                                 e.stopPropagation();
                                 updateAttribute(player, 'physical', 1);
                               }}
-                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 active:scale-95 transition-all border border-[#a8b8a7]/30 text-sm"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
                               +
                             </button>
