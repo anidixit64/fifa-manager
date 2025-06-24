@@ -338,6 +338,38 @@ export default function BestXIPage() {
     });
   };
 
+  // Helper function to render player card content based on toggle state
+  const renderPlayerCardContent = (player: Player, position: string) => {
+    if (bestXIToggle && player.mainPosition !== 'GK') {
+      // Show stats when toggle is on (for non-GK players)
+      const goals = player.stats?.goals || 0;
+      const assists = player.stats?.assists || 0;
+      return (
+        <div className="text-center">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <p className="text-xs text-[#a78968] font-mono">Goals</p>
+              <p className="text-sm font-bold text-[#dde1e0] font-mono">{goals}</p>
+            </div>
+            <div>
+              <p className="text-xs text-[#a78968] font-mono">Assists</p>
+              <p className="text-sm font-bold text-[#dde1e0] font-mono">{assists}</p>
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      // Show overall rating when toggle is off or for GK players
+      return (
+        <div className="text-center">
+          <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+          <p className="text-xs text-[#a78968] font-mono">{position}</p>
+          <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+        </div>
+      );
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[#3c5c34]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -394,11 +426,7 @@ export default function BestXIPage() {
                           key={player.id}
                           className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
-                          <div className="text-center">
-                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
-                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                          {renderPlayerCardContent(player, position)}
                         </div>
                       ))}
                   </div>
@@ -416,11 +444,7 @@ export default function BestXIPage() {
                           key={player.id}
                           className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
-                          <div className="text-center">
-                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
-                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                          {renderPlayerCardContent(player, position)}
                         </div>
                       ))}
                   </div>
@@ -434,11 +458,7 @@ export default function BestXIPage() {
                           key={player.id}
                           className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
-                          <div className="text-center">
-                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
-                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                          {renderPlayerCardContent(player, position)}
                         </div>
                       ))}
                   </div>
@@ -454,11 +474,7 @@ export default function BestXIPage() {
                           key={player.id}
                           className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
-                          <div className="text-center">
-                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
-                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                          {renderPlayerCardContent(player, position)}
                         </div>
                       ))}
                   </div>
@@ -475,11 +491,7 @@ export default function BestXIPage() {
                           key={player.id}
                           className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
-                          <div className="text-center">
-                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
-                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                          {renderPlayerCardContent(player, position)}
                         </div>
                       ))}
                   </div>
@@ -493,11 +505,7 @@ export default function BestXIPage() {
                           key={player.id}
                           className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
-                          <div className="text-center">
-                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
-                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                          {renderPlayerCardContent(player, position)}
                         </div>
                       ))}
                   </div>
@@ -511,11 +519,7 @@ export default function BestXIPage() {
                           key={player.id}
                           className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
-                          <div className="text-center">
-                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
-                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                          {renderPlayerCardContent(player, position)}
                         </div>
                       ))}
                   </div>
@@ -531,11 +535,7 @@ export default function BestXIPage() {
                           key={player.id}
                           className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
-                          <div className="text-center">
-                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
-                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                          {renderPlayerCardContent(player, position)}
                         </div>
                       ))}
                   </div>
@@ -556,11 +556,7 @@ export default function BestXIPage() {
                           key={player.id}
                           className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
-                          <div className="text-center">
-                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
-                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                          {renderPlayerCardContent(player, position)}
                         </div>
                       ))}
                   </div>
@@ -574,11 +570,7 @@ export default function BestXIPage() {
                           key={player.id}
                           className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
-                          <div className="text-center">
-                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
-                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                          {renderPlayerCardContent(player, position)}
                         </div>
                       ))}
                   </div>
@@ -596,11 +588,7 @@ export default function BestXIPage() {
                           key={player.id}
                           className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
-                          <div className="text-center">
-                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
-                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                          {renderPlayerCardContent(player, position)}
                         </div>
                       ))}
                   </div>
@@ -616,11 +604,7 @@ export default function BestXIPage() {
                           key={player.id}
                           className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
-                          <div className="text-center">
-                            <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-                            <p className="text-xs text-[#a78968] font-mono">{position}</p>
-                            <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          </div>
+                          {renderPlayerCardContent(player, position)}
                         </div>
                       ))}
                   </div>
@@ -640,8 +624,23 @@ export default function BestXIPage() {
                         <p className="text-sm text-[#a78968] font-mono">{position}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-[#a78968] font-mono">{player.overall}</p>
-                        <p className="text-sm text-[#644d36] font-mono">{player.role}</p>
+                        {bestXIToggle && player.mainPosition !== 'GK' ? (
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="text-center">
+                              <p className="text-xs text-[#a78968] font-mono">Goals</p>
+                              <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.goals || 0}</p>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-xs text-[#a78968] font-mono">Assists</p>
+                              <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.assists || 0}</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <p className="text-lg font-bold text-[#a78968] font-mono">{player.overall}</p>
+                            <p className="text-sm text-[#644d36] font-mono">{player.role}</p>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
