@@ -362,9 +362,9 @@ export default function BestXIPage() {
       // Show overall rating when toggle is off or for GK players
       return (
         <div className="text-center">
-          <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-          <p className="text-xs text-[#a78968] font-mono">{position}</p>
-          <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
+          <h3 className="font-bold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
+          <p className="text-xs text-[#dde1e0] font-mono">{position}</p>
+          <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.overall}</p>
         </div>
       );
     }
@@ -424,7 +424,7 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -442,7 +442,7 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -456,7 +456,7 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -472,7 +472,7 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -489,7 +489,7 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -503,7 +503,7 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -517,7 +517,7 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -533,7 +533,7 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -554,7 +554,7 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -568,7 +568,7 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -586,7 +586,7 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -602,7 +602,7 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -617,7 +617,7 @@ export default function BestXIPage() {
               <h2 className="text-2xl font-bold text-[#dde1e0] font-mono tracking-wider mb-6">Bench</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {analysis.bench.map(({ player, position }) => (
-                  <div key={player.id} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
+                  <div key={player.id} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors">
                     <div className="flex justify-between items-center">
                       <div>
                         <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
@@ -655,7 +655,7 @@ export default function BestXIPage() {
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Young Stars</h2>
                 <div className="space-y-2">
                   {analysis.youngStars.map(player => (
-                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
+                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors">
                       <div className="flex justify-between items-center">
                         <div>
                           <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
@@ -676,7 +676,7 @@ export default function BestXIPage() {
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Veterans</h2>
                 <div className="space-y-2">
                   {analysis.veterans.map(player => (
-                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
+                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors">
                       <div className="flex justify-between items-center">
                         <div>
                           <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
@@ -697,7 +697,7 @@ export default function BestXIPage() {
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Aging Players</h2>
                 <div className="space-y-2">
                   {analysis.aging.map(player => (
-                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
+                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors">
                       <div className="flex justify-between items-center">
                         <div>
                           <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
@@ -721,7 +721,7 @@ export default function BestXIPage() {
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Sector Strengths</h2>
                 <div className="space-y-4">
                   {Object.entries(analysis.sectorStrengths).map(([sector, data]) => (
-                    <div key={sector} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
+                    <div key={sector} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors">
                       <div className="flex justify-between items-center">
                         <h3 className="font-semibold text-[#dde1e0] font-mono">{sector}</h3>
                         <p className="text-sm text-[#a78968] font-mono">Players: {data.count}</p>
@@ -739,7 +739,7 @@ export default function BestXIPage() {
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Position Strengths</h2>
                 <div className="space-y-4">
                   {Object.entries(analysis.positionStrengths).map(([position, data]) => (
-                    <div key={position} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#a78968]/40 hover:border-[#a78968]/60 transition-colors">
+                    <div key={position} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors">
                       <div className="flex justify-between items-center">
                         <h3 className="font-semibold text-[#dde1e0] font-mono">{position}</h3>
                         <p className="text-sm text-[#a78968] font-mono">Players: {data.count}</p>
