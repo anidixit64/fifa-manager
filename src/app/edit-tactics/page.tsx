@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import { useOptimizedNavigation } from '@/hooks/useOptimizedNavigation';
 import { useTeamThemeStyles } from '@/hooks/useTeamThemeStyles';
 
 interface Team {
@@ -94,6 +95,7 @@ const DEFAULT_COUNTS: Record<Position, number> = {
 
 export default function EditTacticsPage() {
   const router = useRouter();
+  const { navigateTo } = useOptimizedNavigation({ transitionDuration: 100 });
   const [selectedTeam] = useLocalStorage<Team | null>('selectedTeam', null);
   const [positionCounts, setPositionCounts] = useLocalStorage<PositionCount[]>('positionCounts', []);
   const [positionPriorities, setPositionPriorities] = useLocalStorage<PositionPriority[]>('positionPriorities', []);
@@ -273,7 +275,7 @@ export default function EditTacticsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center mb-8">
           <button
-            onClick={() => router.push('/manager')}
+            onClick={() => navigateTo('/manager')}
             className="relative group p-2 rounded-full bg-[#dde1e0]/10 hover:bg-[#dde1e0]/20 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/50 mr-4"
           >
             <svg

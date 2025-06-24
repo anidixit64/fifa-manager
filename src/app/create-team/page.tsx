@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import { useOptimizedNavigation } from '@/hooks/useOptimizedNavigation';
 import Image from 'next/image';
 import { extractColorsFromImage } from '@/utils/colorUtils';
 
@@ -19,17 +20,18 @@ interface Team {
 
 export default function CreateTeamPage() {
   const router = useRouter();
-  const [teams, setTeams] = useLocalStorage<Team[]>('fifaTeams', []);
-  const [showAddTeamModal, setShowAddTeamModal] = useState(false);
-  const [newTeam, setNewTeam] = useState({ name: '', logo: '' });
+  const { navigateTo } = useOptimizedNavigation({ transitionDuration: 100 });
+  const [teams, setTeams] = useLocalStorage<Team[]>('teams', []);
   const [selectedTeam, setSelectedTeam] = useLocalStorage<Team | null>('selectedTeam', null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showAddTeamModal, setShowAddTeamModal] = useState(false);
+  const [newTeam, setNewTeam] = useState<Omit<Team, 'id'>>({ name: '', logo: '' });
   const [teamSuggestions, setTeamSuggestions] = useState<string[]>([]);
-  const [allTeamNames, setAllTeamNames] = useState<string[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [zoomingTeam, setZoomingTeam] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [zoomingTeam, setZoomingTeam] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [allTeamNames, setAllTeamNames] = useState<string[]>([]);
 
   useEffect(() => {
     setIsClient(true);
@@ -130,7 +132,7 @@ export default function CreateTeamPage() {
   };
 
   const handleBack = () => {
-    router.push('/');
+    navigateTo('/');
   };
 
   const handleTeamClick = (team: Team, event: React.MouseEvent) => {
@@ -154,7 +156,7 @@ export default function CreateTeamPage() {
       background: linear-gradient(135deg, #3c5c34 0%, #2a4a2a 50%, #1a3a1a 100%);
       z-index: 50;
       opacity: 0;
-      transition: opacity 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+      transition: opacity 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
     `;
     
     // Create the animated card with better styling
@@ -166,7 +168,7 @@ export default function CreateTeamPage() {
       width: ${rect.width}px;
       height: ${rect.height}px;
       z-index: 51;
-      transition: all 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       transform-origin: center;
       filter: blur(0px) brightness(1);
       box-shadow: 0 0 0 rgba(168, 137, 104, 0);
@@ -179,47 +181,45 @@ export default function CreateTeamPage() {
     
     // Start the enhanced animation sequence
     requestAnimationFrame(() => {
-      // Fade in overlay with a slight delay for better effect
-      setTimeout(() => {
-        overlay.style.opacity = '1';
-      }, 50);
+      // Fade in overlay immediately
+      overlay.style.opacity = '1';
       
       // Calculate target position (center of screen)
       const targetX = (window.innerWidth - rect.width) / 2;
       const targetY = (window.innerHeight - rect.height) / 2;
       
-      // Multi-stage animation for smoother effect
+      // Faster, smoother multi-stage animation
       setTimeout(() => {
         // Stage 1: Move to center and start scaling
         animatedCard.style.top = `${targetY}px`;
         animatedCard.style.left = `${targetX}px`;
         animatedCard.style.transform = 'scale(2.5)';
-        animatedCard.style.filter = 'blur(2px) brightness(1.1)';
-        animatedCard.style.boxShadow = '0 0 40px rgba(168, 137, 104, 0.3)';
-      }, 100);
+        animatedCard.style.filter = 'blur(1px) brightness(1.05)';
+        animatedCard.style.boxShadow = '0 0 30px rgba(168, 137, 104, 0.3)';
+      }, 50);
       
       setTimeout(() => {
         // Stage 2: Continue scaling and add blur
-        animatedCard.style.transform = 'scale(4.5)';
-        animatedCard.style.filter = 'blur(6px) brightness(1.2)';
-        animatedCard.style.boxShadow = '0 0 80px rgba(168, 137, 104, 0.5)';
-      }, 600);
+        animatedCard.style.transform = 'scale(4)';
+        animatedCard.style.filter = 'blur(3px) brightness(1.15)';
+        animatedCard.style.boxShadow = '0 0 60px rgba(168, 137, 104, 0.5)';
+      }, 300);
       
       setTimeout(() => {
         // Stage 3: Final blur and brightness
-        animatedCard.style.transform = 'scale(6)';
-        animatedCard.style.filter = 'blur(12px) brightness(1.4)';
-        animatedCard.style.boxShadow = '0 0 120px rgba(168, 137, 104, 0.7)';
-      }, 1000);
+        animatedCard.style.transform = 'scale(5.5)';
+        animatedCard.style.filter = 'blur(8px) brightness(1.3)';
+        animatedCard.style.boxShadow = '0 0 100px rgba(168, 137, 104, 0.7)';
+      }, 600);
     });
     
-    // Navigate after animation completes with a slight delay for smoothness
+    // Navigate after animation completes with reduced delay
     setTimeout(() => {
-      // Fade out overlay
-      overlay.style.opacity = '0';
-      animatedCard.style.opacity = '0';
+      // Navigate immediately when animation completes
+      setIsAnimating(false);
+      navigateTo('/manager');
       
-      // Clean up after fade out
+      // Clean up elements after navigation starts
       setTimeout(() => {
         if (document.body.contains(overlay)) {
           document.body.removeChild(overlay);
@@ -227,10 +227,8 @@ export default function CreateTeamPage() {
         if (document.body.contains(animatedCard)) {
           document.body.removeChild(animatedCard);
         }
-        setIsAnimating(false);
-        router.push('/manager');
-      }, 300);
-    }, 1400);
+      }, 100);
+    }, 800);
   };
 
   if (!isClient || isLoading) {

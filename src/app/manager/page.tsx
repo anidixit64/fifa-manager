@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import { useOptimizedNavigation } from '@/hooks/useOptimizedNavigation';
 import PlayerForm from '@/components/PlayerForm';
 import PlayerList from '@/components/PlayerList';
 import { Player, PositionCategory, POSITION_CATEGORIES } from '@/types/player';
@@ -22,6 +23,7 @@ interface Team {
 
 export default function ManagerPage() {
   const router = useRouter();
+  const { navigateTo, preloadRoute } = useOptimizedNavigation({ transitionDuration: 100 });
   const [selectedTeam] = useLocalStorage<Team | null>('selectedTeam', null);
   const [players, setPlayers] = useLocalStorage<Player[]>('fifaPlayers', []);
   const [showPlayerForm, setShowPlayerForm] = useState(false);
@@ -168,7 +170,7 @@ export default function ManagerPage() {
       usedPlayerIds.add(fwdPlayers[i].id);
     }
 
-    router.push('/best-xi');
+    navigateTo('/best-xi');
   };
 
   const calculateTeamStats = () => {
@@ -282,7 +284,7 @@ export default function ManagerPage() {
           {/* Header with back button and team info */}
           <div className="flex items-center mb-8">
             <button
-              onClick={() => router.push('/create-team')}
+              onClick={() => navigateTo('/create-team')}
               className="relative group p-2 rounded-full bg-[#dde1e0]/10 hover:bg-[#dde1e0]/20 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/50 mr-4"
             >
               <svg 
@@ -302,7 +304,7 @@ export default function ManagerPage() {
               <h2 className="text-2xl font-bold text-[#a8b8a7] font-mono">{selectedTeam?.name || 'No Team Selected'}</h2>
             </div>
             <button
-              onClick={() => router.push('/create-team')}
+              onClick={() => navigateTo('/create-team')}
               className="relative group px-6 py-3 text-[#3c5c34] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/60"
             >
               {/* Button background */}
@@ -386,7 +388,7 @@ export default function ManagerPage() {
                   <div className="text-3xl font-bold text-[#a78968] font-mono">{players.length}</div>
                 </div>
                 <button
-                  onClick={() => router.push('/edit-tactics')}
+                  onClick={() => navigateTo('/edit-tactics')}
                   className="w-full relative group px-4 py-3 text-[#dde1e0] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37]/60"
                 >
                   {/* Button background */}
@@ -399,7 +401,7 @@ export default function ManagerPage() {
                   </span>
                 </button>
                 <button
-                  onClick={() => router.push('/player-stats')}
+                  onClick={() => navigateTo('/player-stats')}
                   className="w-full relative group px-4 py-3 text-[#dde1e0] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#8b4513]/60"
                 >
                   {/* Button background */}
