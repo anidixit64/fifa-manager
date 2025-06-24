@@ -67,7 +67,7 @@ export default function Home() {
             className="relative mb-8"
           >
             <img
-              src="/soccer_player2.png"
+              src="/images/soccer_player1.png"
               alt="Soccer Player"
               className="w-64 h-64 object-contain filter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
             />

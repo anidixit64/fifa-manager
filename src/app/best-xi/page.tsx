@@ -217,11 +217,26 @@ export default function BestXIPage() {
     
     positionsToRate.forEach(position => {
       players.forEach(player => {
-        if (player.mainPosition === position) {
+        // Check if player can play this position (main position or in alternatePositions)
+        const canPlayPosition = player.mainPosition === position || 
+                               player.alternatePositions.includes(position);
+        
+        if (canPlayPosition) {
           const rating = position === 'GK' 
             ? calculateGKRating(player)
             : calculatePlayerRating(player, position);
-          playerRatings.push({ player, rating, position });
+          
+          // Apply position priority weighting
+          let finalRating = rating;
+          if (player.mainPosition === position) {
+            // Main position gets full rating
+            finalRating = rating;
+          } else if (player.alternatePositions.includes(position)) {
+            // Secondary positions get reduced rating (70% of main position rating)
+            finalRating = rating * 0.7;
+          }
+          
+          playerRatings.push({ player, rating: finalRating, position });
         }
       });
     });
@@ -230,18 +245,20 @@ export default function BestXIPage() {
     const sortedRatings = playerRatings.sort((a, b) => b.rating - a.rating);
     const bestXI: PlayerRating[] = [];
     const usedPositions = new Set<string>();
+    const usedPlayers = new Set<string>();
 
-    // Select best player for each position
+    // Select best player for each position, handling conflicts
     sortedRatings.forEach(({ player, rating, position }) => {
-      if (bestXI.length < 11 && !usedPositions.has(position)) {
+      if (bestXI.length < 11 && !usedPositions.has(position) && !usedPlayers.has(player.id)) {
         bestXI.push({ player, rating, position });
         usedPositions.add(position);
+        usedPlayers.add(player.id);
       }
     });
 
     // Select bench players (remaining top players)
     const bench = sortedRatings
-      .filter(({ player }) => !bestXI.some(xi => xi.player.id === player.id))
+      .filter(({ player }) => !usedPlayers.has(player.id))
       .slice(0, 7);
 
     // Categorize players
@@ -258,7 +275,9 @@ export default function BestXIPage() {
       .map(pc => pc.position);
     
     configuredPositions.forEach(position => {
-      const positionPlayers = players.filter(p => p.mainPosition === position);
+      const positionPlayers = players.filter(p => 
+        p.mainPosition === position || p.alternatePositions.includes(position)
+      );
       const count = positionPlayers.length;
 
       const hasProspect = positionPlayers.some(p => p.age < avgAge - ageStdDev);
@@ -288,7 +307,10 @@ export default function BestXIPage() {
     // Analyze sector strengths
     const sectorStrengths: TeamAnalysis['sectorStrengths'] = {};
     Object.entries(SECTORS).forEach(([sector, positions]) => {
-      const sectorPlayers = players.filter(p => positions.includes(p.mainPosition));
+      const sectorPlayers = players.filter(p => 
+        positions.includes(p.mainPosition) || 
+        p.alternatePositions.some(pos => positions.includes(pos))
+      );
       const count = sectorPlayers.length;
       
       let message: string | undefined;
@@ -544,7 +566,7 @@ export default function BestXIPage() {
                           </div>
                         </div>
                       ))}
-                      </div>
+                  </div>
 
                   {/* Right back positions */}
                   <div className="flex space-x-2">
@@ -563,7 +585,7 @@ export default function BestXIPage() {
                             <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
                             <p className="text-xs text-[#a78968] font-mono">{position}</p>
                             <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                      </div>
+                          </div>
                         </div>
                       ))}
                   </div>
@@ -583,9 +605,9 @@ export default function BestXIPage() {
                             <h3 className="font-semibold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
                             <p className="text-xs text-[#a78968] font-mono">{position}</p>
                             <p className="text-sm font-bold text-[#a78968] font-mono">{player.overall}</p>
-                    </div>
-                  </div>
-                ))}
+                          </div>
+                        </div>
+                      ))}
                   </div>
                 </div>
               </div>

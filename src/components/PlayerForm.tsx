@@ -19,6 +19,7 @@ interface PlayerSuggestion {
   short_name: string;
   nationality_name: string;
   potential: string;
+  player_positions: string[];
 }
 
 const POSITIONS = [
@@ -128,12 +129,23 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
 
   const handlePlayerSuggestionClick = (player: PlayerSuggestion) => {
     const country = allCountries.find(c => c.Country === player.nationality_name);
+    const firstPosition = player.player_positions && player.player_positions.length > 0 
+      ? player.player_positions[0] 
+      : 'GK';
+    
+    // Set alternate positions as all positions except the first one
+    const alternatePositions = player.player_positions && player.player_positions.length > 1
+      ? player.player_positions.slice(1)
+      : [];
+    
     setFormData(prev => ({ 
       ...prev, 
       name: player.long_name,
       shortName: player.short_name,
       nationality: player.nationality_name,
       fifaCode: country?.FIFA || '',
+      mainPosition: firstPosition,
+      alternatePositions: alternatePositions,
       potential: parseInt(player.potential) || 50
     }));
     setPlayerSuggestions([]);
