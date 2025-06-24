@@ -29,6 +29,13 @@ export interface Player {
   };
 }
 
+export interface Team {
+  id: string;
+  name: string;
+  country: string;
+  logo?: string;
+}
+
 export type PositionCategory = 'GK' | 'DEF' | 'MID' | 'FWD';
 
 export const POSITION_CATEGORIES: Record<string, PositionCategory> = {

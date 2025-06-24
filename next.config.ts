@@ -1,27 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'export', // Enable static export for GitHub Pages
+  trailingSlash: true, // Required for GitHub Pages
   experimental: {
     // Enable faster page transitions
     optimizePackageImports: ['react', 'react-dom'],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
   },
   // Enable compression for faster loading
   compress: true,
   // Optimize images
   images: {
+    unoptimized: true, // Required for static export
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,
   },
-  // Enable SWC minification for faster builds
-  swcMinify: true,
   // Optimize bundle size
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
