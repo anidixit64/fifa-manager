@@ -10,7 +10,7 @@ interface PlayerListProps {
 }
 
 const POSITIONS = [
-  'GK', 'LB', 'CB', 'RB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST'
+  'GK', 'RB', 'RWB', 'CB', 'LB', 'LWB', 'CM', 'RM', 'LM', 'CDM', 'CAM', 'RF', 'RW', 'LF', 'LW', 'ST', 'CF'
 ];
 
 const ROLES = [
@@ -101,12 +101,21 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
 
   const updateAttribute = (player: Player, attr: keyof Player['attributes'], delta: number) => {
     const newValue = Math.max(0, Math.min(99, player.attributes[attr] + delta));
+    const updatedAttributes = {
+      ...player.attributes,
+      [attr]: newValue
+    };
+    
+    // Recalculate overall rating based on average of all attributes
+    const newOverall = Math.round(
+      Object.values(updatedAttributes).reduce((sum, val) => sum + val, 0) / 
+      Object.keys(updatedAttributes).length
+    );
+    
     const updatedPlayer = {
       ...player,
-      attributes: {
-        ...player.attributes,
-        [attr]: newValue
-      }
+      attributes: updatedAttributes,
+      overall: newOverall
     };
     onUpdatePlayer(updatedPlayer);
   };
@@ -149,6 +158,15 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
     const updatedPlayer = {
       ...player,
       potential: newPotential
+    };
+    onUpdatePlayer(updatedPlayer);
+  };
+
+  const updateOverall = (player: Player, delta: number) => {
+    const newOverall = Math.max(0, Math.min(99, player.overall + delta));
+    const updatedPlayer = {
+      ...player,
+      overall: newOverall
     };
     onUpdatePlayer(updatedPlayer);
   };
@@ -287,8 +305,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const newOverall = Math.max(0, Math.min(99, player.overall - 1));
-                                onUpdatePlayer({ ...player, overall: newOverall });
+                                updateOverall(player, -1);
                               }}
                               className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >
@@ -300,8 +317,7 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const newOverall = Math.max(0, Math.min(99, player.overall + 1));
-                                onUpdatePlayer({ ...player, overall: newOverall });
+                                updateOverall(player, 1);
                               }}
                               className="w-6 h-6 flex items-center justify-center rounded-full bg-[#a8b8a7]/20 text-[#644d36] hover:bg-[#a8b8a7]/30 hover:text-[#dde1e0] active:scale-90 transition-all border border-[#a8b8a7]/30 text-sm shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/40"
                             >

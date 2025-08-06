@@ -26,6 +26,9 @@ export interface Player {
   stats: {
     goals: number;
     assists: number;
+    redCards: number;
+    shots: number;
+    shotsOnTarget: number;
   };
 }
 

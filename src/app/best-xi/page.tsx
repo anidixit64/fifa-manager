@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { useOptimizedNavigation } from '@/hooks/useOptimizedNavigation';
@@ -74,7 +74,7 @@ const SECTORS = {
 
 export default function BestXIPage() {
   const router = useRouter();
-  const { navigateTo } = useOptimizedNavigation({ transitionDuration: 100 });
+  const { navigateTo } = useOptimizedNavigation({ transitionDuration: 50 });
   const [selectedTeam] = useLocalStorage<Team | null>('selectedTeam', null);
   const [players, setPlayers] = useLocalStorage<Player[]>('fifaPlayers', []);
   const [positionCounts] = useLocalStorage<PositionCount[]>('positionCounts', []);
@@ -83,6 +83,11 @@ export default function BestXIPage() {
   const [toggledPositions, setToggledPositions] = useState<Set<TogglePosition>>(new Set());
   const [isClient, setIsClient] = useState(false);
   const [bestXIToggle, setBestXIToggle] = useState(false);
+
+  // Optimized click handler
+  const handlePlayerClick = useCallback((playerId: string) => {
+    navigateTo(`/player-stats?playerId=${playerId}`);
+  }, [navigateTo]);
 
   useEffect(() => {
     setIsClient(true);
@@ -344,9 +349,21 @@ export default function BestXIPage() {
       // Show stats when toggle is on (for non-GK players)
       const goals = player.stats?.goals || 0;
       const assists = player.stats?.assists || 0;
+      const redCards = player.stats?.redCards || 0;
+      const shots = player.stats?.shots || 0;
+      const shotsOnTarget = player.stats?.shotsOnTarget || 0;
+      
+      // Calculate true shooting percentage
+      const trueShootingPercentage = (() => {
+        if (shots === 0 && shotsOnTarget === 0) return 0;
+        const goalsPerShot = shots > 0 ? goals / shots : 0;
+        const goalsPerShotOnTarget = shotsOnTarget > 0 ? goals / shotsOnTarget : 0;
+        return Math.round(((goalsPerShot + goalsPerShotOnTarget) / 2) * 100);
+      })();
+      
       return (
         <div className="text-center">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-1">
             <div>
               <p className="text-xs text-[#a78968] font-mono">Goals</p>
               <p className="text-sm font-bold text-[#dde1e0] font-mono">{goals}</p>
@@ -354,6 +371,14 @@ export default function BestXIPage() {
             <div>
               <p className="text-xs text-[#a78968] font-mono">Assists</p>
               <p className="text-sm font-bold text-[#dde1e0] font-mono">{assists}</p>
+            </div>
+            <div>
+              <p className="text-xs text-[#a78968] font-mono">Red</p>
+              <p className="text-sm font-bold text-[#dde1e0] font-mono">{redCards}</p>
+            </div>
+            <div>
+              <p className="text-xs text-[#a78968] font-mono">TS%</p>
+              <p className="text-sm font-bold text-[#dde1e0] font-mono">{trueShootingPercentage}%</p>
             </div>
           </div>
         </div>
@@ -424,7 +449,9 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
+                          onClick={() => handlePlayerClick(player.id)}
+                          title={`Click to view ${player.shortName}'s stats`}
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -442,7 +469,8 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
+                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -456,7 +484,8 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
+                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -472,7 +501,8 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
+                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -489,7 +519,8 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
+                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -503,7 +534,8 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
+                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -517,7 +549,8 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
+                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -533,7 +566,8 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
+                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -554,7 +588,8 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
+                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -568,7 +603,8 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
+                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -586,7 +622,8 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
+                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -602,7 +639,8 @@ export default function BestXIPage() {
                       .map(({ player, position }) => (
                         <div
                           key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px]"
+                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
+                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
                         >
                           {renderPlayerCardContent(player, position)}
                         </div>
@@ -617,7 +655,7 @@ export default function BestXIPage() {
               <h2 className="text-2xl font-bold text-[#dde1e0] font-mono tracking-wider mb-6">Bench</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {analysis.bench.map(({ player, position }) => (
-                  <div key={player.id} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors">
+                  <div key={player.id} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                     <div className="flex justify-between items-center">
                       <div>
                         <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
@@ -625,7 +663,7 @@ export default function BestXIPage() {
                       </div>
                       <div className="text-right">
                         {bestXIToggle && player.mainPosition !== 'GK' ? (
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-2 gap-2">
                             <div className="text-center">
                               <p className="text-xs text-[#a78968] font-mono">Goals</p>
                               <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.goals || 0}</p>
@@ -633,6 +671,24 @@ export default function BestXIPage() {
                             <div className="text-center">
                               <p className="text-xs text-[#a78968] font-mono">Assists</p>
                               <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.assists || 0}</p>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-xs text-[#a78968] font-mono">Red</p>
+                              <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.redCards || 0}</p>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-xs text-[#a78968] font-mono">TS%</p>
+                              <p className="text-sm font-bold text-[#dde1e0] font-mono">
+                                {(() => {
+                                  const goals = player.stats?.goals || 0;
+                                  const shots = player.stats?.shots || 0;
+                                  const shotsOnTarget = player.stats?.shotsOnTarget || 0;
+                                  if (shots === 0 && shotsOnTarget === 0) return 0;
+                                  const goalsPerShot = shots > 0 ? goals / shots : 0;
+                                  const goalsPerShotOnTarget = shotsOnTarget > 0 ? goals / shotsOnTarget : 0;
+                                  return Math.round(((goalsPerShot + goalsPerShotOnTarget) / 2) * 100);
+                                })()}%
+                              </p>
                             </div>
                           </div>
                         ) : (
@@ -655,7 +711,7 @@ export default function BestXIPage() {
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Young Stars</h2>
                 <div className="space-y-2">
                   {analysis.youngStars.map(player => (
-                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors">
+                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                       <div className="flex justify-between items-center">
                         <div>
                           <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
@@ -676,7 +732,7 @@ export default function BestXIPage() {
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Veterans</h2>
                 <div className="space-y-2">
                   {analysis.veterans.map(player => (
-                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors">
+                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                       <div className="flex justify-between items-center">
                         <div>
                           <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
@@ -697,7 +753,7 @@ export default function BestXIPage() {
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Aging Players</h2>
                 <div className="space-y-2">
                   {analysis.aging.map(player => (
-                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors">
+                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                       <div className="flex justify-between items-center">
                         <div>
                           <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
