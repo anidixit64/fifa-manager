@@ -9,7 +9,7 @@ interface UseOptimizedNavigationOptions {
 
 export const useOptimizedNavigation = (options: UseOptimizedNavigationOptions = {}) => {
   const router = useRouter();
-  const { preload = true, prefetch = true, transitionDuration = 150 } = options;
+  const { preload = true, prefetch = true, transitionDuration = 100 } = options;
   const isNavigating = useRef(false);
   const preloadedRoutes = useRef<Set<string>>(new Set());
 
@@ -32,19 +32,17 @@ export const useOptimizedNavigation = (options: UseOptimizedNavigationOptions = 
     
     isNavigating.current = true;
     
-    // Add a small delay for visual feedback
+    // Immediate navigation for better responsiveness
+    if (options?.replace) {
+      router.replace(href);
+    } else {
+      router.push(href);
+    }
+    
+    // Reset navigation state after transition
     setTimeout(() => {
-      if (options?.replace) {
-        router.replace(href);
-      } else {
-        router.push(href);
-      }
-      
-      // Reset navigation state after transition
-      setTimeout(() => {
-        isNavigating.current = false;
-      }, transitionDuration);
-    }, 50);
+      isNavigating.current = false;
+    }, transitionDuration);
   }, [router, transitionDuration]);
 
   // Preload common routes on mount
