@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, memo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { useOptimizedNavigation } from '@/hooks/useOptimizedNavigation';
@@ -33,7 +33,7 @@ const POSITION_WEIGHTS = {
   'CB': { goals: 0.1, assists: 0.9 },
 };
 
-export default function PlayerStatsPage() {
+function PlayerStatsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { navigateTo } = useOptimizedNavigation({ transitionDuration: 50 });
@@ -501,5 +501,17 @@ export default function PlayerStatsPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function PlayerStatsPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-[#3c5c34] flex items-center justify-center">
+        <div className="text-[#dde1e0] font-mono">Loading...</div>
+      </main>
+    }>
+      <PlayerStatsContent />
+    </Suspense>
   );
 } 
