@@ -4,18 +4,10 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { useOptimizedNavigation } from '@/hooks/useOptimizedNavigation';
-import { Player, PositionCategory, POSITION_CATEGORIES } from '@/types/player';
-
-interface Team {
-  id: string;
-  name: string;
-  country: string;
-  logo?: string;
-}
+import { analyzeTeam } from '@/utils/teamAnalysis';
+import { Player, Team } from '@/types/player';
 
 type TogglePosition = 'RWB' | 'RB' | 'RW' | 'LWB' | 'LB' | 'LW';
-
-const TOGGLE_POSITIONS: TogglePosition[] = ['RWB', 'RB', 'RW', 'LWB', 'LB', 'LW'];
 
 interface PositionCount {
   position: string;
@@ -57,21 +49,6 @@ interface TeamAnalysis {
   };
 }
 
-const ROLE_WEIGHTS = {
-  'C': 1.0,  // Crucial
-  'I': 0.8,  // Important
-  'R': 0.6,  // Rotation
-  'S': 0.4,  // Squad
-  'P': 0.2   // Prospect
-};
-
-const SECTORS = {
-  'Defense': ['LB', 'CB', 'RB'],
-  'Midfield': ['CDM', 'CM', 'CAM', 'LM', 'RM'],
-  'Forward': ['LW', 'RW', 'ST'],
-  'Goalkeeper': ['GK']
-};
-
 export default function BestXIPage() {
   const router = useRouter();
   const { navigateTo } = useOptimizedNavigation({ transitionDuration: 50 });
@@ -112,235 +89,22 @@ export default function BestXIPage() {
     if (!selectedTeam) {
       router.push('/create-team');
     } else {
-      analyzeTeam();
+      analyzeTeamData();
     }
-  }, [selectedTeam, router, players, positionCounts, positionPriorities]);
+  }, [selectedTeam, router, players, positionCounts, positionPriorities, toggledPositions]);
 
-  const calculatePlayerRating = (player: Player, position: string): number => {
-    const positionPriority = positionPriorities.find(pp => pp.position === position);
-    let rating = 0;
-
-    // Base rating from overall
-    rating += player.overall * 0.3;
-
-    // Attribute rating based on position priorities
-    if (positionPriority && positionPriority.priorities.length > 0) {
-      const priorities = positionPriority.priorities;
-      const attributeWeights = priorities.reduce((acc, attr, index) => {
-        acc[attr.toLowerCase()] = 1 - (index * 0.2); // 1.0, 0.8, 0.6 for top 3
-        return acc;
-      }, {} as { [key: string]: number });
-
-      // Calculate weighted attribute score
-      const attributeScore = Object.entries(player.attributes).reduce((sum, [attr, value]) => {
-        const weight = attributeWeights[attr] || 0.2; // Default weight for non-prioritized attributes
-        return sum + (value * weight);
-      }, 0) / Object.keys(player.attributes).length;
-
-      rating += attributeScore * 0.4;
-    } else {
-      // If no priorities set, use average of all attributes
-      const avgAttribute = Object.values(player.attributes).reduce((sum, val) => sum + val, 0) / 
-        Object.keys(player.attributes).length;
-      rating += avgAttribute * 0.4;
+  const analyzeTeamData = () => {
+    if (!players || players.length === 0) {
+      setAnalysis(null);
+      return;
     }
 
-    // Age rating
-    const ageDiff = Math.abs(player.age - 25);
-    const ageRating = Math.max(0, 1 - (ageDiff * 0.05));
-    rating += ageRating * 0.15;
-
-    // Role rating
-    const roleWeight = ROLE_WEIGHTS[player.role] || 0.2;
-    rating += roleWeight * 0.15;
-
-    // Potential boost - slight boost for higher potential
-    const potentialBoost = (player.potential - player.overall) * 0.02; // 2% boost per point of potential above overall
-    rating += Math.max(0, potentialBoost);
-
-    // Foot preference boost for wing positions
-    if (TOGGLE_POSITIONS.includes(position as TogglePosition)) {
-      const isInverted = toggledPositions.has(position as TogglePosition);
-      const isRightWing = ['RB', 'RWB', 'RW'].includes(position);
-      const isRightFooted = player.preferred_foot === 'Right';
-      
-      // If inverted is off, boost same foot. If inverted is on, boost opposite foot
-      if ((isRightWing && isRightFooted && !isInverted) || 
-          (isRightWing && !isRightFooted && isInverted) ||
-          (!isRightWing && !isRightFooted && !isInverted) ||
-          (!isRightWing && isRightFooted && isInverted)) {
-        rating += 0.5; // Small boost of 0.5 points
-      }
-    }
-
-    return rating;
-  };
-
-  const calculateGKRating = (player: Player): number => {
-    let rating = 0;
-
-    // Base rating from overall
-    rating += player.overall * 0.5;
-
-    // Age rating
-    const ageDiff = Math.abs(player.age - 25);
-    const ageRating = Math.max(0, 1 - (ageDiff * 0.05));
-    rating += ageRating * 0.25;
-
-    // Role rating
-    const roleWeight = ROLE_WEIGHTS[player.role] || 0.2;
-    rating += roleWeight * 0.25;
-
-    // Potential boost - slight boost for higher potential
-    const potentialBoost = (player.potential - player.overall) * 0.02; // 2% boost per point of potential above overall
-    rating += Math.max(0, potentialBoost);
-
-    return rating;
-  };
-
-  const analyzeTeam = () => {
-    // Calculate average age and overall
-    const avgAge = players.reduce((sum, p) => sum + p.age, 0) / players.length;
-    const avgOverall = players.reduce((sum, p) => sum + p.overall, 0) / players.length;
-
-    // Calculate standard deviations
-    const ageStdDev = Math.sqrt(
-      players.reduce((sum, p) => sum + Math.pow(p.age - avgAge, 2), 0) / players.length
-    );
-
-    // Rate players for each position
-    const playerRatings: PlayerRating[] = [];
+    // Convert Set to array for the analysis function
+    const toggledPositionsArray = Array.from(toggledPositions);
     
-    // Only rate players for positions that are configured in tactics
-    const tacticsPositions = positionCounts
-      .filter(pc => pc.count > 0)
-      .map(pc => pc.position);
-    
-    // Always include GK if there are GK players
-    const positionsToRate = players.some(p => p.mainPosition === 'GK') 
-      ? ['GK', ...tacticsPositions]
-      : tacticsPositions;
-    
-    positionsToRate.forEach(position => {
-      players.forEach(player => {
-        // Check if player can play this position (main position or in alternatePositions)
-        const canPlayPosition = player.mainPosition === position || 
-                               player.alternatePositions.includes(position);
-        
-        if (canPlayPosition) {
-          const rating = position === 'GK' 
-            ? calculateGKRating(player)
-            : calculatePlayerRating(player, position);
-          
-          // Apply position priority weighting
-          let finalRating = rating;
-          if (player.mainPosition === position) {
-            // Main position gets full rating
-            finalRating = rating;
-          } else if (player.alternatePositions.includes(position)) {
-            // Secondary positions get reduced rating (70% of main position rating)
-            finalRating = rating * 0.7;
-          }
-          
-          playerRatings.push({ player, rating: finalRating, position });
-        }
-      });
-    });
-
-    // Sort by rating and select best XI
-    const sortedRatings = playerRatings.sort((a, b) => b.rating - a.rating);
-    const bestXI: PlayerRating[] = [];
-    const usedPositions = new Set<string>();
-    const usedPlayers = new Set<string>();
-
-    // Select best player for each position, handling conflicts
-    sortedRatings.forEach(({ player, rating, position }) => {
-      if (bestXI.length < 11 && !usedPositions.has(position) && !usedPlayers.has(player.id)) {
-        bestXI.push({ player, rating, position });
-        usedPositions.add(position);
-        usedPlayers.add(player.id);
-      }
-    });
-
-    // Select bench players (remaining top players)
-    const bench = sortedRatings
-      .filter(({ player }) => !usedPlayers.has(player.id))
-      .slice(0, 7);
-
-    // Categorize players
-    const aging = players.filter(p => p.age > avgAge + ageStdDev);
-    const veterans = players.filter(p => p.age > 30 && p.overall > avgOverall);
-    const youngStars = players.filter(p => p.age < avgAge - ageStdDev && p.overall > avgOverall);
-
-    // Analyze position strengths
-    const positionStrengths: TeamAnalysis['positionStrengths'] = {};
-    
-    // Only analyze positions that the user has set in edit tactics
-    const configuredPositions = positionCounts
-      .filter(pc => pc.count > 0)
-      .map(pc => pc.position);
-    
-    configuredPositions.forEach(position => {
-      const positionPlayers = players.filter(p => 
-        p.mainPosition === position || p.alternatePositions.includes(position)
-      );
-      const count = positionPlayers.length;
-
-      const hasProspect = positionPlayers.some(p => p.age < avgAge - ageStdDev);
-      const hasVeteran = positionPlayers.some(p => p.age > 30);
-      const hasNormal = positionPlayers.some(p => p.age >= avgAge - ageStdDev && p.age <= avgAge + ageStdDev);
-      const hasAging = positionPlayers.some(p => p.age > avgAge + ageStdDev);
-
-      let message: string | undefined;
-      if (count === 0) {
-        message = `No players at ${position}`;
-      } else if (count < 2) {
-        message = `Need more players at ${position}`;
-      } else if (!hasProspect) {
-        message = `Need ${position} prospects`;
-      }
-
-      positionStrengths[position] = {
-        hasProspect,
-        hasVeteran,
-        hasNormal,
-        hasAging,
-        count,
-        message
-      };
-    });
-
-    // Analyze sector strengths
-    const sectorStrengths: TeamAnalysis['sectorStrengths'] = {};
-    Object.entries(SECTORS).forEach(([sector, positions]) => {
-      const sectorPlayers = players.filter(p => 
-        positions.includes(p.mainPosition) || 
-        p.alternatePositions.some(pos => positions.includes(pos))
-      );
-      const count = sectorPlayers.length;
-      
-      let message: string | undefined;
-      if (count < 3) {
-        message = `Weak ${sector} depth`;
-      } else if (count > 8) {
-        message = `Strong ${sector} depth`;
-      }
-
-      sectorStrengths[sector] = {
-        count,
-        message
-      };
-    });
-
-    setAnalysis({
-      bestXI,
-      bench,
-      aging,
-      veterans,
-      youngStars,
-      positionStrengths,
-      sectorStrengths
-    });
+    // Use the centralized team analysis utility
+    const teamAnalysis = analyzeTeam(players, positionCounts, positionPriorities, toggledPositionsArray);
+    setAnalysis(teamAnalysis);
   };
 
   // Helper function to render player card content based on toggle state

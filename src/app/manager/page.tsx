@@ -74,6 +74,10 @@ export default function ManagerPage() {
     setEditingPlayer(null);
   };
 
+  const handleInlineUpdatePlayer = (updatedPlayer: Player) => {
+    setPlayers(players.map(p => p.id === updatedPlayer.id ? updatedPlayer : p));
+  };
+
   const handleDeletePlayer = (playerId: string) => {
     setPlayers(players.filter(p => p.id !== playerId));
   };
@@ -367,7 +371,7 @@ export default function ManagerPage() {
               <PlayerList
                 players={players}
                 onDeletePlayer={handleDeletePlayer}
-                onUpdatePlayer={handleUpdatePlayer}
+                onUpdatePlayer={handleInlineUpdatePlayer}
               />
             </div>
 
