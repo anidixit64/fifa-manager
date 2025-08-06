@@ -1,34 +1,7 @@
 // Client-side team analysis utility
 // This contains all the calculation logic from the API route
 
-interface PlayerAttributes {
-  pace: number;
-  shooting: number;
-  passing: number;
-  dribbling: number;
-  defending: number;
-  physical: number;
-}
-
-interface Player {
-  id: string;
-  name: string;
-  shortName: string;
-  age: number;
-  nationality: string;
-  fifaCode: string;
-  mainPosition: string;
-  alternatePositions: string[];
-  role: 'C' | 'I' | 'R' | 'S' | 'P';
-  attributes: PlayerAttributes;
-  overall: number;
-  potential: number;
-  preferred_foot: 'Left' | 'Right';
-  stats: {
-    goals: number;
-    assists: number;
-  };
-}
+import { Player } from '@/types/player';
 
 interface PositionPriority {
   position: string;

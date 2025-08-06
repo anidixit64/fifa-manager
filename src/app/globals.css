@@ -25,6 +25,36 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Performance optimizations */
+* {
+  box-sizing: border-box;
+}
+
+/* Optimize transitions for better performance */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Faster hover transitions */
+.hover\:scale-105 {
+  transition: transform 100ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+/* Optimize active states */
+.active\:scale-95 {
+  transition: transform 50ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.active\:scale-95:active {
+  transform: scale(0.95);
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

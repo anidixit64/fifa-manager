@@ -57,6 +57,9 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
       stats: {
         goals: 0,
         assists: 0,
+        redCards: 0,
+        shots: 0,
+        shotsOnTarget: 0,
       },
       attributes: {
         pace: 50,
