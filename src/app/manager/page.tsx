@@ -391,58 +391,91 @@ export default function ManagerPage() {
                   <h3 className="text-sm font-medium text-[#a78968] mb-2 font-mono">Squad Size</h3>
                   <div className="text-3xl font-bold text-[#a78968] font-mono">{players.length}</div>
                 </div>
+                {/* Quadrant Button Grid */}
+                <div className="grid grid-cols-2 gap-3 p-4 bg-[#dde1e0]/5 rounded-xl border border-[#dde1e0]/20">
+                  {/* Top Left - Edit Tactics */}
                 <button
                   onClick={() => navigateTo('/edit-tactics')}
-                  className="w-full relative group px-4 py-3 text-[#dde1e0] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37]/60"
+                    className="relative group aspect-square text-[#dde1e0] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37]/60 rounded-lg"
                 >
                   {/* Button background */}
                   <div className="absolute inset-0 bg-[#d4af37] group-hover:bg-[#b8941f] transition-colors"></div>
                   {/* Button border */}
-                  <div className="absolute inset-0 border border-[#b8941f]/60"></div>
+                    <div className="absolute inset-0 border border-[#b8941f]/60 rounded-lg"></div>
                   {/* Button text */}
-                  <span className="relative z-10 tracking-wider">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="relative z-10 tracking-wider text-sm font-semibold text-center px-2">
                     Edit Tactics
                   </span>
+                    </div>
                 </button>
+
+                  {/* Top Right - Player Stats */}
                 <button
                   onClick={() => navigateTo('/player-stats')}
-                  className="w-full relative group px-4 py-3 text-[#dde1e0] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#8b4513]/60"
+                    className="relative group aspect-square text-[#dde1e0] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#8b4513]/60 rounded-lg"
                 >
                   {/* Button background */}
                   <div className="absolute inset-0 bg-[#8b4513] group-hover:bg-[#a0522d] transition-colors"></div>
                   {/* Button border */}
-                  <div className="absolute inset-0 border border-[#a0522d]/60"></div>
+                    <div className="absolute inset-0 border border-[#a0522d]/60 rounded-lg"></div>
                   {/* Button text */}
-                  <span className="relative z-10 tracking-wider">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="relative z-10 tracking-wider text-sm font-semibold text-center px-2">
                     Player Stats
                   </span>
+                    </div>
+                  </button>
+
+                  {/* Bottom Left - Track Finances */}
+                  <button
+                    onClick={() => navigateTo('/track-finances')}
+                    className="relative group aspect-square text-[#dde1e0] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#2e8b57]/60 rounded-lg"
+                  >
+                    {/* Button background */}
+                    <div className="absolute inset-0 bg-[#2e8b57] group-hover:bg-[#228b22] transition-colors"></div>
+                    {/* Button border */}
+                    <div className="absolute inset-0 border border-[#228b22]/60 rounded-lg"></div>
+                    {/* Button text */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="relative z-10 tracking-wider text-sm font-semibold text-center px-2">
+                        Track Finances
+                      </span>
+                    </div>
+                    {/* Hover effect */}
+                    <div className="absolute inset-0 bg-[#dde1e0]/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-lg"></div>
                 </button>
+
+                  {/* Bottom Right - Analyze Team */}
                 <button
                   onClick={analyzeTeam}
                   disabled={!hasValidTactics()}
-                  className={`w-full relative group px-4 py-3 text-[#dde1e0] overflow-hidden font-mono ${
+                    className={`relative group aspect-square text-[#dde1e0] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/60 rounded-lg ${
                     !hasValidTactics() ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                   title={getTacticsValidationMessage()}
                 >
                   {/* Button background */}
-                  <div className={`absolute inset-0 transition-colors ${
+                    <div className={`absolute inset-0 transition-colors rounded-lg ${
                     hasValidTactics() ? 'bg-[#a78968] group-hover:bg-[#8f7a5a]' : 'bg-[#644d36]/50'
                   }`}></div>
                   
                   {/* Button border */}
-                  <div className="absolute inset-0 border-2 border-[#dde1e0]"></div>
+                    <div className="absolute inset-0 border-2 border-[#dde1e0] rounded-lg"></div>
                   
                   {/* Button text */}
-                  <span className="relative z-10 tracking-wider">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="relative z-10 tracking-wider text-sm font-semibold text-center px-2">
                     {hasValidTactics() ? 'Analyze Team' : getTacticsValidationMessage()}
                   </span>
+                    </div>
 
                   {/* Hover effect */}
                   {hasValidTactics() && (
-                    <div className="absolute inset-0 bg-[#dde1e0]/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                      <div className="absolute inset-0 bg-[#dde1e0]/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-lg"></div>
                   )}
                 </button>
+                </div>
               </div>
             </div>
           </div>

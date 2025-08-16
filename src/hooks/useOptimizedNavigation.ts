@@ -33,16 +33,16 @@ export const useOptimizedNavigation = (options: UseOptimizedNavigationOptions = 
     isNavigating.current = true;
     
     // Immediate navigation for better responsiveness
-    if (options?.replace) {
-      router.replace(href);
-    } else {
-      router.push(href);
-    }
-    
-    // Reset navigation state after transition
-    setTimeout(() => {
-      isNavigating.current = false;
-    }, transitionDuration);
+      if (options?.replace) {
+        router.replace(href);
+      } else {
+        router.push(href);
+      }
+      
+      // Reset navigation state after transition
+      setTimeout(() => {
+        isNavigating.current = false;
+      }, transitionDuration);
   }, [router, transitionDuration]);
 
   // Preload common routes on mount

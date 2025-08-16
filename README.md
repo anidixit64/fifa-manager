@@ -16,8 +16,10 @@ A comprehensive football team management application built with Next.js, TypeScr
 - **Player Database**: Access to a comprehensive database of real football players
 - **Player Creation**: Add custom players with detailed attributes
 - **Player Statistics**: Track goals, assists, and performance metrics
+- **Advanced Player Stats**: Monitor red cards, shots, shots on target, and true shooting percentage
 - **Player Potential**: Advanced scoring system that considers player potential for Best XI selection
 - **Attribute System**: Manage pace, shooting, passing, dribbling, defending, and physical attributes
+- **Interactive Navigation**: Click on any player in Best XI to view their detailed statistics
 
 ### Tactical Analysis
 - **Formation Editor**: Configure custom formations with position-specific player counts
@@ -33,15 +35,25 @@ A comprehensive football team management application built with Next.js, TypeScr
   - Player potential for future development
   - Role importance (Crucial, Important, Rotation, Squad, Prospect)
   - Preferred foot for wing positions
+  - **Advanced Metrics**: Red cards (penalty), shooting efficiency, and true shooting percentage
 - **Bench Selection**: Automatic selection of substitute players
 - **Team Analysis**: Comprehensive breakdown of team strengths and weaknesses
 - **Position Analysis**: Detailed analysis of each position's depth and quality
+- **Interactive Player Cards**: Click any player to navigate to their detailed statistics
 
 ### Statistics & Analytics
 - **Player Performance**: Track individual player statistics and performance scores
+- **Advanced Statistics**: Monitor red cards, shots, shots on target, and true shooting percentage
 - **Team Statistics**: Overall team ratings, average age, and squad size
 - **Position-based Scoring**: Weighted scoring system based on position requirements
 - **Sector Analysis**: Defense, midfield, and forward line strength assessment
+- **Shooting Efficiency**: True shooting percentage calculation for attacking players
+
+### Performance & User Experience
+- **Optimized Navigation**: Fast, responsive page transitions with reduced loading times
+- **Smooth Animations**: Enhanced hover effects and interactive feedback
+- **Mobile-First Design**: Responsive layouts optimized for all devices
+- **Real-time Updates**: Instant feedback when modifying player statistics
 
 ## 🛠️ Technology Stack
 
@@ -120,7 +132,8 @@ fifa-manager/
 1. In the Manager Dashboard, click "Add Player"
 2. Enter player details or search from the database
 3. Set player attributes and statistics
-4. Save the player to your squad
+4. Configure advanced stats (red cards, shots, shots on target)
+5. Save the player to your squad
 
 ### Configuring Tactics
 1. Go to "Edit Tactics" from the Manager Dashboard
@@ -132,7 +145,15 @@ fifa-manager/
 1. Ensure you have exactly 10 players configured in tactics
 2. Click "Analyze Team" from the Manager Dashboard
 3. View your optimal starting lineup and bench
-4. Review detailed analysis of team strengths
+4. Click on any player card to view their detailed statistics
+5. Review detailed analysis of team strengths
+
+### Advanced Player Statistics
+1. Navigate to the Player Stats page
+2. Expand the "Advanced Stats" dropdown for detailed metrics
+3. View red cards, shots, shots on target, and true shooting percentage
+4. All advanced stats factor into the player's overall score
+5. Use the two-column layout for efficient data entry
 
 ## 🔧 Development
 
