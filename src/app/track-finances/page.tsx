@@ -56,7 +56,7 @@ export default function TrackFinancesPage() {
   // Helper function to calculate buying value
   const calculateBuyingValue = (isStarter: boolean, category: string, sectorChanges: any, positionChanges: any, currentBudget: number, playerPrice: number) => {
     let valueScore = 0;
-    let valueReasoning: string[] = [];
+    const valueReasoning: string[] = [];
     let valueAssessment = '';
     let valueColor = '';
     let remainingBudget = 0;
