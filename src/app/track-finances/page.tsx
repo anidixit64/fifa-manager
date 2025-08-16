@@ -1031,9 +1031,9 @@ export default function TrackFinancesPage() {
           </div>
 
           {/* Main Content */}
-          <div className="relative h-[calc(100vh-200px)]">
+          <div className="relative h-[calc(90vh-180px)]">
             {/* Bar - Left Side */}
-            <div className="absolute left-16 top-1/2 transform -translate-y-1/2 h-full">
+            <div className="absolute left-16 top-[60%] transform -translate-y-1/2 h-full">
               <div className="relative h-full">
                 {/* Bar Container */}
                 <div className="w-16 h-full bg-[#dde1e0]/10 rounded-full border-4 border-[#a78968] shadow-lg">
@@ -1081,7 +1081,7 @@ export default function TrackFinancesPage() {
             </div>
 
             {/* Trade Calculator - Dynamic height based on toggle state */}
-            <div className={`absolute left-40 top-0 -right-30 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
+            <div className={`absolute left-40 top-16 -right-30 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
               isRedToggleOn || isAnalyzing ? 'h-full overflow-hidden' : 'h-auto overflow-visible'
             }`}>
               {/* Trade Calculator Header */}
@@ -1197,8 +1197,8 @@ export default function TrackFinancesPage() {
               
               {/* Trade Calculator Content - Show search bar for green toggle, full content for red toggle, analyze mode */}
               {isGreenToggleOn && !isAnalyzing && (
-                <div className="p-6">
-                  {/* Search Bar */}
+              <div className="p-6">
+                {/* Search Bar */}
                   <div className="relative" data-search-container>
                     <input
                       type="text"
@@ -1228,7 +1228,7 @@ export default function TrackFinancesPage() {
                               <span className="text-sm text-[#a78968]">
                                 {player.player_positions?.[0] || 'Unknown'} • {player.overall || 'N/A'}
                               </span>
-                            </div>
+                  </div>
                             <div className="text-xs text-[#a78968] mt-1">
                               {player.nationality_name} • Age: {player.age || 'N/A'}
                             </div>
@@ -1236,8 +1236,8 @@ export default function TrackFinancesPage() {
                         ))}
                       </div>
                     )}
-                  </div>
-                  
+                </div>
+                
 
                   
                   {/* Age, Overall, Price, and Attributes Input Fields */}
@@ -1425,12 +1425,12 @@ export default function TrackFinancesPage() {
                   {/* Price Display */}
                   {selectedPlayer && playerPrice && (
                     <div className="mb-4 p-3 bg-[#3c5c34]/20 backdrop-blur-sm rounded-lg border border-[#3c5c34]/30">
-                      <div className="text-center">
+                <div className="text-center">
                         <span className="text-[#dde1e0] font-mono font-semibold text-lg">
                           {isRedToggleOn ? 'Selling Price' : 'Purchase Price'}: ${parseInt(playerPrice).toLocaleString()}
                         </span>
-                      </div>
-                    </div>
+                </div>
+              </div>
                   )}
 
                   {/* Player Bar - Horizontal layout with only 5 saved traits */}
@@ -1440,7 +1440,7 @@ export default function TrackFinancesPage() {
                       <div className="flex items-center mb-3">
                         <div className="w-1/2 flex items-center">
                           <div className="text-xs text-[#a8b8a7] font-mono">Name</div>
-                        </div>
+            </div>
                         <div className="w-1/2 flex justify-between items-center pr-8">
                           <div className="w-12 text-center text-xs text-[#a8b8a7] font-mono">Position</div>
                           <div className="w-8 text-center text-xs text-[#a8b8a7] font-mono">Age</div>
@@ -1452,13 +1452,23 @@ export default function TrackFinancesPage() {
                       {/* Player Data Row */}
                       <div className="flex items-center">
                         <div className="w-1/2">
-                          <span className="font-semibold text-[#dde1e0] font-mono">{selectedPlayer.long_name}</span>
+                          <span className="font-semibold text-[#dde1e0] font-mono">
+                            {isGreenToggleOn ? selectedPlayer.long_name : selectedPlayer.name}
+                          </span>
                         </div>
                         <div className="w-1/2 flex justify-between items-center pr-8">
-                          <div className="w-12 text-center text-[#dde1e0] font-mono">{selectedPlayer.player_positions?.[0] || 'Unknown'}</div>
-                          <div className="w-8 text-center text-[#dde1e0] font-mono">{playerAge || 'N/A'}</div>
-                          <div className="w-10 text-center font-medium text-[#a8b8a7] font-mono">{playerOverall || 'N/A'}</div>
-                          <div className="w-8 text-center text-[#dde1e0] font-mono">{selectedPlayer.preferred_foot || 'N/A'}</div>
+                          <div className="w-12 text-center text-[#dde1e0] font-mono">
+                            {isGreenToggleOn ? (selectedPlayer.player_positions?.[0] || 'Unknown') : (selectedPlayer.mainPosition || 'Unknown')}
+                          </div>
+                          <div className="w-8 text-center text-[#dde1e0] font-mono">
+                            {isGreenToggleOn ? (playerAge || 'N/A') : selectedPlayer.age}
+                          </div>
+                          <div className="w-10 text-center font-medium text-[#a8b8a7] font-mono">
+                            {isGreenToggleOn ? (playerOverall || 'N/A') : selectedPlayer.overall}
+                          </div>
+                          <div className="w-8 text-center text-[#dde1e0] font-mono">
+                            {selectedPlayer.preferred_foot || 'N/A'}
+                          </div>
                         </div>
                       </div>
                     </div>
