@@ -204,7 +204,7 @@ export default function ManagerPage() {
 
   // Get the reason why tactics are invalid
   const getTacticsValidationMessage = () => {
-    if (players.length === 0) return 'Add players to your squad first';
+    if (players.length === 0) return 'Add players first';
     const storedPositionCounts = localStorage.getItem("positionCounts");
     if (!storedPositionCounts) return 'No selected formation';
     try {
