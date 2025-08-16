@@ -12,7 +12,10 @@ export default function TrackFinancesPage() {
   const { navigateTo } = useOptimizedNavigation({ transitionDuration: 50 });
   const { setTheme } = useTeamTheme();
   const [showBudgetModal, setShowBudgetModal] = useState(false);
+  const [showModifyModal, setShowModifyModal] = useState(false);
   const [budgetAmount, setBudgetAmount] = useState('');
+  const [currentMoney, setCurrentMoney] = useState('');
+  const [maxBudget, setMaxBudget] = useState(0);
   const [currentBudget, setCurrentBudget] = useState(0);
   const [players] = useLocalStorage<Player[]>('fifaPlayers', []);
 
@@ -66,79 +69,159 @@ export default function TrackFinancesPage() {
               <h1 className="text-4xl font-bold text-[#dde1e0] font-mono tracking-wider">Track Finances</h1>
             </div>
             
-            {/* Set Budget Button and Modal */}
-            <div className="relative">
-              <button
-                onClick={() => setShowBudgetModal(!showBudgetModal)}
-                className="relative group px-6 py-3 text-[#3c5c34] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/60"
-              >
-                {/* Button background */}
-                <div className="absolute inset-0 bg-[#dde1e0] group-hover:bg-[#c8d0cf] transition-colors"></div>
-                {/* Button border */}
-                <div className="absolute inset-0 border-2 border-[#3c5c34]"></div>
-                {/* Button text */}
-                <span className="relative z-10 tracking-wider font-semibold">
-                  Set Budget
-                </span>
-                {/* Hover effect */}
-                <div className="absolute inset-0 bg-[#3c5c34]/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
-              </button>
+            {/* Set Budget and Modify Buttons */}
+            <div className="flex space-x-4">
+              {/* Set Budget Button */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowBudgetModal(!showBudgetModal)}
+                  className="relative group px-6 py-3 text-[#3c5c34] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/60"
+                >
+                  {/* Button background */}
+                  <div className="absolute inset-0 bg-[#dde1e0] group-hover:bg-[#c8d0cf] transition-colors"></div>
+                  {/* Button border */}
+                  <div className="absolute inset-0 border-2 border-[#3c5c34]"></div>
+                  {/* Button text */}
+                  <span className="relative z-10 tracking-wider font-semibold">
+                    Set Budget
+                  </span>
+                  {/* Hover effect */}
+                  <div className="absolute inset-0 bg-[#3c5c34]/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                </button>
 
-              {/* Budget Modal */}
-              {showBudgetModal && (
-                <div className="absolute top-full right-0 mt-2 bg-[#dde1e0] border-2 border-[#3c5c34] rounded-lg shadow-lg p-4 z-50 min-w-64">
-                  <div className="space-y-3">
-                    <h3 className="text-[#3c5c34] font-mono font-semibold text-lg">Set Budget Amount</h3>
-                    <div className="space-y-2">
-                      <div className="text-[#3c5c34] font-mono text-sm">Select budget in $10M increments:</div>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((amount) => (
-                          <button
-                            key={amount}
-                            onClick={() => setBudgetAmount((amount * 1000000).toString())}
-                            className={`px-3 py-2 border border-[#3c5c34] rounded font-mono text-sm transition-colors ${
-                              budgetAmount === (amount * 1000000).toString()
-                                ? 'bg-[#3c5c34] text-[#dde1e0]'
-                                : 'bg-white text-[#3c5c34] hover:bg-[#dde1e0]/20'
-                            }`}
-                          >
-                            ${amount}M
-                          </button>
-                        ))}
+                {/* Budget Modal */}
+                {showBudgetModal && (
+                  <div className="absolute top-full left-0 mt-2 bg-[#dde1e0] border-2 border-[#3c5c34] rounded-lg shadow-lg p-4 z-50 min-w-64">
+                    <div className="space-y-3">
+                      <h3 className="text-[#3c5c34] font-mono font-semibold text-lg">Set Maximum Budget</h3>
+                      <div className="space-y-2">
+                        <div className="text-[#3c5c34] font-mono text-sm">Select maximum budget in $10M increments:</div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((amount) => (
+                            <button
+                              key={amount}
+                              onClick={() => setBudgetAmount((amount * 1000000).toString())}
+                              className={`px-3 py-2 border border-[#3c5c34] rounded font-mono text-sm transition-colors ${
+                                budgetAmount === (amount * 1000000).toString()
+                                  ? 'bg-[#3c5c34] text-[#dde1e0]'
+                                  : 'bg-white text-[#3c5c34] hover:bg-[#dde1e0]/20'
+                              }`}
+                            >
+                              ${amount}M
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => {
-                          const amount = parseInt(budgetAmount) || 0;
-                          if (amount > 0) {
-                            setCurrentBudget(amount);
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            const amount = parseInt(budgetAmount) || 0;
+                            if (amount > 0) {
+                              setMaxBudget(amount);
+                              setCurrentBudget(amount); // Fill bar to 100%
+                              setShowBudgetModal(false);
+                              setBudgetAmount('');
+                            }
+                          }}
+                          disabled={!budgetAmount}
+                          className={`flex-1 px-4 py-2 font-mono font-semibold rounded transition-colors ${
+                            budgetAmount
+                              ? 'bg-[#3c5c34] text-[#dde1e0] hover:bg-[#2a4a2a]'
+                              : 'bg-[#a78968]/50 text-[#dde1e0]/50 cursor-not-allowed'
+                          }`}
+                        >
+                          Set
+                        </button>
+                        <button
+                          onClick={() => {
                             setShowBudgetModal(false);
                             setBudgetAmount('');
-                          }
-                        }}
-                        disabled={!budgetAmount}
-                        className={`flex-1 px-4 py-2 font-mono font-semibold rounded transition-colors ${
-                          budgetAmount
-                            ? 'bg-[#3c5c34] text-[#dde1e0] hover:bg-[#2a4a2a]'
-                            : 'bg-[#a78968]/50 text-[#dde1e0]/50 cursor-not-allowed'
-                        }`}
-                      >
-                        Set
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowBudgetModal(false);
-                          setBudgetAmount('');
-                        }}
-                        className="flex-1 px-4 py-2 bg-[#a78968] text-[#dde1e0] font-mono font-semibold rounded hover:bg-[#8f7a5a] transition-colors"
-                      >
-                        Cancel
-                      </button>
+                          }}
+                          className="flex-1 px-4 py-2 bg-[#a78968] text-[#dde1e0] font-mono font-semibold rounded hover:bg-[#8f7a5a] transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+
+              {/* Modify Button */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setCurrentMoney(currentBudget.toString());
+                    setShowModifyModal(!showModifyModal);
+                  }}
+                  className="relative group px-6 py-3 text-[#3c5c34] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/60"
+                >
+                  {/* Button background */}
+                  <div className="absolute inset-0 bg-[#dde1e0] group-hover:bg-[#c8d0cf] transition-colors"></div>
+                  {/* Button border */}
+                  <div className="absolute inset-0 border-2 border-[#3c5c34]"></div>
+                  {/* Button text */}
+                  <span className="relative z-10 tracking-wider font-semibold">
+                    Modify
+                  </span>
+                  {/* Hover effect */}
+                  <div className="absolute inset-0 bg-[#3c5c34]/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                </button>
+
+                {/* Modify Modal */}
+                {showModifyModal && (
+                  <div className="absolute top-full left-0 mt-2 bg-[#dde1e0] border-2 border-[#3c5c34] rounded-lg shadow-lg p-4 z-50 min-w-64">
+                    <div className="space-y-3">
+                      <h3 className="text-[#3c5c34] font-mono font-semibold text-lg">Set Current Money</h3>
+                      <div className="space-y-2">
+                        <div className="text-[#3c5c34] font-mono text-sm">
+                          Current max budget: ${maxBudget.toLocaleString()}
+                        </div>
+                        <div className="text-[#3c5c34] font-mono text-sm">Enter current money amount:</div>
+                        <input
+                          type="number"
+                          value={currentMoney}
+                          onChange={(e) => setCurrentMoney(e.target.value)}
+                          placeholder="Enter amount"
+                          className="w-full px-3 py-2 border border-[#3c5c34] rounded font-mono text-sm focus:outline-none focus:border-[#2a4a2a]"
+                        />
+                        <div className="text-[#3c5c34] font-mono text-xs text-gray-600">
+                          Amount must be between $0 and ${maxBudget.toLocaleString()}
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            const amount = parseInt(currentMoney) || 0;
+                            if (amount >= 0 && amount <= maxBudget) {
+                              setCurrentBudget(amount);
+                              setShowModifyModal(false);
+                              setCurrentMoney('');
+                            }
+                          }}
+                          disabled={!currentMoney || parseInt(currentMoney) < 0 || parseInt(currentMoney) > maxBudget}
+                          className={`flex-1 px-4 py-2 font-mono font-semibold rounded transition-colors ${
+                            currentMoney && parseInt(currentMoney) >= 0 && parseInt(currentMoney) <= maxBudget
+                              ? 'bg-[#3c5c34] text-[#dde1e0] hover:bg-[#2a4a2a]'
+                              : 'bg-[#a78968]/50 text-[#dde1e0]/50 cursor-not-allowed'
+                          }`}
+                        >
+                          Set
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowModifyModal(false);
+                            setCurrentMoney('');
+                          }}
+                          className="flex-1 px-4 py-2 bg-[#a78968] text-[#dde1e0] font-mono font-semibold rounded hover:bg-[#8f7a5a] transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -149,17 +232,21 @@ export default function TrackFinancesPage() {
               <div className="relative h-full">
                 {/* Bar Container */}
                 <div className="w-16 h-full bg-[#dde1e0]/10 rounded-full border-4 border-[#a78968] shadow-lg">
-                  {/* Red Fill Bar - fills based on budget */}
+                  {/* Red Fill Bar - fills proportionally based on current money vs max budget */}
                   <div 
                     className="w-full bg-red-500/70 rounded-full shadow-inner transition-all duration-500"
-                    style={{ height: currentBudget > 0 ? '100%' : '0%' }}
+                    style={{ 
+                      height: maxBudget > 0 ? `${(currentBudget / maxBudget) * 100}%` : '0%' 
+                    }}
                   ></div>
                 </div>
                 
                 {/* Level Tag */}
                 <div 
                   className="absolute -left-40 transform -translate-y-1/2 transition-all duration-500"
-                  style={{ top: currentBudget > 0 ? '0%' : '100%' }}
+                  style={{ 
+                    top: maxBudget > 0 ? `${100 - ((currentBudget / maxBudget) * 100)}%` : '100%' 
+                  }}
                 >
                   <div className="relative">
                     {/* Tag Shape */}
@@ -173,6 +260,10 @@ export default function TrackFinancesPage() {
                       <span className="text-[#3c5c34] font-mono font-bold text-6xl">
                         {currentBudget > 0 ? `$${currentBudget.toLocaleString()}` : ''}
                       </span>
+                      {/* Max Budget Display */}
+                      <div className="text-[#3c5c34] font-mono text-sm text-center mt-2">
+                        Max: ${maxBudget.toLocaleString()}
+                      </div>
                     </div>
                   </div>
                 </div>
