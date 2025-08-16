@@ -787,22 +787,7 @@ export default function TrackFinancesPage() {
     }
   };
 
-  // Handle back button click in analyze mode
-  const handleAnalyzeBack = () => {
-    setIsAnalyzing(false);
-    setSelectedPlayer(null);
-    setSearchQuery('');
-    setShowAnalyzeButton(false);
-    setPlayerAge('');
-    setPlayerOverall('');
-    setPlayerPrice('');
-    setPlayerPace('');
-    setPlayerShooting('');
-    setPlayerPassing('');
-    setPlayerDribbling('');
-    setPlayerDefending('');
-    setPlayerPhysical('');
-  };
+
 
   // Handle clicks outside dropdown to close it
   useEffect(() => {
@@ -1404,23 +1389,7 @@ export default function TrackFinancesPage() {
               {/* Analyze Mode Content */}
               {isAnalyzing && (
                 <div className="p-6 h-[calc(100%-80px)] overflow-y-auto">
-                  {/* Tan Back Button */}
-                  <button
-                    onClick={handleAnalyzeBack}
-                    className="relative group p-2 rounded-full bg-[#a78968]/20 hover:bg-[#a78968]/30 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/50 mb-6"
-                  >
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      className="h-6 w-6 text-[#a78968] group-hover:text-[#8f7a5a] transition-all duration-300 group-hover:rotate-12 group-active:-rotate-6" 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
-                      stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    {/* Hover glow effect */}
-                    <div className="absolute inset-0 rounded-full bg-[#a78968]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                  </button>
+
 
                   {/* Price Display */}
                   {selectedPlayer && playerPrice && (
