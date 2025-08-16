@@ -144,8 +144,8 @@ export default function TrackFinancesPage() {
 
           {/* Main Content */}
           <div className="relative h-[calc(100vh-200px)]">
-            {/* Absolutely Centered Bar - Never Moves */}
-            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full">
+            {/* Bar - Left Side */}
+            <div className="absolute left-8 top-1/2 transform -translate-y-1/2 h-full">
               <div className="relative h-full">
                 {/* Bar Container */}
                 <div className="w-16 h-full bg-[#dde1e0]/10 rounded-full border-4 border-[#a78968] shadow-lg">
@@ -158,16 +158,16 @@ export default function TrackFinancesPage() {
                 
                 {/* Level Tag */}
                 <div 
-                  className="absolute -right-40 transform -translate-y-1/2 transition-all duration-500"
+                  className="absolute -left-40 transform -translate-y-1/2 transition-all duration-500"
                   style={{ top: currentBudget > 0 ? '0%' : '100%' }}
                 >
                   <div className="relative">
                     {/* Tag Shape */}
                     <div className="bg-[#dde1e0] border-2 border-[#3c5c34] px-16 py-8 rounded-lg shadow-lg relative">
-                      {/* Tag Pointer - pointing horizontally from left side to red fill level */}
-                      <div className="absolute left-0 top-1/2 transform -translate-x-full -translate-y-1/2">
-                        <div className="w-0 h-0 border-t-12 border-b-12 border-r-12 border-transparent border-r-[#3c5c34]"></div>
-                        <div className="w-0 h-0 border-t-10 border-b-10 border-r-10 border-transparent border-r-[#dde1e0] absolute top-1 left-0.5"></div>
+                      {/* Tag Pointer - pointing horizontally from right side to red fill level */}
+                      <div className="absolute right-0 top-1/2 transform translate-x-full -translate-y-1/2">
+                        <div className="w-0 h-0 border-t-12 border-b-12 border-l-12 border-transparent border-l-[#3c5c34]"></div>
+                        <div className="w-0 h-0 border-t-10 border-b-10 border-l-10 border-transparent border-l-[#dde1e0] absolute top-1 right-0.5"></div>
                       </div>
                       {/* Number Display */}
                       <span className="text-[#3c5c34] font-mono font-bold text-6xl">
@@ -178,46 +178,35 @@ export default function TrackFinancesPage() {
                 </div>
               </div>
             </div>
-            
-            {/* Player List - Left Side */}
-            <div className="absolute -left-20 top-0 w-[600px] h-full bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 overflow-hidden">
-              {/* Player Table */}
-              <div className="h-full overflow-y-auto">
-                {players.length === 0 ? (
-                  <div className="p-8 text-center">
-                    <p className="text-[#a8b8a7] font-mono">No players added yet</p>
-                    <p className="text-sm text-[#a8b8a7]/70 font-mono">Add players in the Manager page</p>
-                  </div>
-                ) : (
-                  <div className="p-8">
-                    {/* Table Header */}
-                    <div className="grid grid-cols-3 gap-4 mb-4 pb-2 border-b border-[#dde1e0]/20">
-                      <div className="text-[#dde1e0] font-mono font-semibold text-sm">Name</div>
-                      <div className="text-[#dde1e0] font-mono font-semibold text-sm text-center">Overall</div>
-                      <div className="text-[#dde1e0] font-mono font-semibold text-sm text-center">Position</div>
-                    </div>
-                    
-                    {/* Player Rows */}
-                    <div className="space-y-2">
-                      {players.map((player) => (
-                        <div
-                          key={player.id}
-                          className="grid grid-cols-3 gap-4 py-3 px-2 bg-[#dde1e0]/5 hover:bg-[#dde1e0]/10 border border-[#dde1e0]/20 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <div className="text-[#dde1e0] font-mono text-sm truncate">
-                            {player.name}
-                          </div>
-                          <div className="text-[#a78968] font-mono font-bold text-center">
-                            {player.overall}
-                          </div>
-                          <div className="text-[#a8b8a7] font-mono text-sm text-center">
-                            {player.mainPosition}
-                          </div>
-                        </div>
-                      ))}
+
+            {/* Trade Calculator - Takes Remaining Space */}
+            <div className="absolute left-32 top-0 -right-30 h-full bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 overflow-hidden">
+              {/* Trade Calculator Header */}
+              <div className="p-6 border-b border-[#dde1e0]/20">
+                <h2 className="text-2xl font-bold text-[#dde1e0] font-mono tracking-wider text-center">Trade Calculator</h2>
+              </div>
+              
+              {/* Trade Calculator Content */}
+              <div className="p-6">
+                {/* Search Bar */}
+                <div className="mb-6">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search players..."
+                      className="w-full px-4 py-3 bg-[#dde1e0]/20 border-2 border-[#a78968] rounded-lg text-[#dde1e0] font-mono placeholder-[#a8b8a7]/70 focus:outline-none focus:border-[#3c5c34] focus:bg-[#dde1e0]/30 transition-all duration-300"
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <svg className="w-5 h-5 text-[#a8b8a7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
                     </div>
                   </div>
-                )}
+                </div>
+                
+                <div className="text-center">
+                  <p className="text-[#a8b8a7] font-mono">Trade calculator functionality coming soon...</p>
+                </div>
               </div>
             </div>
           </div>
