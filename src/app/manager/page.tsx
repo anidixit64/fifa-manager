@@ -439,7 +439,7 @@ export default function ManagerPage() {
                     {/* Button text */}
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="relative z-10 tracking-wider text-sm font-semibold text-center px-2">
-                        Track Finances
+                        Transfer Market
                       </span>
                     </div>
                     {/* Hover effect */}

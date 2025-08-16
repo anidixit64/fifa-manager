@@ -856,7 +856,7 @@ export default function TrackFinancesPage() {
                 {/* Hover glow effect */}
                 <div className="absolute inset-0 rounded-full bg-[#dde1e0]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
               </button>
-              <h1 className="text-4xl font-bold text-[#dde1e0] font-mono tracking-wider">Track Finances</h1>
+              <h1 className="text-4xl font-bold text-[#dde1e0] font-mono tracking-wider">Transfer Market</h1>
             </div>
             
             {/* Set Budget and Modify Buttons */}
