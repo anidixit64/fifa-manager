@@ -204,7 +204,7 @@ export default function ManagerPage() {
 
   // Get the reason why tactics are invalid
   const getTacticsValidationMessage = () => {
-    if (players.length === 0) return 'Add players to your squad first';
+    if (players.length === 0) return 'Add players first';
     const storedPositionCounts = localStorage.getItem("positionCounts");
     if (!storedPositionCounts) return 'No selected formation';
     try {
@@ -439,7 +439,7 @@ export default function ManagerPage() {
                     {/* Button text */}
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="relative z-10 tracking-wider text-sm font-semibold text-center px-2">
-                        Track Finances
+                        Transfer Market
                       </span>
                     </div>
                     {/* Hover effect */}
