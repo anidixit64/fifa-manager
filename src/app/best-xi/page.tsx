@@ -110,20 +110,9 @@ export default function BestXIPage() {
   // Helper function to render player card content based on toggle state
   const renderPlayerCardContent = (player: Player, position: string) => {
     if (bestXIToggle && player.mainPosition !== 'GK') {
-      // Show stats when toggle is on (for non-GK players)
+      // Show only goals and assists when toggle is on (for non-GK players)
       const goals = player.stats?.goals || 0;
       const assists = player.stats?.assists || 0;
-      const redCards = player.stats?.redCards || 0;
-      const shots = player.stats?.shots || 0;
-      const shotsOnTarget = player.stats?.shotsOnTarget || 0;
-      
-      // Calculate true shooting percentage
-      const trueShootingPercentage = (() => {
-        if (shots === 0 && shotsOnTarget === 0) return 0;
-        const goalsPerShot = shots > 0 ? goals / shots : 0;
-        const goalsPerShotOnTarget = shotsOnTarget > 0 ? goals / shotsOnTarget : 0;
-        return Math.round(((goalsPerShot + goalsPerShotOnTarget) / 2) * 100);
-      })();
       
       return (
         <div className="text-center">
@@ -135,14 +124,6 @@ export default function BestXIPage() {
             <div>
               <p className="text-xs text-[#a78968] font-mono">Assists</p>
               <p className="text-sm font-bold text-[#dde1e0] font-mono">{assists}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#a78968] font-mono">Red</p>
-              <p className="text-sm font-bold text-[#dde1e0] font-mono">{redCards}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#a78968] font-mono">TS%</p>
-              <p className="text-sm font-bold text-[#dde1e0] font-mono">{trueShootingPercentage}%</p>
             </div>
           </div>
         </div>
@@ -435,24 +416,6 @@ export default function BestXIPage() {
                             <div className="text-center">
                               <p className="text-xs text-[#a78968] font-mono">Assists</p>
                               <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.assists || 0}</p>
-                            </div>
-                            <div className="text-center">
-                              <p className="text-xs text-[#a78968] font-mono">Red</p>
-                              <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.redCards || 0}</p>
-                            </div>
-                            <div className="text-center">
-                              <p className="text-xs text-[#a78968] font-mono">TS%</p>
-                              <p className="text-sm font-bold text-[#dde1e0] font-mono">
-                                {(() => {
-                                  const goals = player.stats?.goals || 0;
-                                  const shots = player.stats?.shots || 0;
-                                  const shotsOnTarget = player.stats?.shotsOnTarget || 0;
-                                  if (shots === 0 && shotsOnTarget === 0) return 0;
-                                  const goalsPerShot = shots > 0 ? goals / shots : 0;
-                                  const goalsPerShotOnTarget = shotsOnTarget > 0 ? goals / shotsOnTarget : 0;
-                                  return Math.round(((goalsPerShot + goalsPerShotOnTarget) / 2) * 100);
-                                })()}%
-                              </p>
                             </div>
                           </div>
                         ) : (
