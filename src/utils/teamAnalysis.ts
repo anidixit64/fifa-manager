@@ -199,15 +199,35 @@ export function analyzeTeam(
   // Sort by rating and select best XI
   const sortedRatings = playerRatings.sort((a, b) => b.rating - a.rating);
   const bestXI: PlayerRating[] = [];
-  const usedPositions = new Set<string>();
+  const positionCountsMap = new Map(positionCounts?.map(pc => [pc.position, pc.count]) || []);
+  const selectedCounts = new Map<string, number>();
 
-  // Select best player for each position
+  // Initialize selected counts
+  positionCountsMap.forEach((count, position) => {
+    selectedCounts.set(position, 0);
+  });
+
+  // Select players for each position based on tactics configuration
   sortedRatings.forEach(({ player, rating, position }) => {
-    if (bestXI.length < 11 && !usedPositions.has(position)) {
+    const requiredCount = positionCountsMap.get(position) || 0;
+    const currentCount = selectedCounts.get(position) || 0;
+    
+    // If we need more players for this position and haven't filled all 11 slots
+    if (currentCount < requiredCount && bestXI.length < 11) {
       bestXI.push({ player, rating, position });
-      usedPositions.add(position);
+      selectedCounts.set(position, currentCount + 1);
     }
   });
+
+  // If we haven't filled all 11 slots, add the best remaining players
+  // This handles cases where tactics aren't configured or we need to fill remaining slots
+  if (bestXI.length < 11) {
+    sortedRatings.forEach(({ player, rating, position }) => {
+      if (bestXI.length < 11 && !bestXI.some(xi => xi.player.id === player.id)) {
+        bestXI.push({ player, rating, position });
+      }
+    });
+  }
 
   // Select bench players (remaining top players)
   const bench = sortedRatings
