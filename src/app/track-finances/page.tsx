@@ -789,6 +789,114 @@ export default function TrackFinancesPage() {
 
 
 
+  // Generate transfer suggestions based on team analysis
+  const generateTransferSuggestions = () => {
+    
+    const suggestions: Array<{
+      type: string;
+      position: string;
+      category: string;
+      reason: string;
+      priority: 'high' | 'medium' | 'low';
+    }> = [];
+
+    // Analyze current team structure
+    const currentAnalysis = analyzeTeam(players, positionCounts, positionPriorities, Array.from(toggledPositions));
+    
+    // Check for missing starters
+    const requiredPositions = ['GK', 'CB', 'RB', 'LB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST', 'CF'];
+    const bestXIPositions = currentAnalysis.bestXI.map(xi => xi.position);
+    
+    requiredPositions.forEach(position => {
+      if (!bestXIPositions.includes(position)) {
+        suggestions.push({
+          type: 'Starting',
+          position,
+          category: 'Any',
+          reason: `No starter at ${position} position`,
+          priority: 'high'
+        });
+      }
+    });
+
+    // Check position strengths for depth and age balance
+    Object.entries(currentAnalysis.positionStrengths).forEach(([position, data]) => {
+      const positionPlayers = players.filter(p => p.mainPosition === position);
+      
+      // Check for depth issues
+      if (data.count < 2) {
+        suggestions.push({
+          type: 'Bench',
+          position,
+          category: 'Any',
+          reason: `Only ${data.count} player(s) at ${position} - needs depth`,
+          priority: 'medium'
+        });
+      }
+      
+      // Check for age balance issues
+      if (data.count > 0) {
+        const avgAge = positionPlayers.reduce((sum, p) => sum + p.age, 0) / positionPlayers.length;
+        
+        if (!data.hasProspect && avgAge > 28) {
+          suggestions.push({
+            type: 'Young Prospect',
+            position,
+            category: 'Young Star',
+            reason: `${position} has no young prospects (avg age: ${avgAge.toFixed(1)})`,
+            priority: 'medium'
+          });
+        }
+        
+        if (!data.hasVeteran && avgAge < 24) {
+          suggestions.push({
+            type: 'Veteran',
+            position,
+            category: 'Veteran',
+            reason: `${position} has no experienced players (avg age: ${avgAge.toFixed(1)})`,
+            priority: 'low'
+          });
+        }
+        
+        if (data.hasAging && !data.hasProspect) {
+          suggestions.push({
+            type: 'Young Prospect',
+            position,
+            category: 'Young Star',
+            reason: `${position} has aging players but no young prospects`,
+            priority: 'high'
+          });
+        }
+      }
+    });
+
+    // Check sector strengths
+    Object.entries(currentAnalysis.sectorStrengths).forEach(([sector, data]) => {
+      if (data.count < 3) {
+        const sectorPositions = sector === 'Defense' ? ['LB', 'CB', 'RB'] :
+                               sector === 'Midfield' ? ['CDM', 'CM', 'CAM', 'LM', 'RM'] :
+                               sector === 'Forward' ? ['LW', 'RW', 'ST'] : ['GK'];
+        
+        sectorPositions.forEach(position => {
+          if (!suggestions.some(s => s.position === position && s.type === 'Starting')) {
+            suggestions.push({
+              type: 'Sector',
+              position,
+              category: 'Any',
+              reason: `Weak ${sector} depth (${data.count} players)`,
+              priority: 'medium'
+            });
+          }
+        });
+      }
+    });
+
+    return suggestions.sort((a, b) => {
+      const priorityOrder = { high: 3, medium: 2, low: 1 };
+      return priorityOrder[b.priority] - priorityOrder[a.priority];
+    });
+  };
+
   // Handle clicks outside dropdown to close it
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -1680,6 +1788,53 @@ export default function TrackFinancesPage() {
               )}
             </div>
             
+            {/* Transfer Suggestions Box */}
+            <div className={`absolute left-40 -right-30 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 ${
+              isGreenToggleOn || isRedToggleOn || isAnalyzing 
+                ? 'top-[calc(80px+120px+54px)]' 
+                : 'top-[calc(120px+54px)]'
+            }`}>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Transfer Suggestions</h3>
+                
+                {generateTransferSuggestions().length > 0 ? (
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {generateTransferSuggestions().map((suggestion, index) => (
+                      <div key={index} className="bg-[#dde1e0]/20 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <span className={`px-2 py-1 rounded text-xs font-mono font-semibold ${
+                              suggestion.priority === 'high' 
+                                ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
+                                : suggestion.priority === 'medium'
+                                ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                                : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                            }`}>
+                              {suggestion.priority.toUpperCase()}
+                            </span>
+                            <span className="text-[#dde1e0] font-mono font-semibold">
+                              {suggestion.type} {suggestion.position}
+                            </span>
+                          </div>
+                          <span className="text-[#a78968] font-mono text-sm">
+                            {suggestion.category}
+                          </span>
+                        </div>
+                        <p className="text-[#dde1e0] font-mono text-sm">
+                          {suggestion.reason}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-[#a78968] font-mono italic">
+                      No transfer suggestions available. Your team appears to be well-balanced!
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
 
           </div>
         </div>
