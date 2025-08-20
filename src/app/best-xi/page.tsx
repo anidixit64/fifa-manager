@@ -60,6 +60,7 @@ export default function BestXIPage() {
   const [toggledPositions, setToggledPositions] = useState<Set<TogglePosition>>(new Set());
   const [isClient, setIsClient] = useState(false);
   const [bestXIToggle, setBestXIToggle] = useState(false);
+  const [showTransferSuggestions, setShowTransferSuggestions] = useState(false);
 
   // Optimized click handler
   const handlePlayerClick = useCallback((playerId: string) => {
@@ -145,6 +146,112 @@ export default function BestXIPage() {
     }
   };
 
+  // Generate transfer suggestions based on team analysis
+  const generateTransferSuggestions = () => {
+    if (!analysis) return [];
+    
+    const suggestions: Array<{
+      type: string;
+      position: string;
+      category: string;
+      reason: string;
+      priority: 'high' | 'medium' | 'low';
+    }> = [];
+
+    // Check for missing starters
+    const requiredPositions = ['GK', 'CB', 'RB', 'LB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST', 'CF'];
+    const bestXIPositions = analysis.bestXI.map(xi => xi.position);
+    
+    requiredPositions.forEach(position => {
+      if (!bestXIPositions.includes(position)) {
+        suggestions.push({
+          type: 'Starting',
+          position,
+          category: 'Any',
+          reason: `No starter at ${position} position`,
+          priority: 'high'
+        });
+      }
+    });
+
+    // Check position strengths for depth and age balance
+    Object.entries(analysis.positionStrengths).forEach(([position, data]) => {
+      const positionPlayers = players.filter(p => p.mainPosition === position);
+      
+      // Check for depth issues
+      if (data.count < 2) {
+        suggestions.push({
+          type: 'Bench',
+          position,
+          category: 'Any',
+          reason: `Only ${data.count} player(s) at ${position} - needs depth`,
+          priority: 'medium'
+        });
+      }
+      
+      // Check for age balance issues
+      if (data.count > 0) {
+        const avgAge = positionPlayers.reduce((sum, p) => sum + p.age, 0) / positionPlayers.length;
+        
+        if (!data.hasProspect && avgAge > 28) {
+          suggestions.push({
+            type: 'Young Prospect',
+            position,
+            category: 'Young Star',
+            reason: `${position} has no young prospects (avg age: ${avgAge.toFixed(1)})`,
+            priority: 'medium'
+          });
+        }
+        
+        if (!data.hasVeteran && avgAge < 24) {
+          suggestions.push({
+            type: 'Veteran',
+            position,
+            category: 'Veteran',
+            reason: `${position} has no experienced players (avg age: ${avgAge.toFixed(1)})`,
+            priority: 'low'
+          });
+        }
+        
+        if (data.hasAging && !data.hasProspect) {
+          suggestions.push({
+            type: 'Young Prospect',
+            position,
+            category: 'Young Star',
+            reason: `${position} has aging players but no young prospects`,
+            priority: 'high'
+          });
+        }
+      }
+    });
+
+    // Check sector strengths
+    Object.entries(analysis.sectorStrengths).forEach(([sector, data]) => {
+      if (data.count < 3) {
+        const sectorPositions = sector === 'Defense' ? ['LB', 'CB', 'RB'] :
+                               sector === 'Midfield' ? ['CDM', 'CM', 'CAM', 'LM', 'RM'] :
+                               sector === 'Forward' ? ['LW', 'RW', 'ST'] : ['GK'];
+        
+        sectorPositions.forEach(position => {
+          if (!suggestions.some(s => s.position === position && s.type === 'Starting')) {
+            suggestions.push({
+              type: 'Sector',
+              position,
+              category: 'Any',
+              reason: `Weak ${sector} depth (${data.count} players)`,
+              priority: 'medium'
+            });
+          }
+        });
+      }
+    });
+
+    return suggestions.sort((a, b) => {
+      const priorityOrder = { high: 3, medium: 2, low: 1 };
+      return priorityOrder[b.priority] - priorityOrder[a.priority];
+    });
+  };
+
   // Helper function to render player card content based on toggle state
   const renderPlayerCardContent = (player: Player, position: string) => {
     if (bestXIToggle && player.mainPosition !== 'GK') {
@@ -181,24 +288,43 @@ export default function BestXIPage() {
   return (
     <main className="min-h-screen bg-[#3c5c34]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center mb-8">
-          <button
-            onClick={() => navigateTo('/manager')}
-            className="relative group p-2 rounded-full bg-[#dde1e0]/10 hover:bg-[#dde1e0]/20 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/50 mr-4"
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-6 w-6 text-[#dde1e0]/80 group-hover:text-[#8B6F47] transition-all duration-300 group-hover:rotate-12 group-active:-rotate-6" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center">
+            <button
+              onClick={() => navigateTo('/manager')}
+              className="relative group p-2 rounded-full bg-[#dde1e0]/10 hover:bg-[#dde1e0]/20 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/50 mr-4"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {/* Hover glow effect */}
-            <div className="absolute inset-0 rounded-full bg-[#a78968]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-6 w-6 text-[#dde1e0]/80 group-hover:text-[#8B6F47] transition-all duration-300 group-hover:rotate-12 group-active:-rotate-6" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              {/* Hover glow effect */}
+              <div className="absolute inset-0 rounded-full bg-[#a78968]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+            </button>
+            <h1 className="text-3xl font-bold text-[#dde1e0] font-mono tracking-wider">Best XI Analysis</h1>
+          </div>
+          
+          {/* Suggest Transfers Button */}
+          <button
+            onClick={() => setShowTransferSuggestions(true)}
+            className="relative group px-6 py-3 text-[#3c5c34] overflow-hidden font-mono shadow-md transition-transform duration-150 hover:scale-105 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/60"
+          >
+            {/* Button background */}
+            <div className="absolute inset-0 bg-[#dde1e0] group-hover:bg-[#c8d0cf] transition-colors"></div>
+            {/* Button border */}
+            <div className="absolute inset-0 border-2 border-[#3c5c34]"></div>
+            {/* Button text */}
+            <span className="relative z-10 tracking-wider font-semibold">
+              Suggest Transfers
+            </span>
+            {/* Hover effect */}
+            <div className="absolute inset-0 bg-[#3c5c34]/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
           </button>
-          <h1 className="text-3xl font-bold text-[#dde1e0] font-mono tracking-wider">Best XI Analysis</h1>
         </div>
 
         {analysis && (
@@ -499,6 +625,74 @@ export default function BestXIPage() {
                     );
                   })}
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Transfer Suggestions Modal */}
+        {showTransferSuggestions && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <div className="bg-[#dde1e0] rounded-lg shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden transform -translate-y-72">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between p-6 border-b border-[#3c5c34]/20">
+                <h2 className="text-2xl font-bold text-[#3c5c34] font-mono tracking-wider">Transfer Suggestions</h2>
+                <button
+                  onClick={() => setShowTransferSuggestions(false)}
+                  className="relative group p-2 rounded-full bg-[#3c5c34]/10 hover:bg-[#3c5c34]/20 transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#3c5c34]/50"
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="h-6 w-6 text-[#3c5c34] group-hover:text-[#2a4a2a] transition-all duration-300" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Modal Content */}
+              <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
+                {generateTransferSuggestions().length > 0 ? (
+                  <div className="space-y-4">
+                    {generateTransferSuggestions().map((suggestion, index) => (
+                      <div key={index} className="bg-[#3c5c34]/10 backdrop-blur-sm p-4 rounded-lg border border-[#3c5c34]/30">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center space-x-3">
+                            <span className={`px-3 py-1 rounded-full text-sm font-mono font-semibold ${
+                              suggestion.priority === 'high' 
+                                ? 'bg-red-500/20 text-red-700 border border-red-500/30' 
+                                : suggestion.priority === 'medium'
+                                ? 'bg-yellow-500/20 text-yellow-700 border border-yellow-500/30'
+                                : 'bg-blue-500/20 text-blue-700 border border-blue-500/30'
+                            }`}>
+                              {suggestion.priority.toUpperCase()}
+                            </span>
+                            <span className="text-[#3c5c34] font-mono font-semibold text-lg">
+                              {suggestion.type} {suggestion.position}
+                            </span>
+                          </div>
+                          <span className="text-[#8B6F47] font-mono text-sm bg-[#dde1e0]/50 px-3 py-1 rounded-full">
+                            {suggestion.category}
+                          </span>
+                        </div>
+                        <p className="text-[#3c5c34] font-mono text-sm leading-relaxed">
+                          {suggestion.reason}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="text-[#8B6F47] text-6xl mb-4">🎉</div>
+                    <h3 className="text-xl font-bold text-[#3c5c34] font-mono mb-2">Team is Well-Balanced!</h3>
+                    <p className="text-[#8B6F47] font-mono">
+                      Your team appears to have good depth and age balance across all positions.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
