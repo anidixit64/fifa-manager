@@ -107,6 +107,44 @@ export default function BestXIPage() {
     setAnalysis(teamAnalysis);
   };
 
+  // Helper function to determine strength level and border color
+  const getStrengthLevel = (data: any, type: 'sector' | 'position') => {
+    if (type === 'sector') {
+      const count = data.count;
+      if (count < 3) return 'weak';
+      if (count > 8) return 'strong';
+      return 'moderate';
+    } else {
+      // Position strength logic
+      const count = data.count;
+      const hasProspect = data.hasProspect;
+      const hasVeteran = data.hasVeteran;
+      const hasNormal = data.hasNormal;
+      const hasAging = data.hasAging;
+      
+      // Very weak: no players or missing prospects
+      if (count === 0 || (count < 2 && !hasProspect)) return 'weak';
+      
+      // Strong: good count and has prospects
+      if (count >= 2 && hasProspect && (hasVeteran || hasNormal)) return 'strong';
+      
+      // Moderate: some players but could be better
+      return 'moderate';
+    }
+  };
+
+  const getBorderColor = (strengthLevel: string) => {
+    switch (strengthLevel) {
+      case 'weak':
+        return 'border-red-500 hover:border-red-400';
+      case 'strong':
+        return 'border-green-500 hover:border-green-400';
+      case 'moderate':
+      default:
+        return 'border-[#d4af37] hover:border-[#d4af37]/60';
+    }
+  };
+
   // Helper function to render player card content based on toggle state
   const renderPlayerCardContent = (player: Player, position: string) => {
     if (bestXIToggle && player.mainPosition !== 'GK') {
@@ -118,11 +156,11 @@ export default function BestXIPage() {
         <div className="text-center">
           <div className="grid grid-cols-2 gap-1">
             <div>
-              <p className="text-xs text-[#a78968] font-mono">Goals</p>
-              <p className="text-sm font-bold text-[#dde1e0] font-mono">{goals}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#a78968] font-mono">Assists</p>
+                                        <p className="text-xs text-[#8B6F47] font-mono">Goals</p>
+                          <p className="text-sm font-bold text-[#dde1e0] font-mono">{goals}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-[#8B6F47] font-mono">Assists</p>
               <p className="text-sm font-bold text-[#dde1e0] font-mono">{assists}</p>
             </div>
           </div>
@@ -150,7 +188,7 @@ export default function BestXIPage() {
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
-              className="h-6 w-6 text-[#dde1e0]/80 group-hover:text-[#a78968] transition-all duration-300 group-hover:rotate-12 group-active:-rotate-6" 
+              className="h-6 w-6 text-[#dde1e0]/80 group-hover:text-[#8B6F47] transition-all duration-300 group-hover:rotate-12 group-active:-rotate-6" 
               fill="none" 
               viewBox="0 0 24 24" 
               stroke="currentColor"
@@ -328,18 +366,18 @@ export default function BestXIPage() {
                         {bestXIToggle && player.mainPosition !== 'GK' ? (
                           <div className="grid grid-cols-2 gap-2">
                             <div className="text-center">
-                              <p className="text-xs text-[#a78968] font-mono">Goals</p>
-                              <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.goals || 0}</p>
-                            </div>
-                            <div className="text-center">
-                              <p className="text-xs text-[#a78968] font-mono">Assists</p>
+                                                        <p className="text-xs text-[#8B6F47] font-mono">Goals</p>
+                          <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.goals || 0}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-[#8B6F47] font-mono">Assists</p>
                               <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.assists || 0}</p>
                             </div>
                           </div>
                         ) : (
                           <>
-                            <p className="text-lg font-bold text-[#a78968] font-mono">{player.overall}</p>
-                            <p className="text-sm text-[#644d36] font-mono">{player.role}</p>
+                                                      <p className="text-lg font-bold text-[#8B6F47] font-mono">{player.overall}</p>
+                          <p className="text-sm text-[#5A3D2A] font-mono">{player.role}</p>
                           </>
                         )}
                       </div>
@@ -360,11 +398,11 @@ export default function BestXIPage() {
                       <div className="flex justify-between items-center">
                         <div>
                           <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
-                          <p className="text-sm text-[#a78968] font-mono">{player.mainPosition}</p>
+                          <p className="text-sm text-[#8B6F47] font-mono">{player.mainPosition}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          <p className="text-sm text-[#644d36] font-mono">Age: {player.age}</p>
+                          <p className="font-bold text-[#8B6F47] font-mono">{player.overall}</p>
+                          <p className="text-sm text-[#5A3D2A] font-mono">Age: {player.age}</p>
                         </div>
                       </div>
                     </div>
@@ -381,11 +419,11 @@ export default function BestXIPage() {
                       <div className="flex justify-between items-center">
                         <div>
                           <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
-                          <p className="text-sm text-[#a78968] font-mono">{player.mainPosition}</p>
+                          <p className="text-sm text-[#8B6F47] font-mono">{player.mainPosition}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          <p className="text-sm text-[#644d36] font-mono">Age: {player.age}</p>
+                          <p className="font-bold text-[#8B6F47] font-mono">{player.overall}</p>
+                          <p className="text-sm text-[#5A3D2A] font-mono">Age: {player.age}</p>
                         </div>
                       </div>
                     </div>
@@ -402,11 +440,11 @@ export default function BestXIPage() {
                       <div className="flex justify-between items-center">
                         <div>
                           <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
-                          <p className="text-sm text-[#a78968] font-mono">{player.mainPosition}</p>
+                          <p className="text-sm text-[#8B6F47] font-mono">{player.mainPosition}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-[#a78968] font-mono">{player.overall}</p>
-                          <p className="text-sm text-[#644d36] font-mono">Age: {player.age}</p>
+                          <p className="font-bold text-[#8B6F47] font-mono">{player.overall}</p>
+                          <p className="text-sm text-[#5A3D2A] font-mono">Age: {player.age}</p>
                         </div>
                       </div>
                     </div>
@@ -421,17 +459,22 @@ export default function BestXIPage() {
               <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Sector Strengths</h2>
                 <div className="space-y-4">
-                  {Object.entries(analysis.sectorStrengths).map(([sector, data]) => (
-                    <div key={sector} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors">
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-semibold text-[#dde1e0] font-mono">{sector}</h3>
-                        <p className="text-sm text-[#a78968] font-mono">Players: {data.count}</p>
+                  {Object.entries(analysis.sectorStrengths).map(([sector, data]) => {
+                    const strengthLevel = getStrengthLevel(data, 'sector');
+                    const borderColor = getBorderColor(strengthLevel);
+                    
+                    return (
+                      <div key={sector} className={`bg-[#644d36]/10 p-4 rounded-lg border transition-colors ${borderColor}`}>
+                        <div className="flex justify-between items-center">
+                          <h3 className="font-semibold text-[#dde1e0] font-mono">{sector}</h3>
+                          <p className="text-sm text-[#2D1B0E] font-mono">Players: {data.count}</p>
+                        </div>
+                        {data.message && (
+                          <p className="mt-2 text-sm text-[#2D1B0E] font-mono">{data.message}</p>
+                        )}
                       </div>
-                      {data.message && (
-                        <p className="mt-2 text-sm text-[#a78968] font-mono">{data.message}</p>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -439,17 +482,22 @@ export default function BestXIPage() {
               <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Position Strengths</h2>
                 <div className="space-y-4">
-                  {Object.entries(analysis.positionStrengths).map(([position, data]) => (
-                    <div key={position} className="bg-[#644d36]/10 p-4 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors">
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-semibold text-[#dde1e0] font-mono">{position}</h3>
-                        <p className="text-sm text-[#a78968] font-mono">Players: {data.count}</p>
+                  {Object.entries(analysis.positionStrengths).map(([position, data]) => {
+                    const strengthLevel = getStrengthLevel(data, 'position');
+                    const borderColor = getBorderColor(strengthLevel);
+                    
+                    return (
+                      <div key={position} className={`bg-[#644d36]/10 p-4 rounded-lg border transition-colors ${borderColor}`}>
+                        <div className="flex justify-between items-center">
+                          <h3 className="font-semibold text-[#dde1e0] font-mono">{position}</h3>
+                          <p className="text-sm text-[#2D1B0E] font-mono">Players: {data.count}</p>
+                        </div>
+                        {data.message && (
+                          <p className="mt-2 text-sm text-[#2D1B0E] font-mono">{data.message}</p>
+                        )}
                       </div>
-                      {data.message && (
-                        <p className="mt-2 text-sm text-[#a78968] font-mono">{data.message}</p>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
