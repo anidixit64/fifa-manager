@@ -157,9 +157,9 @@ export default function BestXIPage() {
           <div className="grid grid-cols-2 gap-1">
             <div>
                                         <p className="text-xs text-[#8B6F47] font-mono">Goals</p>
-                          <p className="text-sm font-bold text-[#dde1e0] font-mono">{goals}</p>
-                        </div>
-                        <div>
+              <p className="text-sm font-bold text-[#dde1e0] font-mono">{goals}</p>
+            </div>
+            <div>
                           <p className="text-xs text-[#8B6F47] font-mono">Assists</p>
               <p className="text-sm font-bold text-[#dde1e0] font-mono">{assists}</p>
             </div>
@@ -333,19 +333,19 @@ export default function BestXIPage() {
                     >
                       {positionPlayers.length > 0 ? (
                         positionPlayers.map(({ player, position }) => (
-                          <div
-                            key={player.id}
+                        <div
+                          key={player.id}
                             className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-full h-full cursor-pointer hover:scale-105 active:scale-95"
-                            onClick={() => handlePlayerClick(player.id)}
-                            title={`Click to view ${player.shortName}'s stats`}
-                          >
-                            {renderPlayerCardContent(player, position)}
-                          </div>
+                          onClick={() => handlePlayerClick(player.id)}
+                          title={`Click to view ${player.shortName}'s stats`}
+                        >
+                          {renderPlayerCardContent(player, position)}
+                        </div>
                         ))
                       ) : (
                         <div className="w-full h-full" />
                       )}
-                    </div>
+                  </div>
                   );
                 })}
               </div>
@@ -367,9 +367,9 @@ export default function BestXIPage() {
                           <div className="grid grid-cols-2 gap-2">
                             <div className="text-center">
                                                         <p className="text-xs text-[#8B6F47] font-mono">Goals</p>
-                          <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.goals || 0}</p>
-                        </div>
-                        <div className="text-center">
+                              <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.goals || 0}</p>
+                            </div>
+                            <div className="text-center">
                           <p className="text-xs text-[#8B6F47] font-mono">Assists</p>
                               <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.stats?.assists || 0}</p>
                             </div>
@@ -465,14 +465,14 @@ export default function BestXIPage() {
                     
                     return (
                       <div key={sector} className={`bg-[#644d36]/10 p-4 rounded-lg border transition-colors ${borderColor}`}>
-                        <div className="flex justify-between items-center">
-                          <h3 className="font-semibold text-[#dde1e0] font-mono">{sector}</h3>
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-semibold text-[#dde1e0] font-mono">{sector}</h3>
                           <p className="text-sm text-[#2D1B0E] font-mono">Players: {data.count}</p>
-                        </div>
-                        {data.message && (
-                          <p className="mt-2 text-sm text-[#2D1B0E] font-mono">{data.message}</p>
-                        )}
                       </div>
+                      {data.message && (
+                          <p className="mt-2 text-sm text-[#2D1B0E] font-mono">{data.message}</p>
+                      )}
+                    </div>
                     );
                   })}
                 </div>
@@ -488,14 +488,14 @@ export default function BestXIPage() {
                     
                     return (
                       <div key={position} className={`bg-[#644d36]/10 p-4 rounded-lg border transition-colors ${borderColor}`}>
-                        <div className="flex justify-between items-center">
-                          <h3 className="font-semibold text-[#dde1e0] font-mono">{position}</h3>
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-semibold text-[#dde1e0] font-mono">{position}</h3>
                           <p className="text-sm text-[#2D1B0E] font-mono">Players: {data.count}</p>
-                        </div>
-                        {data.message && (
-                          <p className="mt-2 text-sm text-[#2D1B0E] font-mono">{data.message}</p>
-                        )}
                       </div>
+                      {data.message && (
+                          <p className="mt-2 text-sm text-[#2D1B0E] font-mono">{data.message}</p>
+                      )}
+                    </div>
                     );
                   })}
                 </div>

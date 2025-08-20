@@ -225,8 +225,8 @@ export function analyzeTeam(
     sortedRatings.forEach(({ player, rating, position }) => {
       if (bestXI.length < 11 && !bestXI.some(xi => xi.player.id === player.id)) {
         bestXI.push({ player, rating, position });
-      }
-    });
+    }
+  });
   }
 
   // Select bench players (remaining top players)
