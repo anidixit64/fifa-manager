@@ -1,7 +1,7 @@
 // Client-side team analysis utility
 // This contains all the calculation logic from the API route
 
-import { Player } from '@/types/player';
+import { Player, GoalkeeperAttributes } from '@/types/player';
 
 interface PositionPriority {
   position: string;
@@ -133,7 +133,7 @@ function calculateGKRating(player: Player): number {
 
   // Goalkeeper-specific attribute rating
   if ('diving' in player.attributes) {
-    const gkAttributes = player.attributes as any; // Type assertion for goalkeeper attributes
+    const gkAttributes = player.attributes as GoalkeeperAttributes;
     const gkAttributeScore = (
       gkAttributes.diving * 0.25 +      // Diving is most important for GKs
       gkAttributes.handling * 0.20 +    // Handling is second most important
@@ -329,4 +329,4 @@ export function analyzeTeam(
     positionStrengths,
     sectorStrengths
   };
-} 
+}

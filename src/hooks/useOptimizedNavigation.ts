@@ -9,7 +9,7 @@ interface UseOptimizedNavigationOptions {
 
 export const useOptimizedNavigation = (options: UseOptimizedNavigationOptions = {}) => {
   const router = useRouter();
-  const { preload = true, prefetch = true, transitionDuration = 100 } = options;
+  const { preload = true, transitionDuration = 100 } = options;
   const isNavigating = useRef(false);
   const preloadedRoutes = useRef<Set<string>>(new Set());
 
