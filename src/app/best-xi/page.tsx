@@ -110,50 +110,27 @@ export default function BestXIPage() {
   // Helper function to render player card content based on toggle state
   const renderPlayerCardContent = (player: Player, position: string) => {
     if (bestXIToggle && player.mainPosition !== 'GK') {
-      // Show stats when toggle is on (for non-GK players)
+      // Show compact stats when toggle is on (for non-GK players)
       const goals = player.stats?.goals || 0;
       const assists = player.stats?.assists || 0;
-      const redCards = player.stats?.redCards || 0;
-      const shots = player.stats?.shots || 0;
-      const shotsOnTarget = player.stats?.shotsOnTarget || 0;
-      
-      // Calculate true shooting percentage
-      const trueShootingPercentage = (() => {
-        if (shots === 0 && shotsOnTarget === 0) return 0;
-        const goalsPerShot = shots > 0 ? goals / shots : 0;
-        const goalsPerShotOnTarget = shotsOnTarget > 0 ? goals / shotsOnTarget : 0;
-        return Math.round(((goalsPerShot + goalsPerShotOnTarget) / 2) * 100);
-      })();
       
       return (
         <div className="text-center">
-          <div className="grid grid-cols-2 gap-1">
-            <div>
-              <p className="text-xs text-[#a78968] font-mono">Goals</p>
-              <p className="text-sm font-bold text-[#dde1e0] font-mono">{goals}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#a78968] font-mono">Assists</p>
-              <p className="text-sm font-bold text-[#dde1e0] font-mono">{assists}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#a78968] font-mono">Red</p>
-              <p className="text-sm font-bold text-[#dde1e0] font-mono">{redCards}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#a78968] font-mono">TS%</p>
-              <p className="text-sm font-bold text-[#dde1e0] font-mono">{trueShootingPercentage}%</p>
-            </div>
+          <p className="text-xs font-bold text-[#dde1e0] font-mono truncate">{player.shortName}</p>
+          <p className="text-xs text-[#a78968] font-mono">{position}</p>
+          <div className="flex justify-center gap-1 mt-1">
+            <span className="text-xs text-[#a78968] font-mono">G:{goals}</span>
+            <span className="text-xs text-[#a78968] font-mono">A:{assists}</span>
           </div>
         </div>
       );
     } else {
-      // Show overall rating when toggle is off or for GK players
+      // Show compact overall rating when toggle is off or for GK players
       return (
         <div className="text-center">
-          <h3 className="font-bold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-          <p className="text-xs text-[#dde1e0] font-mono">{position}</p>
-          <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.overall}</p>
+          <p className="text-xs font-bold text-[#dde1e0] font-mono truncate">{player.shortName}</p>
+          <p className="text-xs text-[#a78968] font-mono">{position}</p>
+          <p className="text-xs font-bold text-[#dde1e0] font-mono">{player.overall}</p>
         </div>
       );
     }
@@ -202,215 +179,129 @@ export default function BestXIPage() {
                 </button>
               </div>
               
-              {/* Best XI Row Layout */}
-              <div className="space-y-6">
-                {/* Row 6: RW, ST, CF, LW */}
-                <div className="flex justify-between items-center w-full min-h-[70px]">
-                  {/* Left wing positions */}
-                  <div className="flex space-x-2">
-                    {analysis.bestXI
-                      .filter(({ position }) => position === 'LW')
-                      .map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => handlePlayerClick(player.id)}
-                          title={`Click to view ${player.shortName}'s stats`}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                      ))}
-                  </div>
+              {/* Best XI Grid Layout */}
+              <div className="grid grid-cols-7 grid-rows-7 gap-2 w-full h-[490px] bg-[#3c5c34]/20 rounded-lg p-4">
+                {/* Generate all 49 grid cells with players positioned in their designated cells */}
+                {Array.from({ length: 49 }, (_, index) => {
+                  const col = index % 7;
+                  const row = 6 - Math.floor(index / 7); // Reverse row order so 0 is at bottom
+                  
+                  // Find if there's a player for this coordinate
+                  const playerAtPosition = analysis.bestXI.find(({ player, position }) => {
+                    let coordinates: { col: number; row: number }[] = [];
+                    
+                    // Define coordinates for each position
+                    switch (position) {
+                      case 'GK':
+                        coordinates = [{ col: 3, row: 0 }];
+                        break;
+                      case 'CB':
+                        const cbCount = analysis.bestXI.filter(p => p.position === 'CB').length;
+                        if (cbCount === 1) {
+                          coordinates = [{ col: 3, row: 1 }];
+                        } else if (cbCount === 2) {
+                          coordinates = [{ col: 2, row: 1 }, { col: 4, row: 1 }];
+                        } else if (cbCount === 3) {
+                          coordinates = [{ col: 2, row: 1 }, { col: 3, row: 1 }, { col: 4, row: 1 }];
+                        }
+                        break;
+                      case 'RB':
+                        coordinates = [{ col: 6, row: 1 }];
+                        break;
+                      case 'LB':
+                        coordinates = [{ col: 0, row: 1 }];
+                        break;
+                      case 'RWB':
+                        coordinates = [{ col: 6, row: 2 }];
+                        break;
+                      case 'LWB':
+                        coordinates = [{ col: 0, row: 2 }];
+                        break;
+                      case 'CDM':
+                        const cmCount = analysis.bestXI.filter(p => p.position === 'CM').length;
+                        const cdmCount = analysis.bestXI.filter(p => p.position === 'CDM').length;
+                        if (cmCount === 1 && cdmCount === 1) {
+                          coordinates = [{ col: 4, row: 3 }];
+                        } else {
+                          coordinates = [{ col: 3, row: 2 }];
+                        }
+                        break;
+                      case 'LM':
+                        coordinates = [{ col: 0, row: 3 }];
+                        break;
+                      case 'CM':
+                        const cmPlayers = analysis.bestXI.filter(p => p.position === 'CM');
+                        const cmIndex = cmPlayers.findIndex(p => p.player.id === player.id);
+                        if (cmPlayers.length === 1) {
+                          coordinates = [{ col: 2, row: 3 }];
+                        } else if (cmPlayers.length === 2) {
+                          coordinates = cmIndex === 0 ? [{ col: 2, row: 3 }] : [{ col: 4, row: 3 }];
+                        }
+                        break;
+                      case 'RM':
+                        coordinates = [{ col: 6, row: 3 }];
+                        break;
+                      case 'CAM':
+                        coordinates = [{ col: 3, row: 4 }];
+                        break;
+                      case 'LW':
+                        coordinates = [{ col: 0, row: 5 }];
+                        break;
+                      case 'CF':
+                        const cfCount = analysis.bestXI.filter(p => p.position === 'CF').length;
+                        const cfIndex = analysis.bestXI.filter(p => p.position === 'CF').findIndex(p => p.player.id === player.id);
+                        if (cfCount === 1) {
+                          coordinates = [{ col: 3, row: 5 }];
+                        } else if (cfCount === 2) {
+                          coordinates = cfIndex === 0 ? [{ col: 2, row: 5 }] : [{ col: 4, row: 5 }];
+                        }
+                        break;
+                      case 'RW':
+                        coordinates = [{ col: 6, row: 5 }];
+                        break;
+                      case 'ST':
+                        const stCount = analysis.bestXI.filter(p => p.position === 'ST').length;
+                        const stIndex = analysis.bestXI.filter(p => p.position === 'ST').findIndex(p => p.player.id === player.id);
+                        if (stCount === 1) {
+                          coordinates = [{ col: 3, row: 6 }];
+                        } else if (stCount === 2) {
+                          coordinates = stIndex === 0 ? [{ col: 2, row: 6 }] : [{ col: 4, row: 6 }];
+                        }
+                        break;
+                      default:
+                        coordinates = [];
+                    }
 
-                  {/* Center positions */}
-                  <div className="flex justify-center space-x-2">
-                    {analysis.bestXI
-                      .filter(({ position }) => ['ST', 'CF'].includes(position))
-                      .sort((a, b) => {
-                        const order = { 'ST': 0, 'CF': 1 };
-                        return order[a.position as keyof typeof order] - order[b.position as keyof typeof order];
-                      })
-                      .map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                      ))}
-                  </div>
+                    // Find the appropriate coordinate for this player
+                    const playerIndex = analysis.bestXI.filter(p => p.position === position).findIndex(p => p.player.id === player.id);
+                    const coordinate = coordinates[playerIndex] || coordinates[0];
 
-                  {/* Right wing positions */}
-                  <div className="flex space-x-2">
-                    {analysis.bestXI
-                      .filter(({ position }) => position === 'RW')
-                      .map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                      ))}
-                  </div>
-                </div>
+                    return coordinate && coordinate.col === col && coordinate.row === row;
+                  });
 
-                {/* Row 5: CAM */}
-                <div className="flex justify-center w-full min-h-[70px]">
-                  <div className="flex justify-center space-x-2">
-                    {analysis.bestXI
-                      .filter(({ position }) => position === 'CAM')
-                      .map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Row 4: RM, CM, LM */}
-                <div className="flex justify-between items-center w-full min-h-[70px]">
-                  {/* Left midfield */}
-                  <div className="flex space-x-2">
-                    {analysis.bestXI
-                      .filter(({ position }) => position === 'LM')
-                      .map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                      ))}
-                  </div>
-
-                  {/* Center midfield */}
-                  <div className="flex justify-center space-x-2">
-                    {analysis.bestXI
-                      .filter(({ position }) => position === 'CM')
-                      .map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                      ))}
-                  </div>
-
-                  {/* Right midfield */}
-                  <div className="flex space-x-2">
-                    {analysis.bestXI
-                      .filter(({ position }) => position === 'RM')
-                      .map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Row 3: CDM */}
-                <div className="flex justify-center w-full min-h-[70px]">
-                  <div className="flex justify-center space-x-2">
-                    {analysis.bestXI
-                      .filter(({ position }) => position === 'CDM')
-                      .map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Row 2: RWB, RB, CB, LB, LWB */}
-                <div className="flex justify-between items-center w-full min-h-[70px]">
-                  {/* Left back positions */}
-                  <div className="flex space-x-2">
-                    {analysis.bestXI
-                      .filter(({ position }) => ['LB', 'LWB'].includes(position))
-                      .sort((a, b) => {
-                        const order = { 'LB': 0, 'LWB': 1 };
-                        return order[a.position as keyof typeof order] - order[b.position as keyof typeof order];
-                      })
-                      .map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                      ))}
-                  </div>
-
-                  {/* Center back positions */}
-                  <div className="flex justify-center space-x-2">
-                    {analysis.bestXI
-                      .filter(({ position }) => position === 'CB')
-                      .map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                      ))}
-                  </div>
-
-                  {/* Right back positions */}
-                  <div className="flex space-x-2">
-                    {analysis.bestXI
-                      .filter(({ position }) => ['RB', 'RWB'].includes(position))
-                      .sort((a, b) => {
-                        const order = { 'RB': 0, 'RWB': 1 };
-                        return order[a.position as keyof typeof order] - order[b.position as keyof typeof order];
-                      })
-                      .map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                      ))}
-                  </div>
-                </div>
-
-                {/* Row 1: GK */}
-                <div className="flex justify-center w-full min-h-[70px]">
-                  <div className="flex justify-center space-x-2">
-                    {analysis.bestXI
-                      .filter(({ position }) => position === 'GK')
-                      .map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                          className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-[200px] h-[70px] cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                      ))}
-                  </div>
-                </div>
+                  if (playerAtPosition) {
+                    const { player, position } = playerAtPosition;
+                    return (
+                      <div
+                        key={`player-${player.id}`}
+                        className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center cursor-pointer hover:scale-105 active:scale-95"
+                        onClick={() => handlePlayerClick(player.id)}
+                        title={`Click to view ${player.shortName}'s stats`}
+                      >
+                        {renderPlayerCardContent(player, position)}
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div
+                        key={`cell-${col}-${row}`}
+                        className="border border-[#3c5c34]/30 rounded flex items-center justify-center min-h-[60px]"
+                      >
+                        {/* Empty cell */}
+                      </div>
+                    );
+                  }
+                })}
               </div>
             </div>
 
