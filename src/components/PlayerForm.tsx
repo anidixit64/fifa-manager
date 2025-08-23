@@ -36,11 +36,11 @@ const ROLES = [
 
 type PlayerRole = typeof ROLES[number]['value'];
 
-const PLAYER_ATTRIBUTES: (keyof PlayerAttributes)[] = [
+const ATTRIBUTES: (keyof PlayerAttributes)[] = [
   'pace', 'shooting', 'passing', 'dribbling', 'defending', 'physical'
 ];
 
-const GOALKEEPER_ATTRIBUTES: (keyof GoalkeeperAttributes)[] = [
+const GK_ATTRIBUTES: (keyof GoalkeeperAttributes)[] = [
   'diving', 'handling', 'kicking', 'reflexes', 'speed', 'positioning'
 ];
 
@@ -72,7 +72,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
         reflexes: 50,
         speed: 50,
         positioning: 50,
-      },
+      } as GoalkeeperAttributes,
     }
   );
   const [countrySuggestions, setCountrySuggestions] = useState<Country[]>([]);
@@ -80,8 +80,6 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
   const [playerSuggestions, setPlayerSuggestions] = useState<PlayerSuggestion[]>([]);
   const [allPlayers, setAllPlayers] = useState<PlayerSuggestion[]>([]);
   const [overallFocused, setOverallFocused] = useState(false);
-
-  const isGoalkeeper = formData.mainPosition === 'GK';
 
   useEffect(() => {
     if (initialData) {
@@ -183,43 +181,6 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
     setCountrySuggestions([]);
   };
 
-  const handlePositionChange = (newPosition: string) => {
-    const wasGoalkeeper = formData.mainPosition === 'GK';
-    const willBeGoalkeeper = newPosition === 'GK';
-    
-    let newAttributes;
-    if (wasGoalkeeper && !willBeGoalkeeper) {
-      // Converting from GK to regular player
-      newAttributes = {
-        pace: 50,
-        shooting: 50,
-        passing: 50,
-        dribbling: 50,
-        defending: 50,
-        physical: 50,
-      };
-    } else if (!wasGoalkeeper && willBeGoalkeeper) {
-      // Converting from regular player to GK
-      newAttributes = {
-        diving: 50,
-        handling: 50,
-        kicking: 50,
-        reflexes: 50,
-        speed: 50,
-        positioning: 50,
-      };
-    } else {
-      // Same type, keep existing attributes
-      newAttributes = formData.attributes;
-    }
-    
-    setFormData(prev => ({
-      ...prev,
-      mainPosition: newPosition,
-      attributes: newAttributes
-    }));
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -239,7 +200,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
     onSubmit(playerData);
   };
 
-  const handleAttributeChange = (attr: keyof PlayerAttributes, value: number) => {
+  const handleAttributeChange = (attr: keyof PlayerAttributes | keyof GoalkeeperAttributes, value: number) => {
     if (value >= 0 && value <= 99) {
       setFormData(prev => ({
         ...prev,
@@ -249,6 +210,53 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
         }
       }));
     }
+  };
+
+  const handlePositionChange = (position: string) => {
+    setFormData(prev => {
+      let newAttributes;
+      if (position === 'GK') {
+        // Convert to goalkeeper attributes if switching to GK
+        if ('pace' in prev.attributes) {
+          // Converting from regular attributes to GK attributes
+          const avgValue = Object.values(prev.attributes).reduce((sum, val) => sum + val, 0) / 6;
+          newAttributes = {
+            diving: Math.round(avgValue),
+            handling: Math.round(avgValue),
+            kicking: Math.round(avgValue),
+            reflexes: Math.round(avgValue),
+            speed: Math.round(avgValue),
+            positioning: Math.round(avgValue),
+          } as GoalkeeperAttributes;
+        } else {
+          // Already GK attributes, keep them
+          newAttributes = prev.attributes;
+        }
+      } else {
+        // Convert to regular attributes if switching from GK
+        if ('diving' in prev.attributes) {
+          // Converting from GK attributes to regular attributes
+          const avgValue = Object.values(prev.attributes).reduce((sum, val) => sum + val, 0) / 6;
+          newAttributes = {
+            pace: Math.round(avgValue),
+            shooting: Math.round(avgValue),
+            passing: Math.round(avgValue),
+            dribbling: Math.round(avgValue),
+            defending: Math.round(avgValue),
+            physical: Math.round(avgValue),
+          } as PlayerAttributes;
+        } else {
+          // Already regular attributes, keep them
+          newAttributes = prev.attributes;
+        }
+      }
+      
+      return {
+        ...prev,
+        mainPosition: position,
+        attributes: newAttributes
+      };
+    });
   };
 
   return (
@@ -396,7 +404,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
 
           <div>
             <h3 className="text-lg font-medium text-[#3c5c34] mb-4 font-mono">
-              {isGoalkeeper ? 'Goalkeeper Attributes' : 'Player Attributes'}
+              {formData.mainPosition === 'GK' ? 'Goalkeeper Attributes' : 'Attributes'}
             </h3>
             <div className="grid grid-cols-3 gap-6">
               {Object.entries(formData.attributes).map(([attr, value]) => (

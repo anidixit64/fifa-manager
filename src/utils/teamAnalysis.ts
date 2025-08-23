@@ -66,11 +66,6 @@ function calculatePlayerRating(
   positionPriorities: PositionPriority[], 
   toggledPositions: string[]
 ): number {
-  // Use goalkeeper-specific rating for GK positions
-  if (position === 'GK') {
-    return calculateGKRating(player);
-  }
-
   const positionPriority = positionPriorities?.find(pp => pp.position === position);
   let rating = 0;
 
@@ -137,28 +132,25 @@ function calculateGKRating(player: Player): number {
   rating += player.overall * 0.3;
 
   // Goalkeeper-specific attribute rating
-  if (player.mainPosition === 'GK') {
+  if ('diving' in player.attributes) {
     const gkAttributes = player.attributes as any; // Type assertion for goalkeeper attributes
-    const diving = gkAttributes.diving || 0;
-    const handling = gkAttributes.handling || 0;
-    const kicking = gkAttributes.kicking || 0;
-    const reflexes = gkAttributes.reflexes || 0;
-    const speed = gkAttributes.speed || 0;
-    const positioning = gkAttributes.positioning || 0;
-    
-    // Weight goalkeeper attributes (reflexes and diving are most important)
-    const attributeScore = (reflexes * 0.25 + diving * 0.25 + handling * 0.2 + positioning * 0.15 + kicking * 0.1 + speed * 0.05);
-    rating += attributeScore * 0.4;
+    const gkAttributeScore = (
+      gkAttributes.diving * 0.25 +      // Diving is most important for GKs
+      gkAttributes.handling * 0.20 +    // Handling is second most important
+      gkAttributes.reflexes * 0.20 +    // Reflexes are crucial
+      gkAttributes.positioning * 0.15 + // Positioning is important
+      gkAttributes.kicking * 0.10 +     // Kicking is less important
+      gkAttributes.speed * 0.10         // Speed is least important for GKs
+    );
+    rating += gkAttributeScore * 0.4;
   } else {
-    // Fallback to average of all attributes if somehow not a GK
-    const avgAttribute = Object.values(player.attributes).reduce((sum: number, val: number) => sum + val, 0) / 
-      Object.keys(player.attributes).length;
-    rating += avgAttribute * 0.4;
+    // Fallback to overall if no GK attributes
+    rating += player.overall * 0.4;
   }
 
-  // Age rating
-  const ageDiff = Math.abs(player.age - 25);
-  const ageRating = Math.max(0, 1 - (ageDiff * 0.05));
+  // Age rating - goalkeepers peak later, so adjust age curve
+  const ageDiff = Math.abs(player.age - 28); // GKs peak around 28
+  const ageRating = Math.max(0, 1 - (ageDiff * 0.04)); // Slower decline for GKs
   rating += ageRating * 0.15;
 
   // Role rating
@@ -224,15 +216,44 @@ export function analyzeTeam(
   // Sort by rating and select best XI
   const sortedRatings = playerRatings.sort((a, b) => b.rating - a.rating);
   const bestXI: PlayerRating[] = [];
-  const usedPositions = new Set<string>();
+  
+  // Create a map of position counts for easier lookup
+  const positionCountsMap = new Map<string, number>();
+  positionCounts?.forEach((pc: PositionCount) => {
+    positionCountsMap.set(pc.position, pc.count);
+  });
+  
+  // Track how many players we've selected for each position
+  const selectedCounts = new Map<string, number>();
+  
+  // Initialize selected counts
+  positionsToRate.forEach((position: string) => {
+    selectedCounts.set(position, 0);
+  });
 
-  // Select best player for each position
+  // Select players for Best XI based on position counts
   sortedRatings.forEach(({ player, rating, position }) => {
-    if (bestXI.length < 11 && !usedPositions.has(position)) {
+    if (bestXI.length >= 11) return; // Stop if we have 11 players
+    
+    const requiredCount = positionCountsMap.get(position) || 1; // Default to 1 if not specified
+    const currentCount = selectedCounts.get(position) || 0;
+    
+    if (currentCount < requiredCount) {
       bestXI.push({ player, rating, position });
-      usedPositions.add(position);
+      selectedCounts.set(position, currentCount + 1);
     }
   });
+
+  // If we don't have 11 players yet, fill remaining slots with best available players
+  if (bestXI.length < 11) {
+    const remainingPlayers = sortedRatings.filter(({ player }) => 
+      !bestXI.some(xi => xi.player.id === player.id)
+    );
+    
+    for (let i = 0; i < remainingPlayers.length && bestXI.length < 11; i++) {
+      bestXI.push(remainingPlayers[i]);
+    }
+  }
 
   // Select bench players (remaining top players)
   const bench = sortedRatings
