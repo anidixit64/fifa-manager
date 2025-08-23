@@ -66,6 +66,11 @@ function calculatePlayerRating(
   positionPriorities: PositionPriority[], 
   toggledPositions: string[]
 ): number {
+  // Use goalkeeper-specific rating for GK positions
+  if (position === 'GK') {
+    return calculateGKRating(player);
+  }
+
   const positionPriority = positionPriorities?.find(pp => pp.position === position);
   let rating = 0;
 
@@ -129,16 +134,36 @@ function calculateGKRating(player: Player): number {
   let rating = 0;
 
   // Base rating from overall
-  rating += player.overall * 0.5;
+  rating += player.overall * 0.3;
+
+  // Goalkeeper-specific attribute rating
+  if (player.mainPosition === 'GK') {
+    const gkAttributes = player.attributes as any; // Type assertion for goalkeeper attributes
+    const diving = gkAttributes.diving || 0;
+    const handling = gkAttributes.handling || 0;
+    const kicking = gkAttributes.kicking || 0;
+    const reflexes = gkAttributes.reflexes || 0;
+    const speed = gkAttributes.speed || 0;
+    const positioning = gkAttributes.positioning || 0;
+    
+    // Weight goalkeeper attributes (reflexes and diving are most important)
+    const attributeScore = (reflexes * 0.25 + diving * 0.25 + handling * 0.2 + positioning * 0.15 + kicking * 0.1 + speed * 0.05);
+    rating += attributeScore * 0.4;
+  } else {
+    // Fallback to average of all attributes if somehow not a GK
+    const avgAttribute = Object.values(player.attributes).reduce((sum: number, val: number) => sum + val, 0) / 
+      Object.keys(player.attributes).length;
+    rating += avgAttribute * 0.4;
+  }
 
   // Age rating
   const ageDiff = Math.abs(player.age - 25);
   const ageRating = Math.max(0, 1 - (ageDiff * 0.05));
-  rating += ageRating * 0.25;
+  rating += ageRating * 0.15;
 
   // Role rating
   const roleWeight = ROLE_WEIGHTS[player.role] || 0.2;
-  rating += roleWeight * 0.25;
+  rating += roleWeight * 0.15;
 
   // Potential boost - slight boost for higher potential
   const potentialBoost = (player.potential - player.overall) * 0.02; // 2% boost per point of potential above overall

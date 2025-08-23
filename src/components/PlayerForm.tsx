@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Player, PlayerAttributes } from '@/types/player';
+import { Player, PlayerAttributes, GoalkeeperAttributes } from '@/types/player';
 
 interface PlayerFormProps {
   onSubmit: (player: Omit<Player, 'id'>) => void;
@@ -36,8 +36,12 @@ const ROLES = [
 
 type PlayerRole = typeof ROLES[number]['value'];
 
-const ATTRIBUTES: (keyof PlayerAttributes)[] = [
+const PLAYER_ATTRIBUTES: (keyof PlayerAttributes)[] = [
   'pace', 'shooting', 'passing', 'dribbling', 'defending', 'physical'
+];
+
+const GOALKEEPER_ATTRIBUTES: (keyof GoalkeeperAttributes)[] = [
+  'diving', 'handling', 'kicking', 'reflexes', 'speed', 'positioning'
 ];
 
 export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFormProps) {
@@ -62,12 +66,12 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
         shotsOnTarget: 0,
       },
       attributes: {
-        pace: 50,
-        shooting: 50,
-        passing: 50,
-        dribbling: 50,
-        defending: 50,
-        physical: 50,
+        diving: 50,
+        handling: 50,
+        kicking: 50,
+        reflexes: 50,
+        speed: 50,
+        positioning: 50,
       },
     }
   );
@@ -76,6 +80,8 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
   const [playerSuggestions, setPlayerSuggestions] = useState<PlayerSuggestion[]>([]);
   const [allPlayers, setAllPlayers] = useState<PlayerSuggestion[]>([]);
   const [overallFocused, setOverallFocused] = useState(false);
+
+  const isGoalkeeper = formData.mainPosition === 'GK';
 
   useEffect(() => {
     if (initialData) {
@@ -175,6 +181,43 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
       fifaCode: country.FIFA
     }));
     setCountrySuggestions([]);
+  };
+
+  const handlePositionChange = (newPosition: string) => {
+    const wasGoalkeeper = formData.mainPosition === 'GK';
+    const willBeGoalkeeper = newPosition === 'GK';
+    
+    let newAttributes;
+    if (wasGoalkeeper && !willBeGoalkeeper) {
+      // Converting from GK to regular player
+      newAttributes = {
+        pace: 50,
+        shooting: 50,
+        passing: 50,
+        dribbling: 50,
+        defending: 50,
+        physical: 50,
+      };
+    } else if (!wasGoalkeeper && willBeGoalkeeper) {
+      // Converting from regular player to GK
+      newAttributes = {
+        diving: 50,
+        handling: 50,
+        kicking: 50,
+        reflexes: 50,
+        speed: 50,
+        positioning: 50,
+      };
+    } else {
+      // Same type, keep existing attributes
+      newAttributes = formData.attributes;
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      mainPosition: newPosition,
+      attributes: newAttributes
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -298,7 +341,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
               <select
                 id="position"
                 value={formData.mainPosition}
-                onChange={(e) => setFormData({ ...formData, mainPosition: e.target.value })}
+                onChange={(e) => handlePositionChange(e.target.value)}
                 className="w-full px-4 py-2 border border-[#a8b8a7]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a8b8a7] text-[#3c5c34] bg-[#dde1e0]/50"
                 required
               >
@@ -352,7 +395,9 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
           </div>
 
           <div>
-            <h3 className="text-lg font-medium text-[#3c5c34] mb-4 font-mono">Attributes</h3>
+            <h3 className="text-lg font-medium text-[#3c5c34] mb-4 font-mono">
+              {isGoalkeeper ? 'Goalkeeper Attributes' : 'Player Attributes'}
+            </h3>
             <div className="grid grid-cols-3 gap-6">
               {Object.entries(formData.attributes).map(([attr, value]) => (
                 <div key={attr} className="flex flex-col space-y-2">
