@@ -255,31 +255,27 @@ export default function BestXIPage() {
   // Helper function to render player card content based on toggle state
   const renderPlayerCardContent = (player: Player, position: string) => {
     if (bestXIToggle && player.mainPosition !== 'GK') {
-      // Show only goals and assists when toggle is on (for non-GK players)
+      // Show compact stats when toggle is on (for non-GK players)
       const goals = player.stats?.goals || 0;
       const assists = player.stats?.assists || 0;
       
       return (
         <div className="text-center">
-          <div className="grid grid-cols-2 gap-1">
-            <div>
-                                        <p className="text-xs text-[#8B6F47] font-mono">Goals</p>
-              <p className="text-sm font-bold text-[#dde1e0] font-mono">{goals}</p>
-            </div>
-            <div>
-                          <p className="text-xs text-[#8B6F47] font-mono">Assists</p>
-              <p className="text-sm font-bold text-[#dde1e0] font-mono">{assists}</p>
-            </div>
+          <p className="text-xs font-bold text-[#dde1e0] font-mono truncate">{player.shortName}</p>
+          <p className="text-xs text-[#a78968] font-mono">{position}</p>
+          <div className="flex justify-center gap-1 mt-1">
+            <span className="text-xs text-[#a78968] font-mono">G:{goals}</span>
+            <span className="text-xs text-[#a78968] font-mono">A:{assists}</span>
           </div>
         </div>
       );
     } else {
-      // Show overall rating when toggle is off or for GK players
+      // Show compact overall rating when toggle is off or for GK players
       return (
         <div className="text-center">
-          <h3 className="font-bold text-[#dde1e0] font-mono text-xs truncate">{player.shortName}</h3>
-          <p className="text-xs text-[#dde1e0] font-mono">{position}</p>
-          <p className="text-sm font-bold text-[#dde1e0] font-mono">{player.overall}</p>
+          <p className="text-xs font-bold text-[#dde1e0] font-mono truncate">{player.shortName}</p>
+          <p className="text-xs text-[#a78968] font-mono">{position}</p>
+          <p className="text-xs font-bold text-[#dde1e0] font-mono">{player.overall}</p>
         </div>
       );
     }
@@ -348,131 +344,127 @@ export default function BestXIPage() {
               </div>
               
               {/* Best XI Grid Layout */}
-              <div className="grid grid-cols-7 grid-rows-7 gap-2 w-full h-[490px]">
-                {/* Generate 49 grid cells (7x7) */}
+              <div className="grid grid-cols-7 grid-rows-7 gap-2 w-full h-[490px] bg-[#3c5c34]/20 rounded-lg p-4">
+                {/* Generate all 49 grid cells with players positioned in their designated cells */}
                 {Array.from({ length: 49 }, (_, index) => {
                   const col = index % 7;
                   const row = 6 - Math.floor(index / 7); // Reverse row order so 0 is at bottom
                   
-                  // Find players for this specific coordinate
-                  const getPlayersForPosition = (position: string, count: number) => {
-                    const players = analysis.bestXI.filter(({ position: pos }) => pos === position);
-                    return players.slice(0, count);
-                  };
+                  // Find if there's a player for this coordinate
+                  const playerAtPosition = analysis.bestXI.find(({ player, position }) => {
+                    let coordinates: { col: number; row: number }[] = [];
+                    
+                    // Define coordinates for each position
+                    switch (position) {
+                      case 'GK':
+                        coordinates = [{ col: 3, row: 0 }];
+                        break;
+                      case 'CB':
+                        const cbCount = analysis.bestXI.filter(p => p.position === 'CB').length;
+                        if (cbCount === 1) {
+                          coordinates = [{ col: 3, row: 1 }];
+                        } else if (cbCount === 2) {
+                          coordinates = [{ col: 2, row: 1 }, { col: 4, row: 1 }];
+                        } else if (cbCount === 3) {
+                          coordinates = [{ col: 2, row: 1 }, { col: 3, row: 1 }, { col: 4, row: 1 }];
+                        }
+                        break;
+                      case 'RB':
+                        coordinates = [{ col: 6, row: 1 }];
+                        break;
+                      case 'LB':
+                        coordinates = [{ col: 0, row: 1 }];
+                        break;
+                      case 'RWB':
+                        coordinates = [{ col: 6, row: 2 }];
+                        break;
+                      case 'LWB':
+                        coordinates = [{ col: 0, row: 2 }];
+                        break;
+                      case 'CDM':
+                        const cmCount = analysis.bestXI.filter(p => p.position === 'CM').length;
+                        const cdmCount = analysis.bestXI.filter(p => p.position === 'CDM').length;
+                        if (cmCount === 1 && cdmCount === 1) {
+                          coordinates = [{ col: 4, row: 3 }];
+                        } else {
+                          coordinates = [{ col: 3, row: 2 }];
+                        }
+                        break;
+                      case 'LM':
+                        coordinates = [{ col: 0, row: 3 }];
+                        break;
+                      case 'CM':
+                        const cmPlayers = analysis.bestXI.filter(p => p.position === 'CM');
+                        const cmIndex = cmPlayers.findIndex(p => p.player.id === player.id);
+                        if (cmPlayers.length === 1) {
+                          coordinates = [{ col: 2, row: 3 }];
+                        } else if (cmPlayers.length === 2) {
+                          coordinates = cmIndex === 0 ? [{ col: 2, row: 3 }] : [{ col: 4, row: 3 }];
+                        }
+                        break;
+                      case 'RM':
+                        coordinates = [{ col: 6, row: 3 }];
+                        break;
+                      case 'CAM':
+                        coordinates = [{ col: 3, row: 4 }];
+                        break;
+                      case 'LW':
+                        coordinates = [{ col: 0, row: 5 }];
+                        break;
+                      case 'CF':
+                        const cfCount = analysis.bestXI.filter(p => p.position === 'CF').length;
+                        const cfIndex = analysis.bestXI.filter(p => p.position === 'CF').findIndex(p => p.player.id === player.id);
+                        if (cfCount === 1) {
+                          coordinates = [{ col: 3, row: 5 }];
+                        } else if (cfCount === 2) {
+                          coordinates = cfIndex === 0 ? [{ col: 2, row: 5 }] : [{ col: 4, row: 5 }];
+                        }
+                        break;
+                      case 'RW':
+                        coordinates = [{ col: 6, row: 5 }];
+                        break;
+                      case 'ST':
+                        const stCount = analysis.bestXI.filter(p => p.position === 'ST').length;
+                        const stIndex = analysis.bestXI.filter(p => p.position === 'ST').findIndex(p => p.player.id === player.id);
+                        if (stCount === 1) {
+                          coordinates = [{ col: 3, row: 6 }];
+                        } else if (stCount === 2) {
+                          coordinates = stIndex === 0 ? [{ col: 2, row: 6 }] : [{ col: 4, row: 6 }];
+                        }
+                        break;
+                      default:
+                        coordinates = [];
+                    }
 
-                  // Determine which position should be at this coordinate
-                  let positionPlayers: any[] = [];
-                  
-                  // GK: (3, 0)
-                  if (col === 3 && row === 0) {
-                    positionPlayers = getPlayersForPosition('GK', 1);
-                  }
-                  // CB: If 1, (3, 1). If 2, (2, 1) and (4, 1). If 3, (2, 1), (3, 1), and (4, 1)
-                  else if (row === 1 && [2, 3, 4].includes(col)) {
-                    const cbPlayers = getPlayersForPosition('CB', 3);
-                    if (cbPlayers.length === 1 && col === 3) {
-                      positionPlayers = cbPlayers;
-                    } else if (cbPlayers.length === 2 && [2, 4].includes(col)) {
-                      positionPlayers = cbPlayers.slice(col === 2 ? 0 : 1, col === 2 ? 1 : 2);
-                    } else if (cbPlayers.length >= 3) {
-                      positionPlayers = cbPlayers.slice(col - 2, col - 1);
-                    }
-                  }
-                  // RB: (6, 1)
-                  else if (col === 6 && row === 1) {
-                    positionPlayers = getPlayersForPosition('RB', 1);
-                  }
-                  // LB: (0, 1)
-                  else if (col === 0 && row === 1) {
-                    positionPlayers = getPlayersForPosition('LB', 1);
-                  }
-                  // RWB: (6, 2)
-                  else if (col === 6 && row === 2) {
-                    positionPlayers = getPlayersForPosition('RWB', 1);
-                  }
-                  // LWB: (0, 2)
-                  else if (col === 0 && row === 2) {
-                    positionPlayers = getPlayersForPosition('LWB', 1);
-                  }
-                  // CDM: (3, 2), but if there is only 1 CM and 1 CDM, then CDM is at (4, 3)
-                  else if ((col === 3 && row === 2) || (col === 4 && row === 3)) {
-                    const cmPlayers = getPlayersForPosition('CM', 2);
-                    const cdmPlayers = getPlayersForPosition('CDM', 1);
-                    if (col === 3 && row === 2 && cmPlayers.length > 1) {
-                      positionPlayers = cdmPlayers;
-                    } else if (col === 4 && row === 3 && cmPlayers.length === 1) {
-                      positionPlayers = cdmPlayers;
-                    }
-                  }
-                  // LM: (0, 3)
-                  else if (col === 0 && row === 3) {
-                    positionPlayers = getPlayersForPosition('LM', 1);
-                  }
-                  // CM: If 1, (2, 3). If 2, (2, 3), (4, 3).
-                  else if (row === 3 && [2, 4].includes(col)) {
-                    const cmPlayers = getPlayersForPosition('CM', 2);
-                    if (cmPlayers.length === 1 && col === 2) {
-                      positionPlayers = cmPlayers;
-                    } else if (cmPlayers.length >= 2) {
-                      positionPlayers = cmPlayers.slice(col === 2 ? 0 : 1, col === 2 ? 1 : 2);
-                    }
-                  }
-                  // RM: (6, 3)
-                  else if (col === 6 && row === 3) {
-                    positionPlayers = getPlayersForPosition('RM', 1);
-                  }
-                  // CAM: (3, 4)
-                  else if (col === 3 && row === 4) {
-                    positionPlayers = getPlayersForPosition('CAM', 1);
-                  }
-                  // LW: (0, 5)
-                  else if (col === 0 && row === 5) {
-                    positionPlayers = getPlayersForPosition('LW', 1);
-                  }
-                  // CF: If 1, (3, 5). If 2, (2, 5), (4, 5)
-                  else if (row === 5 && [2, 3, 4].includes(col)) {
-                    const cfPlayers = getPlayersForPosition('CF', 2);
-                    if (cfPlayers.length === 1 && col === 3) {
-                      positionPlayers = cfPlayers;
-                    } else if (cfPlayers.length >= 2 && [2, 4].includes(col)) {
-                      positionPlayers = cfPlayers.slice(col === 2 ? 0 : 1, col === 2 ? 1 : 2);
-                    }
-                  }
-                  // RW: (6, 5)
-                  else if (col === 6 && row === 5) {
-                    positionPlayers = getPlayersForPosition('RW', 1);
-                  }
-                  // ST: If 1, (3, 6). If 2, (2, 6), (4, 6)
-                  else if (row === 6 && [2, 3, 4].includes(col)) {
-                    const stPlayers = getPlayersForPosition('ST', 2);
-                    if (stPlayers.length === 1 && col === 3) {
-                      positionPlayers = stPlayers;
-                    } else if (stPlayers.length >= 2 && [2, 4].includes(col)) {
-                      positionPlayers = stPlayers.slice(col === 2 ? 0 : 1, col === 2 ? 1 : 2);
-                    }
-                  }
+                    // Find the appropriate coordinate for this player
+                    const playerIndex = analysis.bestXI.filter(p => p.position === position).findIndex(p => p.player.id === player.id);
+                    const coordinate = coordinates[playerIndex] || coordinates[0];
 
-                  return (
-                    <div
-                      key={index}
-                      className="relative p-1"
-                    >
-                      {positionPlayers.length > 0 ? (
-                        positionPlayers.map(({ player, position }) => (
-                        <div
-                          key={player.id}
-                            className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center w-full h-full cursor-pointer hover:scale-105 active:scale-95"
-                          onClick={() => handlePlayerClick(player.id)}
-                          title={`Click to view ${player.shortName}'s stats`}
-                        >
-                          {renderPlayerCardContent(player, position)}
-                        </div>
-                        ))
-                      ) : (
-                        <div className="w-full h-full" />
-                      )}
-                  </div>
-                  );
+                    return coordinate && coordinate.col === col && coordinate.row === row;
+                  });
+
+                  if (playerAtPosition) {
+                    const { player, position } = playerAtPosition;
+                    return (
+                      <div
+                        key={`player-${player.id}`}
+                        className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center cursor-pointer hover:scale-105 active:scale-95"
+                        onClick={() => handlePlayerClick(player.id)}
+                        title={`Click to view ${player.shortName}'s stats`}
+                      >
+                        {renderPlayerCardContent(player, position)}
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div
+                        key={`cell-${col}-${row}`}
+                        className="border border-[#3c5c34]/30 rounded flex items-center justify-center min-h-[60px]"
+                      >
+                        {/* Empty cell */}
+                      </div>
+                    );
+                  }
                 })}
               </div>
             </div>

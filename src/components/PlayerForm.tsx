@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Player, PlayerAttributes } from '@/types/player';
+import { Player, PlayerAttributes, GoalkeeperAttributes } from '@/types/player';
 
 interface PlayerFormProps {
   onSubmit: (player: Omit<Player, 'id'>) => void;
@@ -40,6 +40,10 @@ const ATTRIBUTES: (keyof PlayerAttributes)[] = [
   'pace', 'shooting', 'passing', 'dribbling', 'defending', 'physical'
 ];
 
+const GK_ATTRIBUTES: (keyof GoalkeeperAttributes)[] = [
+  'diving', 'handling', 'kicking', 'reflexes', 'speed', 'positioning'
+];
+
 export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFormProps) {
   const [formData, setFormData] = useState<Omit<Player, 'id'>>(
     initialData || {
@@ -62,13 +66,13 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
         shotsOnTarget: 0,
       },
       attributes: {
-        pace: 50,
-        shooting: 50,
-        passing: 50,
-        dribbling: 50,
-        defending: 50,
-        physical: 50,
-      },
+        diving: 50,
+        handling: 50,
+        kicking: 50,
+        reflexes: 50,
+        speed: 50,
+        positioning: 50,
+      } as GoalkeeperAttributes,
     }
   );
   const [countrySuggestions, setCountrySuggestions] = useState<Country[]>([]);
@@ -196,7 +200,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
     onSubmit(playerData);
   };
 
-  const handleAttributeChange = (attr: keyof PlayerAttributes, value: number) => {
+  const handleAttributeChange = (attr: keyof PlayerAttributes | keyof GoalkeeperAttributes, value: number) => {
     if (value >= 0 && value <= 99) {
       setFormData(prev => ({
         ...prev,
@@ -206,6 +210,53 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
         }
       }));
     }
+  };
+
+  const handlePositionChange = (position: string) => {
+    setFormData(prev => {
+      let newAttributes;
+      if (position === 'GK') {
+        // Convert to goalkeeper attributes if switching to GK
+        if ('pace' in prev.attributes) {
+          // Converting from regular attributes to GK attributes
+          const avgValue = Object.values(prev.attributes).reduce((sum, val) => sum + val, 0) / 6;
+          newAttributes = {
+            diving: Math.round(avgValue),
+            handling: Math.round(avgValue),
+            kicking: Math.round(avgValue),
+            reflexes: Math.round(avgValue),
+            speed: Math.round(avgValue),
+            positioning: Math.round(avgValue),
+          } as GoalkeeperAttributes;
+        } else {
+          // Already GK attributes, keep them
+          newAttributes = prev.attributes;
+        }
+      } else {
+        // Convert to regular attributes if switching from GK
+        if ('diving' in prev.attributes) {
+          // Converting from GK attributes to regular attributes
+          const avgValue = Object.values(prev.attributes).reduce((sum, val) => sum + val, 0) / 6;
+          newAttributes = {
+            pace: Math.round(avgValue),
+            shooting: Math.round(avgValue),
+            passing: Math.round(avgValue),
+            dribbling: Math.round(avgValue),
+            defending: Math.round(avgValue),
+            physical: Math.round(avgValue),
+          } as PlayerAttributes;
+        } else {
+          // Already regular attributes, keep them
+          newAttributes = prev.attributes;
+        }
+      }
+      
+      return {
+        ...prev,
+        mainPosition: position,
+        attributes: newAttributes
+      };
+    });
   };
 
   return (
@@ -298,7 +349,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
               <select
                 id="position"
                 value={formData.mainPosition}
-                onChange={(e) => setFormData({ ...formData, mainPosition: e.target.value })}
+                onChange={(e) => handlePositionChange(e.target.value)}
                 className="w-full px-4 py-2 border border-[#a8b8a7]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a8b8a7] text-[#3c5c34] bg-[#dde1e0]/50"
                 required
               >
@@ -352,7 +403,9 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
           </div>
 
           <div>
-            <h3 className="text-lg font-medium text-[#3c5c34] mb-4 font-mono">Attributes</h3>
+            <h3 className="text-lg font-medium text-[#3c5c34] mb-4 font-mono">
+              {formData.mainPosition === 'GK' ? 'Goalkeeper Attributes' : 'Attributes'}
+            </h3>
             <div className="grid grid-cols-3 gap-6">
               {Object.entries(formData.attributes).map(([attr, value]) => (
                 <div key={attr} className="flex flex-col space-y-2">

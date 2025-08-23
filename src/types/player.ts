@@ -7,6 +7,15 @@ export interface PlayerAttributes {
   physical: number;
 }
 
+export interface GoalkeeperAttributes {
+  diving: number;
+  handling: number;
+  kicking: number;
+  reflexes: number;
+  speed: number;
+  positioning: number;
+}
+
 export type PlayerRole = 'C' | 'I' | 'R' | 'S' | 'P';
 
 export interface Player {
@@ -19,7 +28,7 @@ export interface Player {
   mainPosition: string;
   alternatePositions: string[];
   role: PlayerRole;
-  attributes: PlayerAttributes;
+  attributes: PlayerAttributes | GoalkeeperAttributes;
   overall: number;
   potential: number;
   preferred_foot: 'Left' | 'Right';

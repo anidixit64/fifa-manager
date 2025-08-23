@@ -1,4 +1,4 @@
-import { Player } from '@/types/player';
+import { Player, GoalkeeperAttributes, PlayerAttributes } from '@/types/player';
 
 interface TeamStatsProps {
   players: Player[];
@@ -20,14 +20,29 @@ export default function TeamStats({ players }: TeamStatsProps) {
   const averageAge = calculateAverage(players.map(p => p.age));
   const averageOverall = calculateAverage(players.map(p => p.overall));
   
-  const attributeAverages = {
-    passing: calculateAverage(players.map(p => p.attributes.passing)),
-    shooting: calculateAverage(players.map(p => p.attributes.shooting)),
-    dribbling: calculateAverage(players.map(p => p.attributes.dribbling)),
-    pace: calculateAverage(players.map(p => p.attributes.pace)),
-    physical: calculateAverage(players.map(p => p.attributes.physical)),
-    defending: calculateAverage(players.map(p => p.attributes.defending)),
-  };
+  // Separate goalkeepers and outfield players
+  const goalkeepers = players.filter(p => p.mainPosition === 'GK');
+  const outfieldPlayers = players.filter(p => p.mainPosition !== 'GK');
+  
+  // Calculate attribute averages for outfield players only
+  const outfieldAttributeAverages = outfieldPlayers.length > 0 ? {
+    passing: calculateAverage(outfieldPlayers.map(p => (p.attributes as PlayerAttributes).passing)),
+    shooting: calculateAverage(outfieldPlayers.map(p => (p.attributes as PlayerAttributes).shooting)),
+    dribbling: calculateAverage(outfieldPlayers.map(p => (p.attributes as PlayerAttributes).dribbling)),
+    pace: calculateAverage(outfieldPlayers.map(p => (p.attributes as PlayerAttributes).pace)),
+    physical: calculateAverage(outfieldPlayers.map(p => (p.attributes as PlayerAttributes).physical)),
+    defending: calculateAverage(outfieldPlayers.map(p => (p.attributes as PlayerAttributes).defending)),
+  } : null;
+
+  // Calculate goalkeeper attribute averages if there are goalkeepers
+  const goalkeeperAttributeAverages = goalkeepers.length > 0 ? {
+    diving: calculateAverage(goalkeepers.map(p => (p.attributes as GoalkeeperAttributes).diving)),
+    handling: calculateAverage(goalkeepers.map(p => (p.attributes as GoalkeeperAttributes).handling)),
+    kicking: calculateAverage(goalkeepers.map(p => (p.attributes as GoalkeeperAttributes).kicking)),
+    reflexes: calculateAverage(goalkeepers.map(p => (p.attributes as GoalkeeperAttributes).reflexes)),
+    speed: calculateAverage(goalkeepers.map(p => (p.attributes as GoalkeeperAttributes).speed)),
+    positioning: calculateAverage(goalkeepers.map(p => (p.attributes as GoalkeeperAttributes).positioning)),
+  } : null;
 
   return (
     <div className="bg-white p-4 rounded-lg shadow">
@@ -40,6 +55,14 @@ export default function TeamStats({ players }: TeamStatsProps) {
             <p className="text-sm">
               <span className="text-gray-600">Total Players:</span>{' '}
               <span className="font-medium">{players.length}</span>
+            </p>
+            <p className="text-sm">
+              <span className="text-gray-600">Goalkeepers:</span>{' '}
+              <span className="font-medium">{goalkeepers.length}</span>
+            </p>
+            <p className="text-sm">
+              <span className="text-gray-600">Outfield Players:</span>{' '}
+              <span className="font-medium">{outfieldPlayers.length}</span>
             </p>
             <p className="text-sm">
               <span className="text-gray-600">Average Age:</span>{' '}
@@ -55,12 +78,28 @@ export default function TeamStats({ players }: TeamStatsProps) {
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Attributes</h3>
           <div className="space-y-2">
-            {Object.entries(attributeAverages).map(([attr, value]) => (
-              <p key={attr} className="text-sm">
-                <span className="text-gray-600 capitalize">{attr}:</span>{' '}
-                <span className="font-medium">{value}</span>
-              </p>
-            ))}
+            {outfieldAttributeAverages && (
+              <>
+                <p className="text-sm font-medium text-gray-700">Outfield Players:</p>
+                {Object.entries(outfieldAttributeAverages).map(([attr, value]) => (
+                  <p key={attr} className="text-sm ml-2">
+                    <span className="text-gray-600 capitalize">{attr}:</span>{' '}
+                    <span className="font-medium">{value}</span>
+                  </p>
+                ))}
+              </>
+            )}
+            {goalkeeperAttributeAverages && (
+              <>
+                <p className="text-sm font-medium text-gray-700 mt-2">Goalkeepers:</p>
+                {Object.entries(goalkeeperAttributeAverages).map(([attr, value]) => (
+                  <p key={attr} className="text-sm ml-2">
+                    <span className="text-gray-600 capitalize">{attr}:</span>{' '}
+                    <span className="font-medium">{value}</span>
+                  </p>
+                ))}
+              </>
+            )}
           </div>
         </div>
       </div>
