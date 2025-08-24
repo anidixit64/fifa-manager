@@ -1175,7 +1175,7 @@ export default function TrackFinancesPage() {
 
             {/* Trade Calculator - Dynamic height based on toggle state */}
             <div className={`absolute left-45 top-16 right-58 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
-              isRedToggleOn || isAnalyzing ? 'h-full overflow-hidden' : 'h-auto overflow-visible'
+              isAnalyzing ? 'h-full overflow-hidden' : 'h-auto overflow-visible'
             }`}>
               {/* Trade Calculator Header */}
               <div className="p-6 border-b border-[#dde1e0]/20">
@@ -1791,8 +1791,8 @@ export default function TrackFinancesPage() {
             {/* Transfer Suggestions Box */}
             <div className={`absolute left-45 right-58 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 ${
               isGreenToggleOn || isRedToggleOn || isAnalyzing 
-                ? 'top-[calc(80px+120px+54px)]' 
-                : 'top-[calc(120px+54px)]'
+                ? 'top-[calc(64px+80px+92px+50px)]' 
+                : 'top-[calc(64px+80px+50px)]'
             }`}>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Transfer Suggestions</h3>
