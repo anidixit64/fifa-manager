@@ -94,10 +94,10 @@ export default function TeamStats({ players }: TeamStatsProps) {
                 <p className="text-sm font-medium text-gray-700 mt-2">Goalkeepers:</p>
                 {Object.entries(goalkeeperAttributeAverages).map(([attr, value]) => (
                   <p key={attr} className="text-sm ml-2">
-                    <span className="text-gray-600 capitalize">{attr}:</span>{' '}
-                    <span className="font-medium">{value}</span>
-                  </p>
-                ))}
+                <span className="text-gray-600 capitalize">{attr}:</span>{' '}
+                <span className="font-medium">{value}</span>
+              </p>
+            ))}
               </>
             )}
           </div>

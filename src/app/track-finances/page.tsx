@@ -1125,8 +1125,8 @@ export default function TrackFinancesPage() {
 
           {/* Main Content */}
           <div className="relative h-[calc(90vh-180px)]">
-            {/* Bar - Left Side */}
-            <div className="absolute left-16 top-[60%] transform -translate-y-1/2 h-full">
+                          {/* Bar - Left Side */}
+              <div className="absolute left-20 top-[60%] transform -translate-y-1/2 h-full">
               <div className="relative h-full">
                 {/* Bar Container */}
                 <div className="w-16 h-full bg-[#dde1e0]/10 rounded-full border-4 border-[#a78968] shadow-lg">
@@ -1174,7 +1174,7 @@ export default function TrackFinancesPage() {
             </div>
 
             {/* Trade Calculator - Dynamic height based on toggle state */}
-            <div className={`absolute left-40 top-16 -right-30 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
+            <div className={`absolute left-45 top-16 right-58 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
               isRedToggleOn || isAnalyzing ? 'h-full overflow-hidden' : 'h-auto overflow-visible'
             }`}>
               {/* Trade Calculator Header */}
@@ -1789,7 +1789,7 @@ export default function TrackFinancesPage() {
             </div>
             
             {/* Transfer Suggestions Box */}
-            <div className={`absolute left-40 -right-30 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 ${
+            <div className={`absolute left-45 right-58 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 ${
               isGreenToggleOn || isRedToggleOn || isAnalyzing 
                 ? 'top-[calc(80px+120px+54px)]' 
                 : 'top-[calc(120px+54px)]'
@@ -1815,7 +1815,7 @@ export default function TrackFinancesPage() {
                             <span className="text-[#dde1e0] font-mono font-semibold">
                               {suggestion.type} {suggestion.position}
                             </span>
-                          </div>
+          </div>
                           <span className="text-[#a78968] font-mono text-sm">
                             {suggestion.category}
                           </span>
@@ -1833,6 +1833,20 @@ export default function TrackFinancesPage() {
                     </p>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Right Sidebar */}
+            <div className="absolute -right-30 top-16 w-80 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20">
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Shortlist</h3>
+                
+                {/* Shortlist content will go here */}
+                <div className="text-center py-8">
+                  <p className="text-[#a78968] font-mono italic">
+                    Shortlist functionality coming soon...
+                  </p>
+                </div>
               </div>
             </div>
 
