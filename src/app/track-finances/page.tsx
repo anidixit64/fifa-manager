@@ -1944,21 +1944,21 @@ export default function TrackFinancesPage() {
                       <div key={player.id} className="bg-[#dde1e0]/20 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30 group hover:bg-[#dde1e0]/30 transition-all duration-200">
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
-                            <div className="font-semibold text-[#dde1e0] font-mono">
+                            <div className="font-semibold text-[#2d1b0e] font-mono">
                               {player.short_name || player.name}
                             </div>
                             {/* Hover content - shows overall and age */}
-                            <div className="text-sm text-[#a78968] font-mono opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <div className="text-sm text-[#4a2c1a] font-mono opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                               Overall: {player.overall} • Age: {player.age}
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <div className="text-sm text-[#a78968] font-mono">
+                            <div className="text-sm text-[#4a2c1a] font-mono">
                               {player.player_positions?.[0] || player.mainPosition}
                             </div>
                             <button
                               onClick={() => removeFromShortlist(player.id)}
-                              className="p-1 text-[#a78968] hover:text-red-400 transition-colors duration-200 opacity-0 group-hover:opacity-100"
+                              className="p-1 text-[#4a2c1a] hover:text-red-600 transition-colors duration-200 opacity-0 group-hover:opacity-100"
                               title="Remove from shortlist"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1972,7 +1972,7 @@ export default function TrackFinancesPage() {
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <p className="text-[#a78968] font-mono italic">
+                    <p className="text-[#4a2c1a] font-mono italic">
                       No players in shortlist. Add players from the trade calculator!
                     </p>
                   </div>
