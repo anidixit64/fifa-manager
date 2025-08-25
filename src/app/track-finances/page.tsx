@@ -1126,7 +1126,7 @@ export default function TrackFinancesPage() {
           {/* Main Content */}
           <div className="relative h-[calc(90vh-180px)]">
                           {/* Bar - Left Side */}
-              <div className="absolute left-20 top-[60%] transform -translate-y-1/2 h-full">
+              <div className="absolute left-60 top-[60%] transform -translate-y-1/2 h-full">
               <div className="relative h-full">
                 {/* Bar Container */}
                 <div className="w-16 h-full bg-[#dde1e0]/10 rounded-full border-4 border-[#a78968] shadow-lg">
@@ -1174,7 +1174,7 @@ export default function TrackFinancesPage() {
             </div>
 
             {/* Trade Calculator - Dynamic height based on toggle state */}
-            <div className={`absolute left-45 top-16 right-58 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
+            <div className={`absolute left-85 top-16 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
               isAnalyzing ? 'h-full overflow-hidden' : 'h-auto overflow-visible'
             }`}>
               {/* Trade Calculator Header */}
@@ -1789,7 +1789,7 @@ export default function TrackFinancesPage() {
             </div>
             
             {/* Transfer Suggestions Box */}
-            <div className={`absolute left-45 right-58 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 ${
+            <div className={`absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 ${
               isGreenToggleOn || isRedToggleOn || isAnalyzing 
                 ? 'top-[calc(64px+80px+92px+50px)]' 
                 : 'top-[calc(64px+80px+50px)]'
@@ -1837,7 +1837,7 @@ export default function TrackFinancesPage() {
             </div>
 
             {/* Right Sidebar */}
-            <div className="absolute -right-30 top-16 w-80 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20">
+            <div className="absolute -right-5 top-16 w-80 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20">
               <div className="p-6">
                 <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Shortlist</h3>
                 
