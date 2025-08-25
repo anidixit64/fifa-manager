@@ -56,6 +56,7 @@ export default function TrackFinancesPage() {
   // Transfer suggestions positioning state
   const tradeCalculatorRef = useRef<HTMLDivElement>(null);
   const [tradeCalculatorHeight, setTradeCalculatorHeight] = useState(0);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // Helper function to calculate buying value
   const calculateBuyingValue = (isStarter: boolean, category: string, sectorChanges: any, positionChanges: any, currentBudget: number, playerPrice: number) => {
@@ -948,6 +949,11 @@ export default function TrackFinancesPage() {
     };
   }, [isGreenToggleOn, isRedToggleOn, isAnalyzing, showAnalyzeButton, selectedPlayer]);
 
+  // Handle hydration to prevent server/client mismatch
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
   return (
     <main className="min-h-screen bg-[#3c5c34] relative overflow-hidden">
       {/* Background soccer player image */}
@@ -1165,7 +1171,7 @@ export default function TrackFinancesPage() {
                   <div 
                     className="w-full bg-red-500/70 rounded-full shadow-inner transition-all duration-500"
                     style={{ 
-                      height: maxBudget > 0 ? `${(currentBudget / maxBudget) * 100}%` : '0%' 
+                      height: isHydrated && maxBudget > 0 ? `${(currentBudget / maxBudget) * 100}%` : '0%' 
                     }}
                   ></div>
                 </div>
@@ -1174,7 +1180,7 @@ export default function TrackFinancesPage() {
                 <div 
                   className="absolute -left-56 transform -translate-y-1/2 transition-all duration-500"
                   style={{ 
-                    top: maxBudget > 0 ? `${100 - ((currentBudget / maxBudget) * 100)}%` : '100%' 
+                    top: isHydrated && maxBudget > 0 ? `${100 - ((currentBudget / maxBudget) * 100)}%` : '100%' 
                   }}
                 >
                   <div className="relative">
@@ -1190,12 +1196,12 @@ export default function TrackFinancesPage() {
                         <span 
                           className="text-[#3c5c34] font-mono font-bold leading-none"
                           style={{
-                            fontSize: currentBudget > 0 ? 
+                            fontSize: isHydrated && currentBudget > 0 ? 
                               Math.max(10, Math.min(28, 28 - (currentBudget.toString().length * 1.0))) + 'px' : 
                               '28px'
                           }}
                         >
-                        {currentBudget > 0 ? `$${currentBudget.toLocaleString()}` : ''}
+                        {isHydrated && currentBudget > 0 ? `$${currentBudget.toLocaleString()}` : ''}
                       </span>
                       </div>
                     </div>
