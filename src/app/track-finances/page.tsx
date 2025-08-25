@@ -956,7 +956,13 @@ export default function TrackFinancesPage() {
     // Check if player is already in shortlist
     const isAlreadyInShortlist = shortlist.some(p => p.id === player.id);
     if (!isAlreadyInShortlist) {
-      setShortlist([...shortlist, player]);
+      // Create player object with user-entered values
+      const playerWithUserData = {
+        ...player,
+        overall: playerOverall || player.overall,
+        age: playerAge || player.age
+      };
+      setShortlist([...shortlist, playerWithUserData]);
     }
   };
 
@@ -1933,27 +1939,33 @@ export default function TrackFinancesPage() {
                 
                 {/* Shortlist content */}
                 {shortlist.length > 0 ? (
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
                     {shortlist.map((player, index) => (
-                      <div key={player.id} className="bg-[#dde1e0]/20 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30">
-                        <div className="flex items-center justify-between mb-2">
+                      <div key={player.id} className="bg-[#dde1e0]/20 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30 group hover:bg-[#dde1e0]/30 transition-all duration-200">
+                        <div className="flex items-center justify-between">
                           <div className="flex-1">
                             <div className="font-semibold text-[#dde1e0] font-mono">
                               {player.short_name || player.name}
                             </div>
-                            <div className="text-sm text-[#a78968] font-mono">
-                              {player.player_positions?.[0] || player.mainPosition} • Age: {player.age} • Overall: {player.overall}
+                            {/* Hover content - shows overall and age */}
+                            <div className="text-sm text-[#a78968] font-mono opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              Overall: {player.overall} • Age: {player.age}
                             </div>
                           </div>
-                          <button
-                            onClick={() => removeFromShortlist(player.id)}
-                            className="ml-2 p-1 text-[#a78968] hover:text-red-400 transition-colors duration-200"
-                            title="Remove from shortlist"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
+                          <div className="flex items-center space-x-2">
+                            <div className="text-sm text-[#a78968] font-mono">
+                              {player.player_positions?.[0] || player.mainPosition}
+                            </div>
+                            <button
+                              onClick={() => removeFromShortlist(player.id)}
+                              className="p-1 text-[#a78968] hover:text-red-400 transition-colors duration-200 opacity-0 group-hover:opacity-100"
+                              title="Remove from shortlist"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
