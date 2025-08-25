@@ -52,8 +52,8 @@ export default function TrackFinancesPage() {
   const [positionPriorities] = useLocalStorage<any[]>('positionPriorities', []);
   const [toggledPositions] = useLocalStorage<Set<any>>('toggledPositions', new Set());
   const [evaluation, setEvaluation] = useState<any>(null);
-  
-  // Dynamic positioning for transfer suggestions box
+
+  // Transfer suggestions positioning state
   const tradeCalculatorRef = useRef<HTMLDivElement>(null);
   const [tradeCalculatorHeight, setTradeCalculatorHeight] = useState(0);
 
@@ -468,21 +468,6 @@ export default function TrackFinancesPage() {
         console.error('Error loading players:', error);
       });
   }, []);
-
-  // Track trade calculator height for dynamic positioning
-  useEffect(() => {
-    if (tradeCalculatorRef.current) {
-      const resizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          setTradeCalculatorHeight(entry.contentRect.height);
-        }
-      });
-      
-      resizeObserver.observe(tradeCalculatorRef.current);
-      
-      return () => resizeObserver.disconnect();
-    }
-  }, [isGreenToggleOn, isRedToggleOn, isAnalyzing, showAnalyzeButton, selectedPlayer]);
 
   // Handle search query changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -936,6 +921,33 @@ export default function TrackFinancesPage() {
     };
   }, [playerSuggestions.length]);
 
+  // Track trade calculator height for dynamic transfer suggestions positioning
+  useEffect(() => {
+    const calculateHeight = () => {
+      if (tradeCalculatorRef.current) {
+        const height = tradeCalculatorRef.current.offsetHeight;
+        setTradeCalculatorHeight(height);
+      }
+    };
+
+    // Calculate initial height
+    calculateHeight();
+
+    // Set up ResizeObserver to track height changes
+    const resizeObserver = new ResizeObserver(() => {
+      calculateHeight();
+    });
+
+    if (tradeCalculatorRef.current) {
+      resizeObserver.observe(tradeCalculatorRef.current);
+    }
+
+    // Cleanup
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isGreenToggleOn, isRedToggleOn, isAnalyzing, showAnalyzeButton, selectedPlayer]);
+
   return (
     <main className="min-h-screen bg-[#3c5c34] relative overflow-hidden">
       {/* Background soccer player image */}
@@ -1193,9 +1205,12 @@ export default function TrackFinancesPage() {
             </div>
 
             {/* Trade Calculator - Dynamic height based on toggle state */}
-            <div ref={tradeCalculatorRef} className={`absolute left-85 top-16 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
-              isAnalyzing ? 'h-full overflow-hidden' : 'h-auto overflow-visible'
-            }`}>
+            <div 
+              ref={tradeCalculatorRef}
+              className={`absolute left-85 top-16 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
+                isAnalyzing ? 'h-full overflow-hidden' : 'h-auto overflow-visible'
+              }`}
+            >
               {/* Trade Calculator Header */}
               <div className="p-6 border-b border-[#dde1e0]/20">
                 <div className="flex items-center justify-between">
@@ -1811,7 +1826,7 @@ export default function TrackFinancesPage() {
             <div 
               className="absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150"
               style={{ 
-                top: `calc(64px + 16px + ${tradeCalculatorHeight}px + (${tradeCalculatorHeight}px * 0.5))` 
+                top: `calc(64px + 16px + ${tradeCalculatorHeight}px + 30px)` 
               }}
             >
               <div className="p-6">
