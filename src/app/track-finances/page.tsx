@@ -57,6 +57,9 @@ export default function TrackFinancesPage() {
   const tradeCalculatorRef = useRef<HTMLDivElement>(null);
   const [tradeCalculatorHeight, setTradeCalculatorHeight] = useState(0);
 
+  // Shortlist state
+  const [shortlist, setShortlist] = useLocalStorage<any[]>('shortlist', []);
+
   // Helper function to calculate buying value
   const calculateBuyingValue = (isStarter: boolean, category: string, sectorChanges: any, positionChanges: any, currentBudget: number, playerPrice: number) => {
     let valueScore = 0;
@@ -948,6 +951,37 @@ export default function TrackFinancesPage() {
     };
   }, [isGreenToggleOn, isRedToggleOn, isAnalyzing, showAnalyzeButton, selectedPlayer]);
 
+  // Shortlist management functions
+  const addToShortlist = (player: any) => {
+    // Check if player is already in shortlist
+    const isAlreadyInShortlist = shortlist.some(p => p.id === player.id);
+    if (!isAlreadyInShortlist) {
+      setShortlist([...shortlist, player]);
+    }
+  };
+
+  const removeFromShortlist = (playerId: string) => {
+    setShortlist(shortlist.filter(p => p.id !== playerId));
+  };
+
+  const resetToSearch = () => {
+    setIsAnalyzing(false);
+    setSelectedPlayer(null);
+    setSearchQuery('');
+    setPlayerSuggestions([]);
+    setShowAnalyzeButton(false);
+    setPlayerAge('');
+    setPlayerOverall('');
+    setPlayerPrice('');
+    setPlayerPace('');
+    setPlayerShooting('');
+    setPlayerPassing('');
+    setPlayerDribbling('');
+    setPlayerDefending('');
+    setPlayerPhysical('');
+    setEvaluation(null);
+  };
+
   return (
     <main className="min-h-screen bg-[#3c5c34] relative overflow-hidden">
       {/* Background soccer player image */}
@@ -1745,6 +1779,27 @@ export default function TrackFinancesPage() {
                               </span>
                             </div>
                           </div>
+
+                          {/* Add to Shortlist Button - Only show for green toggle (buying) */}
+                          {!isRedToggleOn && (
+                            <div className="mt-4 flex space-x-3">
+                              <button
+                                onClick={() => {
+                                  addToShortlist(selectedPlayer);
+                                  resetToSearch();
+                                }}
+                                className="flex-1 px-4 py-3 bg-[#3c5c34] text-[#dde1e0] font-mono font-semibold rounded-lg hover:bg-[#2a4a2a] transition-all duration-300 shadow-lg"
+                              >
+                                Add to Shortlist
+                              </button>
+                              <button
+                                onClick={resetToSearch}
+                                className="px-4 py-3 bg-[#a78968] text-[#dde1e0] font-mono font-semibold rounded-lg hover:bg-[#8b6f5a] transition-all duration-300 shadow-lg"
+                              >
+                                Back to Search
+                              </button>
+                            </div>
+                          )}
                       </div>
                     </div>
                   )}
@@ -1876,12 +1931,40 @@ export default function TrackFinancesPage() {
               <div className="p-6">
                 <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Shortlist</h3>
                 
-                {/* Shortlist content will go here */}
-                <div className="text-center py-8">
-                  <p className="text-[#a78968] font-mono italic">
-                    Shortlist functionality coming soon...
-                  </p>
-                </div>
+                {/* Shortlist content */}
+                {shortlist.length > 0 ? (
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {shortlist.map((player, index) => (
+                      <div key={player.id} className="bg-[#dde1e0]/20 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex-1">
+                            <div className="font-semibold text-[#dde1e0] font-mono">
+                              {player.short_name || player.name}
+                            </div>
+                            <div className="text-sm text-[#a78968] font-mono">
+                              {player.player_positions?.[0] || player.mainPosition} • Age: {player.age} • Overall: {player.overall}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => removeFromShortlist(player.id)}
+                            className="ml-2 p-1 text-[#a78968] hover:text-red-400 transition-colors duration-200"
+                            title="Remove from shortlist"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-[#a78968] font-mono italic">
+                      No players in shortlist. Add players from the trade calculator!
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
