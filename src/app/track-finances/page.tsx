@@ -1830,7 +1830,7 @@ export default function TrackFinancesPage() {
             
             {/* Transfer Suggestions Box */}
             <div 
-              className="absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 min-h-[400px] z-10"
+              className="absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 max-h-[calc(100vh-200px)] overflow-y-auto z-10"
               style={{ 
                 top: `calc(64px + 16px + ${tradeCalculatorHeight}px + 30px)` 
               }}
