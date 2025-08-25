@@ -990,11 +990,24 @@ export default function TrackFinancesPage() {
 
   // Check if a shortlisted player fits a transfer suggestion
   const checkPlayerFitsSuggestion = (player: any, suggestion: any) => {
-    // Check position match
-    const playerPositions = player.player_positions || [player.mainPosition];
+    // Check position match - handle different position formats
+    let playerPositions = [];
+    
+    // Handle different position formats
+    if (player.player_positions && Array.isArray(player.player_positions)) {
+      playerPositions = player.player_positions;
+    } else if (player.mainPosition) {
+      playerPositions = [player.mainPosition];
+    } else if (player.position) {
+      playerPositions = [player.position];
+    }
+    
     const suggestionPosition = suggestion.position;
     
-    if (!playerPositions.includes(suggestionPosition)) {
+    // Check if any player position matches the suggestion position
+    const positionMatch = playerPositions.some((pos: string) => pos === suggestionPosition);
+    
+    if (!positionMatch) {
       return false;
     }
 
@@ -1019,14 +1032,20 @@ export default function TrackFinancesPage() {
     const matchedSuggestions = new Set();
     const suggestions = generateTransferSuggestions();
     
+    console.log('Shortlist players:', shortlist);
+    console.log('Transfer suggestions:', suggestions);
+    
     shortlist.forEach(player => {
       suggestions.forEach((suggestion, index) => {
-        if (checkPlayerFitsSuggestion(player, suggestion)) {
+        const fits = checkPlayerFitsSuggestion(player, suggestion);
+        console.log(`Player ${player.short_name || player.name} (${player.player_positions?.[0] || player.mainPosition}) fits suggestion ${suggestion.position} (${suggestion.category}): ${fits}`);
+        if (fits) {
           matchedSuggestions.add(index);
         }
       });
     });
     
+    console.log('Matched suggestions:', Array.from(matchedSuggestions));
     return matchedSuggestions;
   };
 
