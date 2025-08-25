@@ -1207,7 +1207,7 @@ export default function TrackFinancesPage() {
             {/* Trade Calculator - Dynamic height based on toggle state */}
             <div 
               ref={tradeCalculatorRef}
-              className={`absolute left-85 top-16 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
+              className={`absolute left-85 top-16 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 z-20 ${
                 isAnalyzing ? 'h-full overflow-hidden' : 'h-auto overflow-visible'
               }`}
             >
@@ -1342,7 +1342,7 @@ export default function TrackFinancesPage() {
                     
                     {/* Player Suggestions - Positioned directly under search bar */}
                     {playerSuggestions.length > 0 && (
-                      <div className="absolute z-[60] w-full mt-1 bg-[#dde1e0]/95 border border-[#a78968]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-[9999] w-full mt-1 bg-[#dde1e0]/95 border border-[#a78968]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
                         {playerSuggestions.map((player, index) => (
                           <button
                             key={index}
@@ -1824,7 +1824,7 @@ export default function TrackFinancesPage() {
             
             {/* Transfer Suggestions Box */}
             <div 
-              className="absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 z-10"
+              className="absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 z-5"
               style={{ 
                 top: `calc(64px + 16px + ${tradeCalculatorHeight}px + 30px)` 
               }}
