@@ -1342,7 +1342,7 @@ export default function TrackFinancesPage() {
                     
                     {/* Player Suggestions - Positioned directly under search bar */}
                     {playerSuggestions.length > 0 && (
-                      <div className="absolute z-[100] w-full mt-1 bg-[#dde1e0]/95 border border-[#a78968]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-[9999] w-full mt-1 bg-[#dde1e0]/95 border border-[#a78968]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
                         {playerSuggestions.map((player, index) => (
                           <button
                             key={index}
@@ -1824,7 +1824,7 @@ export default function TrackFinancesPage() {
             
             {/* Transfer Suggestions Box */}
             <div 
-              className="absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 max-h-[calc(100vh-200px)] overflow-y-auto"
+              className="absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 max-h-[calc(100vh-200px)] overflow-y-auto z-10"
               style={{ 
                 top: `calc(64px + 16px + ${tradeCalculatorHeight}px + 30px)` 
               }}
@@ -1833,7 +1833,7 @@ export default function TrackFinancesPage() {
                 <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Transfer Suggestions</h3>
                 
                 {generateTransferSuggestions().length > 0 ? (
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                  <div className="space-y-3">
                     {generateTransferSuggestions().map((suggestion, index) => (
                       <div key={index} className="bg-[#dde1e0]/20 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30">
                         <div className="flex items-center justify-between mb-2">
