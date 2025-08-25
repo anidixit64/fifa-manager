@@ -988,6 +988,48 @@ export default function TrackFinancesPage() {
     setEvaluation(null);
   };
 
+  // Check if a shortlisted player fits a transfer suggestion
+  const checkPlayerFitsSuggestion = (player: any, suggestion: any) => {
+    // Check position match
+    const playerPositions = player.player_positions || [player.mainPosition];
+    const suggestionPosition = suggestion.position;
+    
+    if (!playerPositions.includes(suggestionPosition)) {
+      return false;
+    }
+
+    // Check category match
+    const playerAge = parseInt(player.age) || player.age;
+    const playerOverall = parseInt(player.overall) || player.overall;
+
+    switch (suggestion.category) {
+      case 'Young Star':
+        return playerAge <= 23 && playerOverall >= 70;
+      case 'Veteran':
+        return playerAge >= 28 && playerOverall >= 75;
+      case 'Any':
+        return true;
+      default:
+        return true;
+    }
+  };
+
+  // Get matched suggestions for shortlisted players
+  const getMatchedSuggestions = () => {
+    const matchedSuggestions = new Set();
+    const suggestions = generateTransferSuggestions();
+    
+    shortlist.forEach(player => {
+      suggestions.forEach((suggestion, index) => {
+        if (checkPlayerFitsSuggestion(player, suggestion)) {
+          matchedSuggestions.add(index);
+        }
+      });
+    });
+    
+    return matchedSuggestions;
+  };
+
   return (
     <main className="min-h-screen bg-[#3c5c34] relative overflow-hidden">
       {/* Background soccer player image */}
@@ -1895,32 +1937,52 @@ export default function TrackFinancesPage() {
                 
                 {generateTransferSuggestions().length > 0 ? (
                   <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {generateTransferSuggestions().map((suggestion, index) => (
-                      <div key={index} className="bg-[#dde1e0]/20 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center space-x-2">
-                            <span className={`px-2 py-1 rounded text-xs font-mono font-semibold ${
-                              suggestion.priority === 'high' 
-                                ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
-                                : suggestion.priority === 'medium'
-                                ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
-                                : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                    {generateTransferSuggestions().map((suggestion, index) => {
+                      const matchedSuggestions = getMatchedSuggestions();
+                      const isMatched = matchedSuggestions.has(index);
+                      
+                      return (
+                        <div 
+                          key={index} 
+                          className={`backdrop-blur-sm p-3 rounded-lg border transition-all duration-200 ${
+                            isMatched 
+                              ? 'bg-green-500/30 border-green-400/50' 
+                              : 'bg-[#dde1e0]/20 border-[#a78968]/30'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <span className={`px-2 py-1 rounded text-xs font-mono font-semibold ${
+                                isMatched
+                                  ? 'bg-green-500/40 text-green-200 border border-green-400/50'
+                                  : suggestion.priority === 'high' 
+                                    ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
+                                    : suggestion.priority === 'medium'
+                                    ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                                    : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                              }`}>
+                                {isMatched ? 'MATCHED' : suggestion.priority.toUpperCase()}
+                              </span>
+                              <span className={`font-mono font-semibold ${
+                                isMatched ? 'text-green-200' : 'text-[#dde1e0]'
+                              }`}>
+                                {suggestion.type} {suggestion.position}
+                              </span>
+                            </div>
+                            <span className={`font-mono text-sm ${
+                              isMatched ? 'text-green-200' : 'text-[#a78968]'
                             }`}>
-                              {suggestion.priority.toUpperCase()}
+                              {suggestion.category}
                             </span>
-                            <span className="text-[#dde1e0] font-mono font-semibold">
-                              {suggestion.type} {suggestion.position}
-                            </span>
-          </div>
-                          <span className="text-[#a78968] font-mono text-sm">
-                            {suggestion.category}
-                          </span>
+                          </div>
+                          <p className={`font-mono text-sm ${
+                            isMatched ? 'text-green-200' : 'text-[#dde1e0]'
+                          }`}>
+                            {suggestion.reason}
+                          </p>
                         </div>
-                        <p className="text-[#dde1e0] font-mono text-sm">
-                          {suggestion.reason}
-                        </p>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="text-center py-8">
