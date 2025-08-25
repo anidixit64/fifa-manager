@@ -56,7 +56,6 @@ export default function TrackFinancesPage() {
   // Transfer suggestions positioning state
   const tradeCalculatorRef = useRef<HTMLDivElement>(null);
   const [tradeCalculatorHeight, setTradeCalculatorHeight] = useState(0);
-  const [isHydrated, setIsHydrated] = useState(false);
 
   // Helper function to calculate buying value
   const calculateBuyingValue = (isStarter: boolean, category: string, sectorChanges: any, positionChanges: any, currentBudget: number, playerPrice: number) => {
@@ -949,11 +948,6 @@ export default function TrackFinancesPage() {
     };
   }, [isGreenToggleOn, isRedToggleOn, isAnalyzing, showAnalyzeButton, selectedPlayer]);
 
-  // Handle hydration to prevent server/client mismatch
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-
   return (
     <main className="min-h-screen bg-[#3c5c34] relative overflow-hidden">
       {/* Background soccer player image */}
@@ -1161,7 +1155,7 @@ export default function TrackFinancesPage() {
           </div>
 
           {/* Main Content */}
-          <div className="relative h-[calc(90vh-180px)] overflow-y-auto">
+          <div className="relative h-[calc(90vh-180px)]">
                           {/* Bar - Left Side */}
               <div className="absolute left-60 top-[60%] transform -translate-y-1/2 h-full">
               <div className="relative h-full">
@@ -1171,7 +1165,7 @@ export default function TrackFinancesPage() {
                   <div 
                     className="w-full bg-red-500/70 rounded-full shadow-inner transition-all duration-500"
                     style={{ 
-                      height: isHydrated && maxBudget > 0 ? `${(currentBudget / maxBudget) * 100}%` : '0%' 
+                      height: maxBudget > 0 ? `${(currentBudget / maxBudget) * 100}%` : '0%' 
                     }}
                   ></div>
                 </div>
@@ -1180,7 +1174,7 @@ export default function TrackFinancesPage() {
                 <div 
                   className="absolute -left-56 transform -translate-y-1/2 transition-all duration-500"
                   style={{ 
-                    top: isHydrated && maxBudget > 0 ? `${100 - ((currentBudget / maxBudget) * 100)}%` : '100%' 
+                    top: maxBudget > 0 ? `${100 - ((currentBudget / maxBudget) * 100)}%` : '100%' 
                   }}
                 >
                   <div className="relative">
@@ -1196,12 +1190,12 @@ export default function TrackFinancesPage() {
                         <span 
                           className="text-[#3c5c34] font-mono font-bold leading-none"
                           style={{
-                            fontSize: isHydrated && currentBudget > 0 ? 
+                            fontSize: currentBudget > 0 ? 
                               Math.max(10, Math.min(28, 28 - (currentBudget.toString().length * 1.0))) + 'px' : 
                               '28px'
                           }}
                         >
-                        {isHydrated && currentBudget > 0 ? `$${currentBudget.toLocaleString()}` : ''}
+                        {currentBudget > 0 ? `$${currentBudget.toLocaleString()}` : ''}
                       </span>
                       </div>
                     </div>
@@ -1348,7 +1342,7 @@ export default function TrackFinancesPage() {
                     
                     {/* Player Suggestions - Positioned directly under search bar */}
                     {playerSuggestions.length > 0 && (
-                      <div className="absolute z-[9999] w-full mt-1 bg-[#dde1e0]/95 border border-[#a78968]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-[60] w-full mt-1 bg-[#dde1e0]/95 border border-[#a78968]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
                         {playerSuggestions.map((player, index) => (
                           <button
                             key={index}
@@ -1830,7 +1824,7 @@ export default function TrackFinancesPage() {
             
             {/* Transfer Suggestions Box */}
             <div 
-              className="absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 max-h-[calc(100vh-200px)] overflow-y-auto z-10"
+              className="absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 z-10"
               style={{ 
                 top: `calc(64px + 16px + ${tradeCalculatorHeight}px + 30px)` 
               }}
@@ -1839,7 +1833,7 @@ export default function TrackFinancesPage() {
                 <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Transfer Suggestions</h3>
                 
                 {generateTransferSuggestions().length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
                     {generateTransferSuggestions().map((suggestion, index) => (
                       <div key={index} className="bg-[#dde1e0]/20 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30">
                         <div className="flex items-center justify-between mb-2">

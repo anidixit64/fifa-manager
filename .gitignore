@@ -17,12 +17,6 @@
 /.next/
 /out/
 
-# Build manifests and cache files
-.next/server/**/app-build-manifest.json
-.next/static/development/_buildManifest.js*
-.next/server/**/app-paths-manifest.json
-node_modules/.cache/
-
 # production
 /build
 
