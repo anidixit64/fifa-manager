@@ -1944,18 +1944,26 @@ export default function TrackFinancesPage() {
                       <div key={player.id} className="bg-[#dde1e0]/20 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30 group hover:bg-[#dde1e0]/30 transition-all duration-200">
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
-                            <div className="font-semibold text-[#2d1b0e] font-mono">
-                              {player.short_name || player.name}
+                            {/* Default content - name and position */}
+                            <div className="group-hover:hidden">
+                              <div className="font-semibold text-[#2d1b0e] font-mono">
+                                {player.short_name || player.name}
+                              </div>
+                              <div className="text-sm text-[#4a2c1a] font-mono">
+                                {player.player_positions?.[0] || player.mainPosition}
+                              </div>
                             </div>
-                            {/* Hover content - shows overall and age */}
-                            <div className="text-sm text-[#4a2c1a] font-mono opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                              Overall: {player.overall} • Age: {player.age}
+                            {/* Hover content - overall and age */}
+                            <div className="hidden group-hover:block">
+                              <div className="text-sm text-[#4a2c1a] font-mono">
+                                Overall: {player.overall}
+                              </div>
+                              <div className="text-sm text-[#4a2c1a] font-mono">
+                                Age: {player.age}
+                              </div>
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <div className="text-sm text-[#4a2c1a] font-mono">
-                              {player.player_positions?.[0] || player.mainPosition}
-                            </div>
                             <button
                               onClick={() => removeFromShortlist(player.id)}
                               className="p-1 text-[#4a2c1a] hover:text-red-600 transition-colors duration-200 opacity-0 group-hover:opacity-100"
