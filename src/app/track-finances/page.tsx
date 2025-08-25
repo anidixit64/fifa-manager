@@ -1161,7 +1161,7 @@ export default function TrackFinancesPage() {
           </div>
 
           {/* Main Content */}
-          <div className="relative min-h-[calc(90vh-180px)] overflow-y-auto">
+          <div className="relative h-[calc(90vh-180px)] overflow-y-auto">
                           {/* Bar - Left Side */}
               <div className="absolute left-60 top-[60%] transform -translate-y-1/2 h-full">
               <div className="relative h-full">
