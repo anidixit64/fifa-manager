@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useOptimizedNavigation } from '@/hooks/useOptimizedNavigation';
 import { useTeamTheme } from '@/contexts/TeamThemeContext';
@@ -52,6 +52,10 @@ export default function TrackFinancesPage() {
   const [positionPriorities] = useLocalStorage<any[]>('positionPriorities', []);
   const [toggledPositions] = useLocalStorage<Set<any>>('toggledPositions', new Set());
   const [evaluation, setEvaluation] = useState<any>(null);
+  
+  // Dynamic positioning for transfer suggestions box
+  const tradeCalculatorRef = useRef<HTMLDivElement>(null);
+  const [tradeCalculatorHeight, setTradeCalculatorHeight] = useState(0);
 
   // Helper function to calculate buying value
   const calculateBuyingValue = (isStarter: boolean, category: string, sectorChanges: any, positionChanges: any, currentBudget: number, playerPrice: number) => {
@@ -464,6 +468,21 @@ export default function TrackFinancesPage() {
         console.error('Error loading players:', error);
       });
   }, []);
+
+  // Track trade calculator height for dynamic positioning
+  useEffect(() => {
+    if (tradeCalculatorRef.current) {
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          setTradeCalculatorHeight(entry.contentRect.height);
+        }
+      });
+      
+      resizeObserver.observe(tradeCalculatorRef.current);
+      
+      return () => resizeObserver.disconnect();
+    }
+  }, [isGreenToggleOn, isRedToggleOn, isAnalyzing, showAnalyzeButton, selectedPlayer]);
 
   // Handle search query changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1174,7 +1193,7 @@ export default function TrackFinancesPage() {
             </div>
 
             {/* Trade Calculator - Dynamic height based on toggle state */}
-            <div className={`absolute left-85 top-16 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
+            <div ref={tradeCalculatorRef} className={`absolute left-85 top-16 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
               isAnalyzing ? 'h-full overflow-hidden' : 'h-auto overflow-visible'
             }`}>
               {/* Trade Calculator Header */}
@@ -1789,11 +1808,12 @@ export default function TrackFinancesPage() {
             </div>
             
             {/* Transfer Suggestions Box */}
-            <div className={`absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 ${
-              isGreenToggleOn || isRedToggleOn || isAnalyzing 
-                ? 'top-[calc(64px+80px+92px+50px)]' 
-                : 'top-[calc(64px+80px+50px)]'
-            }`}>
+            <div 
+              className="absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150"
+              style={{ 
+                top: `calc(64px + 16px + ${tradeCalculatorHeight}px + (${tradeCalculatorHeight}px * 0.5))` 
+              }}
+            >
               <div className="p-6">
                 <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Transfer Suggestions</h3>
                 
