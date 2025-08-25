@@ -6,15 +6,6 @@ const nextConfig: NextConfig = {
   experimental: {
     // Enable faster page transitions
     optimizePackageImports: ['react', 'react-dom'],
-    // Prevent build manifest issues
-    turbo: {
-      rules: {
-        '*.tsx': {
-          loaders: ['@next/swc-loader'],
-          as: '*.js',
-        },
-      },
-    },
   },
   // Enable compression for faster loading
   compress: true,
