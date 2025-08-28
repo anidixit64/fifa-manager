@@ -225,7 +225,7 @@ export function analyzeTeam(
   
   // Track how many players we've selected for each position
   const selectedCounts = new Map<string, number>();
-  
+
   // Initialize selected counts
   positionsToRate.forEach((position: string) => {
     selectedCounts.set(position, 0);
@@ -329,4 +329,4 @@ export function analyzeTeam(
     positionStrengths,
     sectorStrengths
   };
-}
+} 

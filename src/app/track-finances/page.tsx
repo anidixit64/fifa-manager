@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useOptimizedNavigation } from '@/hooks/useOptimizedNavigation';
 import { useTeamTheme } from '@/contexts/TeamThemeContext';
@@ -52,6 +52,13 @@ export default function TrackFinancesPage() {
   const [positionPriorities] = useLocalStorage<any[]>('positionPriorities', []);
   const [toggledPositions] = useLocalStorage<Set<any>>('toggledPositions', new Set());
   const [evaluation, setEvaluation] = useState<any>(null);
+
+  // Transfer suggestions positioning state
+  const tradeCalculatorRef = useRef<HTMLDivElement>(null);
+  const [tradeCalculatorHeight, setTradeCalculatorHeight] = useState(0);
+
+  // Shortlist state
+  const [shortlist, setShortlist] = useLocalStorage<any[]>('shortlist', []);
 
   // Helper function to calculate buying value
   const calculateBuyingValue = (isStarter: boolean, category: string, sectorChanges: any, positionChanges: any, currentBudget: number, playerPrice: number) => {
@@ -917,6 +924,131 @@ export default function TrackFinancesPage() {
     };
   }, [playerSuggestions.length]);
 
+  // Track trade calculator height for dynamic transfer suggestions positioning
+  useEffect(() => {
+    const calculateHeight = () => {
+      if (tradeCalculatorRef.current) {
+        const height = tradeCalculatorRef.current.offsetHeight;
+        setTradeCalculatorHeight(height);
+      }
+    };
+
+    // Calculate initial height
+    calculateHeight();
+
+    // Set up ResizeObserver to track height changes
+    const resizeObserver = new ResizeObserver(() => {
+      calculateHeight();
+    });
+
+    if (tradeCalculatorRef.current) {
+      resizeObserver.observe(tradeCalculatorRef.current);
+    }
+
+    // Cleanup
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isGreenToggleOn, isRedToggleOn, isAnalyzing, showAnalyzeButton, selectedPlayer]);
+
+  // Shortlist management functions
+  const addToShortlist = (player: any) => {
+    // Check if player is already in shortlist
+    const isAlreadyInShortlist = shortlist.some(p => p.id === player.id);
+    if (!isAlreadyInShortlist) {
+      // Create player object with user-entered values
+      const playerWithUserData = {
+        ...player,
+        overall: playerOverall || player.overall,
+        age: playerAge || player.age
+      };
+      setShortlist([...shortlist, playerWithUserData]);
+    }
+  };
+
+  const removeFromShortlist = (playerId: string) => {
+    setShortlist(shortlist.filter(p => p.id !== playerId));
+  };
+
+  const resetToSearch = () => {
+    setIsAnalyzing(false);
+    setSelectedPlayer(null);
+    setSearchQuery('');
+    setPlayerSuggestions([]);
+    setShowAnalyzeButton(false);
+    setPlayerAge('');
+    setPlayerOverall('');
+    setPlayerPrice('');
+    setPlayerPace('');
+    setPlayerShooting('');
+    setPlayerPassing('');
+    setPlayerDribbling('');
+    setPlayerDefending('');
+    setPlayerPhysical('');
+    setEvaluation(null);
+  };
+
+  // Check if a shortlisted player fits a transfer suggestion
+  const checkPlayerFitsSuggestion = (player: any, suggestion: any) => {
+    // Check position match - handle different position formats
+    let playerPositions = [];
+    
+    // Handle different position formats
+    if (player.player_positions && Array.isArray(player.player_positions)) {
+      playerPositions = player.player_positions;
+    } else if (player.mainPosition) {
+      playerPositions = [player.mainPosition];
+    } else if (player.position) {
+      playerPositions = [player.position];
+    }
+    
+    const suggestionPosition = suggestion.position;
+    
+    // Check if any player position matches the suggestion position
+    const positionMatch = playerPositions.some((pos: string) => pos === suggestionPosition);
+    
+    if (!positionMatch) {
+      return false;
+    }
+
+    // Check category match
+    const playerAge = parseInt(player.age) || player.age;
+    const playerOverall = parseInt(player.overall) || player.overall;
+
+    switch (suggestion.category) {
+      case 'Young Star':
+        return playerAge <= 23 && playerOverall >= 70;
+      case 'Veteran':
+        return playerAge >= 28 && playerOverall >= 75;
+      case 'Any':
+        return true;
+      default:
+        return true;
+    }
+  };
+
+  // Get matched suggestions for shortlisted players
+  const getMatchedSuggestions = () => {
+    const matchedSuggestions = new Set();
+    const suggestions = generateTransferSuggestions();
+    
+    console.log('Shortlist players:', shortlist);
+    console.log('Transfer suggestions:', suggestions);
+    
+    shortlist.forEach(player => {
+      suggestions.forEach((suggestion, index) => {
+        const fits = checkPlayerFitsSuggestion(player, suggestion);
+        console.log(`Player ${player.short_name || player.name} (${player.player_positions?.[0] || player.mainPosition}) fits suggestion ${suggestion.position} (${suggestion.category}): ${fits}`);
+        if (fits) {
+          matchedSuggestions.add(index);
+        }
+      });
+    });
+    
+    console.log('Matched suggestions:', Array.from(matchedSuggestions));
+    return matchedSuggestions;
+  };
+
   return (
     <main className="min-h-screen bg-[#3c5c34] relative overflow-hidden">
       {/* Background soccer player image */}
@@ -1125,8 +1257,8 @@ export default function TrackFinancesPage() {
 
           {/* Main Content */}
           <div className="relative h-[calc(90vh-180px)]">
-            {/* Bar - Left Side */}
-            <div className="absolute left-16 top-[60%] transform -translate-y-1/2 h-full">
+                          {/* Bar - Left Side */}
+              <div className="absolute left-60 top-[60%] transform -translate-y-1/2 h-full">
               <div className="relative h-full">
                 {/* Bar Container */}
                 <div className="w-16 h-full bg-[#dde1e0]/10 rounded-full border-4 border-[#a78968] shadow-lg">
@@ -1174,9 +1306,12 @@ export default function TrackFinancesPage() {
             </div>
 
             {/* Trade Calculator - Dynamic height based on toggle state */}
-            <div className={`absolute left-40 top-16 -right-30 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 ${
-              isRedToggleOn || isAnalyzing ? 'h-full overflow-hidden' : 'h-auto overflow-visible'
-            }`}>
+            <div 
+              ref={tradeCalculatorRef}
+              className={`absolute left-85 top-16 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-300 z-20 ${
+                isAnalyzing ? 'h-full overflow-hidden' : 'h-auto overflow-visible'
+              }`}
+            >
               {/* Trade Calculator Header */}
               <div className="p-6 border-b border-[#dde1e0]/20">
                 <div className="flex items-center justify-between">
@@ -1308,7 +1443,7 @@ export default function TrackFinancesPage() {
                     
                     {/* Player Suggestions - Positioned directly under search bar */}
                     {playerSuggestions.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-[#dde1e0]/95 border border-[#a78968]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-[9999] w-full mt-1 bg-[#dde1e0]/95 border border-[#a78968]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
                         {playerSuggestions.map((player, index) => (
                           <button
                             key={index}
@@ -1711,6 +1846,27 @@ export default function TrackFinancesPage() {
                               </span>
                             </div>
                           </div>
+
+                          {/* Add to Shortlist Button - Only show for green toggle (buying) */}
+                          {!isRedToggleOn && (
+                            <div className="mt-4 flex space-x-3">
+                              <button
+                                onClick={() => {
+                                  addToShortlist(selectedPlayer);
+                                  resetToSearch();
+                                }}
+                                className="flex-1 px-4 py-3 bg-[#3c5c34] text-[#dde1e0] font-mono font-semibold rounded-lg hover:bg-[#2a4a2a] transition-all duration-300 shadow-lg"
+                              >
+                                Add to Shortlist
+                              </button>
+                              <button
+                                onClick={resetToSearch}
+                                className="px-4 py-3 bg-[#a78968] text-[#dde1e0] font-mono font-semibold rounded-lg hover:bg-[#8b6f5a] transition-all duration-300 shadow-lg"
+                              >
+                                Back to Search
+                              </button>
+                            </div>
+                          )}
                       </div>
                     </div>
                   )}
@@ -1789,47 +1945,124 @@ export default function TrackFinancesPage() {
             </div>
             
             {/* Transfer Suggestions Box */}
-            <div className={`absolute left-40 -right-30 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 ${
-              isGreenToggleOn || isRedToggleOn || isAnalyzing 
-                ? 'top-[calc(80px+120px+54px)]' 
-                : 'top-[calc(120px+54px)]'
-            }`}>
+            <div 
+              className="absolute left-85 right-85 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20 transition-all duration-150 z-5"
+              style={{ 
+                top: `calc(64px + 16px + ${tradeCalculatorHeight}px + 30px)` 
+              }}
+            >
               <div className="p-6">
                 <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Transfer Suggestions</h3>
                 
                 {generateTransferSuggestions().length > 0 ? (
                   <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {generateTransferSuggestions().map((suggestion, index) => (
-                      <div key={index} className="bg-[#dde1e0]/20 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center space-x-2">
-                            <span className={`px-2 py-1 rounded text-xs font-mono font-semibold ${
-                              suggestion.priority === 'high' 
-                                ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
-                                : suggestion.priority === 'medium'
-                                ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
-                                : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                    {generateTransferSuggestions().map((suggestion, index) => {
+                      const matchedSuggestions = getMatchedSuggestions();
+                      const isMatched = matchedSuggestions.has(index);
+                      
+                      return (
+                        <div 
+                          key={index} 
+                          className={`backdrop-blur-sm p-3 rounded-lg border transition-all duration-200 ${
+                            isMatched 
+                              ? 'bg-green-500/30 border-green-400/50' 
+                              : 'bg-[#dde1e0]/20 border-[#a78968]/30'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <span className={`px-2 py-1 rounded text-xs font-mono font-semibold ${
+                                isMatched
+                                  ? 'bg-green-500/40 text-green-200 border border-green-400/50'
+                                  : suggestion.priority === 'high' 
+                                    ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
+                                    : suggestion.priority === 'medium'
+                                    ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                                    : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                              }`}>
+                                {isMatched ? 'MATCHED' : suggestion.priority.toUpperCase()}
+                              </span>
+                              <span className={`font-mono font-semibold ${
+                                isMatched ? 'text-green-200' : 'text-[#dde1e0]'
+                              }`}>
+                                {suggestion.type} {suggestion.position}
+                              </span>
+                            </div>
+                            <span className={`font-mono text-sm ${
+                              isMatched ? 'text-green-200' : 'text-[#a78968]'
                             }`}>
-                              {suggestion.priority.toUpperCase()}
-                            </span>
-                            <span className="text-[#dde1e0] font-mono font-semibold">
-                              {suggestion.type} {suggestion.position}
+                              {suggestion.category}
                             </span>
                           </div>
-                          <span className="text-[#a78968] font-mono text-sm">
-                            {suggestion.category}
-                          </span>
+                          <p className={`font-mono text-sm ${
+                            isMatched ? 'text-green-200' : 'text-[#dde1e0]'
+                          }`}>
+                            {suggestion.reason}
+                          </p>
                         </div>
-                        <p className="text-[#dde1e0] font-mono text-sm">
-                          {suggestion.reason}
-                        </p>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="text-center py-8">
                     <p className="text-[#a78968] font-mono italic">
                       No transfer suggestions available. Your team appears to be well-balanced!
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Sidebar */}
+            <div className="absolute -right-5 top-16 w-80 bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow-lg border border-[#dde1e0]/20">
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Shortlist</h3>
+                
+                {/* Shortlist content */}
+                {shortlist.length > 0 ? (
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {shortlist.map((player, index) => (
+                      <div key={player.id} className="bg-[#dde1e0]/20 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30 group hover:bg-[#dde1e0]/30 transition-all duration-200">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            {/* Default content - name and position */}
+                            <div className="group-hover:hidden">
+                              <div className="font-semibold text-[#2d1b0e] font-mono">
+                                {player.short_name || player.name}
+                              </div>
+                              <div className="text-sm text-[#4a2c1a] font-mono">
+                                {player.player_positions?.[0] || player.mainPosition}
+                              </div>
+                            </div>
+                            {/* Hover content - overall and age */}
+                            <div className="hidden group-hover:block">
+                              <div className="text-sm text-[#4a2c1a] font-mono">
+                                Overall: {player.overall}
+                              </div>
+                              <div className="text-sm text-[#4a2c1a] font-mono">
+                                Age: {player.age}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => removeFromShortlist(player.id)}
+                              className="p-1 text-[#4a2c1a] hover:text-red-600 transition-colors duration-200 opacity-0 group-hover:opacity-100"
+                              title="Remove from shortlist"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-[#4a2c1a] font-mono italic">
+                      No players in shortlist. Add players from the trade calculator!
                     </p>
                   </div>
                 )}

@@ -286,23 +286,23 @@ export default function BestXIPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
-            <button
-              onClick={() => navigateTo('/manager')}
-              className="relative group p-2 rounded-full bg-[#dde1e0]/10 hover:bg-[#dde1e0]/20 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/50 mr-4"
-            >
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
+          <button
+            onClick={() => navigateTo('/manager')}
+            className="relative group p-2 rounded-full bg-[#dde1e0]/10 hover:bg-[#dde1e0]/20 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#a78968]/50 mr-4"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
                 className="h-6 w-6 text-[#dde1e0]/80 group-hover:text-[#8B6F47] transition-all duration-300 group-hover:rotate-12 group-active:-rotate-6" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              {/* Hover glow effect */}
-              <div className="absolute inset-0 rounded-full bg-[#a78968]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-            </button>
-            <h1 className="text-3xl font-bold text-[#dde1e0] font-mono tracking-wider">Best XI Analysis</h1>
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            {/* Hover glow effect */}
+            <div className="absolute inset-0 rounded-full bg-[#a78968]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+          </button>
+          <h1 className="text-3xl font-bold text-[#dde1e0] font-mono tracking-wider">Best XI Analysis</h1>
           </div>
           
           {/* Suggest Transfers Button */}
@@ -446,23 +446,23 @@ export default function BestXIPage() {
                   if (playerAtPosition) {
                     const { player, position } = playerAtPosition;
                     return (
-                      <div
+                        <div
                         key={`player-${player.id}`}
                         className="bg-[#644d36]/20 p-2 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors flex flex-col justify-center cursor-pointer hover:scale-105 active:scale-95"
-                        onClick={() => handlePlayerClick(player.id)}
-                        title={`Click to view ${player.shortName}'s stats`}
-                      >
-                        {renderPlayerCardContent(player, position)}
-                      </div>
+                          onClick={() => handlePlayerClick(player.id)}
+                          title={`Click to view ${player.shortName}'s stats`}
+                        >
+                          {renderPlayerCardContent(player, position)}
+                        </div>
                     );
                   } else {
                     return (
-                      <div
+                        <div
                         key={`cell-${col}-${row}`}
                         className="border border-[#3c5c34]/30 rounded flex items-center justify-center min-h-[60px]"
                       >
                         {/* Empty cell */}
-                      </div>
+                        </div>
                     );
                   }
                 })}
