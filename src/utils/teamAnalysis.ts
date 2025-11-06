@@ -192,7 +192,11 @@ export function analyzeTeam(
   // Rate players for each position
   const playerRatings: PlayerRating[] = [];
   
-  // Only rate players for positions that are configured in tactics
+  // Rate all players for bench selection (need all sectors: defense, midfield, forward)
+  // But only use configured positions for Best XI selection
+  const allSectorPositions = ['RB', 'RWB', 'CB', 'LWB', 'LB', 'CM', 'RM', 'LM', 'CDM', 'CAM', 'ST', 'CF', 'LW', 'RW'];
+  
+  // Only rate players for positions that are configured in tactics (for Best XI)
   const tacticsPositions = positionCounts
     ?.filter((pc: PositionCount) => pc.count > 0)
     .map((pc: PositionCount) => pc.position) || [];
@@ -202,12 +206,25 @@ export function analyzeTeam(
     ? ['GK', ...tacticsPositions]
     : tacticsPositions;
   
+  // Rate players for configured positions (for Best XI)
   positionsToRate.forEach((position: string) => {
     players.forEach((player: Player) => {
       if (player.mainPosition === position) {
         const rating = position === 'GK' 
           ? calculateGKRating(player)
           : calculatePlayerRating(player, position, positionPriorities, toggledPositions);
+        playerRatings.push({ player, rating, position });
+      }
+    });
+  });
+  
+  // Also rate players for all sector positions (for bench selection)
+  // This ensures we can select bench players even if their position isn't configured
+  allSectorPositions.forEach((position: string) => {
+    players.forEach((player: Player) => {
+      // Skip if already rated (in configured positions)
+      if (player.mainPosition === position && !playerRatings.some(pr => pr.player.id === player.id && pr.position === position)) {
+        const rating = calculatePlayerRating(player, position, positionPriorities, toggledPositions);
         playerRatings.push({ player, rating, position });
       }
     });
@@ -289,24 +306,13 @@ export function analyzeTeam(
     !bestXI.some(xi => xi.player.id === player.id)
   );
   
-  // Get configured positions from Edit Tactics
-  const configuredPositions = new Set<string>();
-  positionCounts?.forEach(pc => {
-    if (pc.count > 0) {
-      configuredPositions.add(pc.position);
-    }
-  });
-  if (players.some(p => p.mainPosition === 'GK')) {
-    configuredPositions.add('GK');
-  }
-  
   const bench: PlayerRating[] = [];
   const benchPlayerIds = new Set<string>();
   
   // Select top 2 defensive players (already sorted by rating)
+  // Don't filter by configured positions - just get top rated from sector
   const defensivePlayers = remainingPlayers.filter(rating => 
-    defensivePositions.includes(rating.position) && 
-    configuredPositions.has(rating.position)
+    defensivePositions.includes(rating.position)
   );
   for (let i = 0; i < Math.min(2, defensivePlayers.length); i++) {
     bench.push(defensivePlayers[i]);
@@ -315,8 +321,7 @@ export function analyzeTeam(
   
   // Select top 2 midfield players (already sorted by rating)
   const midfieldPlayers = remainingPlayers.filter(rating => 
-    midfieldPositions.includes(rating.position) && 
-    configuredPositions.has(rating.position) &&
+    midfieldPositions.includes(rating.position) &&
     !benchPlayerIds.has(rating.player.id)
   );
   for (let i = 0; i < Math.min(2, midfieldPlayers.length); i++) {
@@ -326,8 +331,7 @@ export function analyzeTeam(
   
   // Select top 2 forward players (already sorted by rating)
   const forwardPlayers = remainingPlayers.filter(rating => 
-    forwardPositions.includes(rating.position) && 
-    configuredPositions.has(rating.position) &&
+    forwardPositions.includes(rating.position) &&
     !benchPlayerIds.has(rating.player.id)
   );
   for (let i = 0; i < Math.min(2, forwardPlayers.length); i++) {
