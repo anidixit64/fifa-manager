@@ -158,11 +158,22 @@ export default function BestXIPage() {
       priority: 'high' | 'medium' | 'low';
     }> = [];
 
-    // Check for missing starters
-    const requiredPositions = ['GK', 'CB', 'RB', 'LB', 'CDM', 'CM', 'CAM', 'LM', 'RM', 'LW', 'RW', 'ST', 'CF'];
+    // Get configured positions from Edit Tactics (positions with count > 0)
+    const configuredPositions = new Set<string>();
+    positionCounts?.forEach(pc => {
+      if (pc.count > 0) {
+        configuredPositions.add(pc.position);
+      }
+    });
+    // Always include GK if there are GK players
+    if (players.some(p => p.mainPosition === 'GK')) {
+      configuredPositions.add('GK');
+    }
+
+    // Check for missing starters - only for configured positions
     const bestXIPositions = analysis.bestXI.map(xi => xi.position);
     
-    requiredPositions.forEach(position => {
+    configuredPositions.forEach(position => {
       if (!bestXIPositions.includes(position)) {
         suggestions.push({
           type: 'Starting',
@@ -174,8 +185,11 @@ export default function BestXIPage() {
       }
     });
 
-    // Check position strengths for depth and age balance
+    // Check position strengths for depth and age balance - only for configured positions
     Object.entries(analysis.positionStrengths).forEach(([position, data]) => {
+      // Only suggest for positions that are configured in Edit Tactics
+      if (!configuredPositions.has(position)) return;
+      
       const positionPlayers = players.filter(p => p.mainPosition === position);
       
       // Check for depth issues
@@ -225,7 +239,7 @@ export default function BestXIPage() {
       }
     });
 
-    // Check sector strengths
+    // Check sector strengths - only suggest positions that are configured
     Object.entries(analysis.sectorStrengths).forEach(([sector, data]) => {
       if (data.count < 3) {
         const sectorPositions = sector === 'Defense' ? ['LB', 'CB', 'RB'] :
@@ -233,7 +247,9 @@ export default function BestXIPage() {
                                sector === 'Forward' ? ['LW', 'RW', 'ST'] : ['GK'];
         
         sectorPositions.forEach(position => {
-          if (!suggestions.some(s => s.position === position && s.type === 'Starting')) {
+          // Only suggest positions that are configured in Edit Tactics
+          if (configuredPositions.has(position) && 
+              !suggestions.some(s => s.position === position && s.type === 'Starting')) {
             suggestions.push({
               type: 'Sector',
               position,
