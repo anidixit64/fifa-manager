@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { useOptimizedNavigation } from '@/hooks/useOptimizedNavigation';
@@ -61,6 +61,7 @@ export default function BestXIPage() {
   const [isClient, setIsClient] = useState(false);
   const [bestXIToggle, setBestXIToggle] = useState(false);
   const [showTransferSuggestions, setShowTransferSuggestions] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Optimized click handler
   const handlePlayerClick = useCallback((playerId: string) => {
@@ -93,6 +94,13 @@ export default function BestXIPage() {
       analyzeTeamData();
     }
   }, [selectedTeam, router, players, positionCounts, positionPriorities, toggledPositions]);
+
+  // Scroll modal to top when it opens
+  useEffect(() => {
+    if (showTransferSuggestions && modalRef.current) {
+      modalRef.current.scrollTop = 0;
+    }
+  }, [showTransferSuggestions]);
 
   const analyzeTeamData = () => {
     if (!players || players.length === 0) {
@@ -642,8 +650,9 @@ export default function BestXIPage() {
 
         {/* Transfer Suggestions Modal */}
         {showTransferSuggestions && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style={{ alignItems: 'center', justifyContent: 'center' }}>
-            <div className="bg-[#dde1e0] rounded-lg shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden transform -translate-y-72">
+          <div ref={modalRef} className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 overflow-y-auto">
+            <div className="min-h-full flex items-start justify-center p-4 pt-8 md:pt-16">
+              <div className="bg-[#dde1e0] rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden mb-8">
               {/* Modal Header */}
               <div className="flex items-center justify-between p-6 border-b border-[#3c5c34]/20">
                 <h2 className="text-2xl font-bold text-[#3c5c34] font-mono tracking-wider">Transfer Suggestions</h2>
@@ -703,6 +712,7 @@ export default function BestXIPage() {
                     </p>
                   </div>
                 )}
+              </div>
               </div>
             </div>
           </div>
