@@ -241,16 +241,30 @@ export function analyzeTeam(
     playersByPosition.get(rating.position)!.push(rating);
   });
 
-  // Fill required positions first
+  // Fill required positions first - ensure we respect the counts from positionCounts
   positionsToRate.forEach((position) => {
-    const requiredCount = positionCountsMap.get(position) || (position === 'GK' ? 1 : 0);
-    const positionPlayers = playersByPosition.get(position) || [];
+    // Get required count from positionCountsMap, default to 1 for GK, 0 for others
+    let requiredCount: number;
+    if (position === 'GK') {
+      requiredCount = 1; // Always need 1 GK if available
+    } else {
+      // For other positions, get from map, default to 0 if not found
+      const mapCount = positionCountsMap.get(position);
+      requiredCount = mapCount !== undefined ? mapCount : 0;
+    }
     
-    for (let i = 0; i < Math.min(requiredCount, positionPlayers.length); i++) {
-      const rating = positionPlayers[i];
-      if (!bestXI.some(xi => xi.player.id === rating.player.id)) {
-        bestXI.push(rating);
-        selectedCounts.set(position, (selectedCounts.get(position) || 0) + 1);
+    // Only proceed if we need players for this position
+    if (requiredCount > 0) {
+      const positionPlayers = playersByPosition.get(position) || [];
+      
+      // Select up to requiredCount players for this position
+      for (let i = 0; i < Math.min(requiredCount, positionPlayers.length); i++) {
+        const rating = positionPlayers[i];
+        // Make sure we don't add the same player twice
+        if (!bestXI.some(xi => xi.player.id === rating.player.id)) {
+          bestXI.push(rating);
+          selectedCounts.set(position, (selectedCounts.get(position) || 0) + 1);
+        }
       }
     }
   });
