@@ -280,10 +280,92 @@ export function analyzeTeam(
     }
   }
 
-  // Select bench players (remaining top players)
-  const bench = sortedRatings
-    .filter(({ player }) => !bestXI.some(xi => xi.player.id === player.id))
-    .slice(0, 7);
+  // Select bench players based on sector requirements
+  // Need: 2 defensive, 2 midfield, 2 forward players (prefer different positions)
+  const defensivePositions = ['RB', 'RWB', 'CB', 'LWB', 'LB'];
+  const midfieldPositions = ['CM', 'RM', 'LM', 'CDM', 'CAM'];
+  const forwardPositions = ['ST', 'CF', 'LW', 'RW'];
+  
+  const remainingPlayers = sortedRatings.filter(({ player }) => 
+    !bestXI.some(xi => xi.player.id === player.id)
+  );
+  
+  const bench: PlayerRating[] = [];
+  const benchPlayerIds = new Set<string>();
+  
+  // Get configured positions from Edit Tactics
+  const configuredPositions = new Set<string>();
+  positionCounts?.forEach(pc => {
+    if (pc.count > 0) {
+      configuredPositions.add(pc.position);
+    }
+  });
+  if (players.some(p => p.mainPosition === 'GK')) {
+    configuredPositions.add('GK');
+  }
+  
+  // Helper function to get position category
+  const getPositionCategory = (position: string): 'defense' | 'midfield' | 'forward' | null => {
+    if (defensivePositions.includes(position)) return 'defense';
+    if (midfieldPositions.includes(position)) return 'midfield';
+    if (forwardPositions.includes(position)) return 'forward';
+    return null;
+  };
+  
+  // Helper function to select players from a sector
+  const selectSectorPlayers = (
+    sectorPositions: string[], 
+    targetCount: number, 
+    sectorName: string
+  ) => {
+    const sectorPlayers = remainingPlayers.filter(rating => 
+      sectorPositions.includes(rating.position) && 
+      configuredPositions.has(rating.position) &&
+      !benchPlayerIds.has(rating.player.id)
+    );
+    
+    const selectedPositions = new Set<string>();
+    
+    // First pass: try to select from different positions
+    for (const rating of sectorPlayers) {
+      if (bench.filter(b => getPositionCategory(b.position) === sectorName).length >= targetCount) break;
+      if (!selectedPositions.has(rating.position)) {
+        bench.push(rating);
+        benchPlayerIds.add(rating.player.id);
+        selectedPositions.add(rating.position);
+      }
+    }
+    
+    // Second pass: fill remaining slots if needed (can use same position if no other options)
+    if (bench.filter(b => getPositionCategory(b.position) === sectorName).length < targetCount) {
+      for (const rating of sectorPlayers) {
+        if (bench.filter(b => getPositionCategory(b.position) === sectorName).length >= targetCount) break;
+        if (!benchPlayerIds.has(rating.player.id)) {
+          bench.push(rating);
+          benchPlayerIds.add(rating.player.id);
+        }
+      }
+    }
+  };
+  
+  // Select 2 defensive players
+  selectSectorPlayers(defensivePositions, 2, 'defense');
+  
+  // Select 2 midfield players
+  selectSectorPlayers(midfieldPositions, 2, 'midfield');
+  
+  // Select 2 forward players
+  selectSectorPlayers(forwardPositions, 2, 'forward');
+  
+  // Fill remaining slots (up to 7 total) with best available players if we don't have 6 yet
+  if (bench.length < 6) {
+    const remaining = remainingPlayers.filter(({ player }) => !benchPlayerIds.has(player.id));
+    for (const rating of remaining) {
+      if (bench.length >= 7) break;
+      bench.push(rating);
+      benchPlayerIds.add(rating.player.id);
+    }
+  }
 
   // Categorize players
   const aging = players.filter((p: Player) => p.age > avgAge + ageStdDev);

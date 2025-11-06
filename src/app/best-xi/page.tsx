@@ -651,8 +651,8 @@ export default function BestXIPage() {
         {/* Transfer Suggestions Modal */}
         {showTransferSuggestions && (
           <div ref={modalRef} className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 overflow-y-auto">
-            <div className="min-h-full flex items-start justify-center p-4 pt-8 md:pt-16">
-              <div className="bg-[#dde1e0] rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden mb-8">
+            <div className="min-h-full flex items-start justify-center p-4 pt-4">
+              <div className="bg-[#dde1e0] rounded-lg shadow-xl max-w-4xl w-full max-h-[calc(100vh-2rem)] overflow-hidden mb-4">
               {/* Modal Header */}
               <div className="flex items-center justify-between p-6 border-b border-[#3c5c34]/20">
                 <h2 className="text-2xl font-bold text-[#3c5c34] font-mono tracking-wider">Transfer Suggestions</h2>
