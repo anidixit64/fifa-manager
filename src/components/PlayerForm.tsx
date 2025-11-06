@@ -52,10 +52,10 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
       age: 18,
       nationality: '',
       fifaCode: '',
-      mainPosition: 'GK',
+      mainPosition: 'ST',
       role: 'C',
       alternatePositions: [],
-      overall: 0,
+      overall: 50,
       potential: 50,
       preferred_foot: 'Right',
       stats: {
@@ -66,25 +66,26 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
         shotsOnTarget: 0,
       },
       attributes: {
-        diving: 50,
-        handling: 50,
-        kicking: 50,
-        reflexes: 50,
-        speed: 50,
-        positioning: 50,
-      } as GoalkeeperAttributes,
+        pace: 50,
+        shooting: 50,
+        passing: 50,
+        dribbling: 50,
+        defending: 50,
+        physical: 50,
+      } as PlayerAttributes,
     }
   );
   const [countrySuggestions, setCountrySuggestions] = useState<Country[]>([]);
   const [allCountries, setAllCountries] = useState<Country[]>([]);
   const [playerSuggestions, setPlayerSuggestions] = useState<PlayerSuggestion[]>([]);
   const [allPlayers, setAllPlayers] = useState<PlayerSuggestion[]>([]);
-  const [overallFocused, setOverallFocused] = useState(false);
+  const [overallInputValue, setOverallInputValue] = useState<string>('');
 
   useEffect(() => {
     if (initialData) {
       const { id, ...rest } = initialData;
       setFormData(rest);
+      setOverallInputValue('');
     }
   }, [initialData]);
 
@@ -138,23 +139,64 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
     const country = allCountries.find(c => c.Country === player.nationality_name);
     const firstPosition = player.player_positions && player.player_positions.length > 0 
       ? player.player_positions[0] 
-      : 'GK';
+      : 'ST';
     
     // Set alternate positions as all positions except the first one
     const alternatePositions = player.player_positions && player.player_positions.length > 1
       ? player.player_positions.slice(1)
       : [];
     
-    setFormData(prev => ({ 
-      ...prev, 
-      name: player.long_name,
-      shortName: player.short_name,
-      nationality: player.nationality_name,
-      fifaCode: country?.FIFA || '',
-      mainPosition: firstPosition,
-      alternatePositions: alternatePositions,
-      potential: parseInt(player.potential) || 50
-    }));
+    setFormData(prev => {
+      // Handle attribute conversion based on position
+      let newAttributes;
+      if (firstPosition === 'GK') {
+        // Convert to goalkeeper attributes if switching to GK
+        if ('pace' in prev.attributes) {
+          // Converting from regular attributes to GK attributes
+          const avgValue = Object.values(prev.attributes).reduce((sum, val) => sum + val, 0) / 6;
+          newAttributes = {
+            diving: Math.round(avgValue),
+            handling: Math.round(avgValue),
+            kicking: Math.round(avgValue),
+            reflexes: Math.round(avgValue),
+            speed: Math.round(avgValue),
+            positioning: Math.round(avgValue),
+          } as GoalkeeperAttributes;
+        } else {
+          // Already GK attributes, keep them
+          newAttributes = prev.attributes;
+        }
+      } else {
+        // Convert to regular attributes if switching from GK
+        if ('diving' in prev.attributes) {
+          // Converting from GK attributes to regular attributes
+          const avgValue = Object.values(prev.attributes).reduce((sum, val) => sum + val, 0) / 6;
+          newAttributes = {
+            pace: Math.round(avgValue),
+            shooting: Math.round(avgValue),
+            passing: Math.round(avgValue),
+            dribbling: Math.round(avgValue),
+            defending: Math.round(avgValue),
+            physical: Math.round(avgValue),
+          } as PlayerAttributes;
+        } else {
+          // Already regular attributes, keep them
+          newAttributes = prev.attributes;
+        }
+      }
+      
+      return {
+        ...prev, 
+        name: player.long_name,
+        shortName: player.short_name,
+        nationality: player.nationality_name,
+        fifaCode: country?.FIFA || '',
+        mainPosition: firstPosition,
+        alternatePositions: alternatePositions,
+        potential: parseInt(player.potential) || 50,
+        attributes: newAttributes
+      };
+    });
     setPlayerSuggestions([]);
   };
 
@@ -184,20 +226,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Calculate overall from attributes if overall is explicitly 0 (user left it blank)
-    let finalOverall = formData.overall;
-    if (finalOverall === 0) {
-      const avgAttribute = Object.values(formData.attributes).reduce((sum, val) => sum + val, 0) / 
-        Object.keys(formData.attributes).length;
-      finalOverall = Math.round(avgAttribute);
-    }
-    
-    const playerData = {
-      ...formData,
-      overall: finalOverall
-    };
-    
-    onSubmit(playerData);
+    onSubmit(formData);
   };
 
   const handleAttributeChange = (attr: keyof PlayerAttributes | keyof GoalkeeperAttributes, value: number) => {
@@ -389,15 +418,40 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
                 id="overall"
                 min="0"
                 max="99"
-                value={overallFocused ? (formData.overall || '') : (formData.overall || 50)}
+                value={overallInputValue !== '' ? overallInputValue : (formData.overall ?? 50)}
                 onChange={(e) => {
-                  const value = e.target.value === '' ? 0 : parseInt(e.target.value);
-                  setFormData({ ...formData, overall: value });
+                  const inputValue = e.target.value;
+                  setOverallInputValue(inputValue);
+                  if (inputValue === '') {
+                    // Allow empty while typing
+                    setFormData({ ...formData, overall: 0 });
+                  } else {
+                    const parsedValue = parseInt(inputValue);
+                    if (!isNaN(parsedValue)) {
+                      setFormData({ ...formData, overall: parsedValue });
+                    }
+                  }
                 }}
                 className="w-full px-4 py-2 border border-[#a8b8a7]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a8b8a7] text-[#3c5c34] bg-[#dde1e0]/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                placeholder="Leave empty to calculate from attributes"
-                onFocus={() => setOverallFocused(true)}
-                onBlur={() => setOverallFocused(false)}
+                placeholder="Enter overall rating"
+                onFocus={() => {
+                  setOverallInputValue(formData.overall?.toString() || '');
+                }}
+                onBlur={(e) => {
+                  const inputValue = e.target.value.trim();
+                  // Default to 50 if field is empty or invalid, but allow 0 if explicitly entered
+                  if (inputValue === '' || isNaN(parseInt(inputValue))) {
+                    setFormData({ ...formData, overall: 50 });
+                    setOverallInputValue('');
+                  } else {
+                    const parsedValue = parseInt(inputValue);
+                    // Only update if it's a valid number
+                    if (!isNaN(parsedValue)) {
+                      setFormData({ ...formData, overall: parsedValue });
+                      setOverallInputValue('');
+                    }
+                  }
+                }}
               />
             </div>
           </div>
