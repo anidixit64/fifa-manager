@@ -289,8 +289,9 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
   };
 
   return (
-    <div className="fixed inset-0 bg-[#3c5c34]/80 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
-      <div className="bg-[#dde1e0]/95 backdrop-blur-sm rounded-lg p-8 w-full max-w-2xl shadow-xl border border-[#dde1e0]/20">
+    <div className="fixed inset-0 bg-[#3c5c34]/80 backdrop-blur-sm z-[100] overflow-y-auto p-4">
+      <div className="min-h-full flex items-center justify-center py-8">
+        <div className="bg-[#dde1e0]/95 backdrop-blur-sm rounded-lg p-8 w-full max-w-2xl shadow-xl border border-[#dde1e0]/20 my-auto">
         <h2 className="text-2xl font-bold text-[#3c5c34] mb-6 font-mono">
           {initialData ? 'Edit Player' : 'Add Player'}
         </h2>
@@ -512,6 +513,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );
