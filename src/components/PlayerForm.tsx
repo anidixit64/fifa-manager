@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Player, PlayerAttributes, GoalkeeperAttributes } from '@/types/player';
 
 interface PlayerFormProps {
@@ -80,6 +80,7 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
   const [playerSuggestions, setPlayerSuggestions] = useState<PlayerSuggestion[]>([]);
   const [allPlayers, setAllPlayers] = useState<PlayerSuggestion[]>([]);
   const [overallInputValue, setOverallInputValue] = useState<string>('');
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (initialData) {
@@ -88,6 +89,13 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
       setOverallInputValue('');
     }
   }, [initialData]);
+
+  // Scroll modal to top when it opens
+  useEffect(() => {
+    if (modalRef.current) {
+      modalRef.current.scrollTop = 0;
+    }
+  }, []);
 
   useEffect(() => {
     // Load countries from JSON
@@ -289,9 +297,9 @@ export default function PlayerForm({ onSubmit, onCancel, initialData }: PlayerFo
   };
 
   return (
-    <div className="fixed inset-0 bg-[#3c5c34]/80 backdrop-blur-sm z-[100] overflow-y-auto p-4">
-      <div className="min-h-full flex items-center justify-center py-8">
-        <div className="bg-[#dde1e0]/95 backdrop-blur-sm rounded-lg p-8 w-full max-w-2xl shadow-xl border border-[#dde1e0]/20 my-auto">
+    <div ref={modalRef} className="fixed inset-0 bg-[#3c5c34]/80 backdrop-blur-sm z-[100] overflow-y-auto">
+      <div className="min-h-full flex items-start justify-center p-4 pt-8 md:pt-16">
+        <div className="bg-[#dde1e0]/95 backdrop-blur-sm rounded-lg p-8 w-full max-w-2xl shadow-xl border border-[#dde1e0]/20 mb-8">
         <h2 className="text-2xl font-bold text-[#3c5c34] mb-6 font-mono">
           {initialData ? 'Edit Player' : 'Add Player'}
         </h2>
