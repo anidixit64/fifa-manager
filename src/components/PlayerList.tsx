@@ -174,16 +174,10 @@ export default function PlayerList({ players, onDeletePlayer, onUpdatePlayer }: 
       } as PlayerAttributes;
     }
     
-    // Recalculate overall rating based on average of all attributes
-    const newOverall = Math.round(
-      Object.values(updatedAttributes).reduce((sum, val) => sum + val, 0) / 
-      Object.keys(updatedAttributes).length
-    );
-    
     const updatedPlayer = {
       ...player,
       attributes: updatedAttributes,
-      overall: newOverall
+      // Keep the existing overall value - don't recalculate from attributes
     };
     onUpdatePlayer(updatedPlayer);
   };

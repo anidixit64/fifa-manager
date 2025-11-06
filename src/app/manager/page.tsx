@@ -42,17 +42,10 @@ export default function ManagerPage() {
     setIsLoading(false);
   }, [selectedTeam, router, setTheme]);
 
-  const calculateOverall = (attributes: Player['attributes']): number => {
-    const values = Object.values(attributes);
-    return Math.round(values.reduce((sum, val) => sum + val, 0) / values.length);
-  };
-
   const handleAddPlayer = (playerData: Omit<Player, 'id'>) => {
-    const overall = calculateOverall(playerData.attributes);
     const newPlayer: Player = {
       id: Date.now().toString(),
       ...playerData,
-      overall,
     };
     setPlayers([...players, newPlayer]);
     setShowPlayerForm(false);
