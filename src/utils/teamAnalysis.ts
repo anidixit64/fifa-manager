@@ -231,20 +231,31 @@ export function analyzeTeam(
     selectedCounts.set(position, 0);
   });
 
-  // Select players for Best XI based on position counts
-  sortedRatings.forEach(({ player, rating, position }) => {
-    if (bestXI.length >= 11) return; // Stop if we have 11 players
+  // First pass: Fill all required position counts (prioritize required positions)
+  // Group players by position and fill required counts for each position
+  const playersByPosition = new Map<string, PlayerRating[]>();
+  sortedRatings.forEach((rating) => {
+    if (!playersByPosition.has(rating.position)) {
+      playersByPosition.set(rating.position, []);
+    }
+    playersByPosition.get(rating.position)!.push(rating);
+  });
+
+  // Fill required positions first
+  positionsToRate.forEach((position) => {
+    const requiredCount = positionCountsMap.get(position) || (position === 'GK' ? 1 : 0);
+    const positionPlayers = playersByPosition.get(position) || [];
     
-    const requiredCount = positionCountsMap.get(position) || 1; // Default to 1 if not specified
-    const currentCount = selectedCounts.get(position) || 0;
-    
-    if (currentCount < requiredCount) {
-      bestXI.push({ player, rating, position });
-      selectedCounts.set(position, currentCount + 1);
+    for (let i = 0; i < Math.min(requiredCount, positionPlayers.length); i++) {
+      const rating = positionPlayers[i];
+      if (!bestXI.some(xi => xi.player.id === rating.player.id)) {
+        bestXI.push(rating);
+        selectedCounts.set(position, (selectedCounts.get(position) || 0) + 1);
+      }
     }
   });
 
-  // If we don't have 11 players yet, fill remaining slots with best available players
+  // Second pass: Fill remaining slots up to 11 with best available players
   if (bestXI.length < 11) {
     const remainingPlayers = sortedRatings.filter(({ player }) => 
       !bestXI.some(xi => xi.player.id === player.id)
