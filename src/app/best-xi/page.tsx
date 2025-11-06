@@ -386,6 +386,8 @@ export default function BestXIPage() {
                         const cdmCount = analysis.bestXI.filter(p => p.position === 'CDM').length;
                         if (cmCount === 1 && cdmCount === 1) {
                           coordinates = [{ col: 4, row: 3 }];
+                        } else if (cdmCount === 2) {
+                          coordinates = [{ col: 2, row: 2 }, { col: 4, row: 2 }];
                         } else {
                           coordinates = [{ col: 3, row: 2 }];
                         }
