@@ -1975,69 +1975,71 @@ export default function TrackFinancesPage() {
                 top: `calc(64px + 16px + ${tradeCalculatorHeight}px + 30px)` 
               }}
             >
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Transfer Suggestions</h3>
-                
-                {incomingSuggestions.length > 0 ? (
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {incomingSuggestions.map((suggestion, index) => {
-                      const isMatched = matchedSuggestions.has(index);
-                      
-                      return (
-                        <div 
-                          key={index} 
-                          className={`backdrop-blur-sm p-3 rounded-lg border transition-all duration-200 ${
-                            isMatched 
-                              ? 'bg-green-500/30 border-green-400/50' 
-                              : 'bg-[#dde1e0]/20 border-[#a78968]/30'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center space-x-2">
-                              <span className={`px-2 py-1 rounded text-xs font-mono font-semibold ${
-                                isMatched
-                                  ? 'bg-green-500/40 text-green-200 border border-green-400/50'
-                                  : suggestion.priority === 'high' 
-                                    ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
-                                    : suggestion.priority === 'medium'
-                                    ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
-                                    : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+              <div className="p-6 space-y-6 max-h-[460px] overflow-y-auto pr-2">
+                <div>
+                  <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Incoming Transfers</h3>
+                  
+                  {incomingSuggestions.length > 0 ? (
+                    <div className="space-y-3">
+                      {incomingSuggestions.map((suggestion, index) => {
+                        const isMatched = matchedSuggestions.has(index);
+                        
+                        return (
+                          <div 
+                            key={index} 
+                            className={`backdrop-blur-sm p-3 rounded-lg border transition-all duration-200 ${
+                              isMatched 
+                                ? 'bg-green-500/30 border-green-400/50' 
+                                : 'bg-[#dde1e0]/20 border-[#a78968]/30'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <span className={`px-2 py-1 rounded text-xs font-mono font-semibold ${
+                                  isMatched
+                                    ? 'bg-green-500/40 text-green-200 border border-green-400/50'
+                                    : suggestion.priority === 'high' 
+                                      ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
+                                      : suggestion.priority === 'medium'
+                                      ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                                      : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                                }`}>
+                                  {isMatched ? 'MATCHED' : suggestion.priority.toUpperCase()}
+                                </span>
+                                <span className={`font-mono font-semibold ${
+                                  isMatched ? 'text-green-200' : 'text-[#dde1e0]'
+                                }`}>
+                                  {suggestion.type} {suggestion.position}
+                                </span>
+                              </div>
+                              <span className={`font-mono text-sm ${
+                                isMatched ? 'text-green-200' : 'text-[#a78968]'
                               }`}>
-                                {isMatched ? 'MATCHED' : suggestion.priority.toUpperCase()}
-                              </span>
-                              <span className={`font-mono font-semibold ${
-                                isMatched ? 'text-green-200' : 'text-[#dde1e0]'
-                              }`}>
-                                {suggestion.type} {suggestion.position}
+                                {suggestion.category}
                               </span>
                             </div>
-                            <span className={`font-mono text-sm ${
-                              isMatched ? 'text-green-200' : 'text-[#a78968]'
+                            <p className={`font-mono text-sm ${
+                              isMatched ? 'text-green-200' : 'text-[#dde1e0]'
                             }`}>
-                              {suggestion.category}
-                            </span>
+                              {suggestion.reason}
+                            </p>
                           </div>
-                          <p className={`font-mono text-sm ${
-                            isMatched ? 'text-green-200' : 'text-[#dde1e0]'
-                          }`}>
-                            {suggestion.reason}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-[#a78968] font-mono italic">
-                      No transfer suggestions available. Your team appears to be well-balanced!
-                    </p>
-                  </div>
-                )}
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-[#a78968] font-mono italic">
+                        No transfer suggestions available. Your team appears to be well-balanced!
+                      </p>
+                    </div>
+                  )}
+                </div>
 
-                <div className="mt-6 border-t border-[#dde1e0]/20 pt-4">
+                <div className="border-t border-[#dde1e0]/20 pt-4">
                   <h4 className="text-lg font-bold text-[#dde1e0] font-mono tracking-wider mb-3">Outgoing Transfer Candidates</h4>
                   {outgoingTransfers.length > 0 ? (
-                    <div className="space-y-3 max-h-72 overflow-y-auto">
+                    <div className="space-y-3">
                       {outgoingTransfers.map(({ player, reasons }) => (
                         <div key={player.id} className="bg-[#dde1e0]/15 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30">
                           <div className="flex items-center justify-between mb-2">
