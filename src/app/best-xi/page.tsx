@@ -31,6 +31,7 @@ interface TeamAnalysis {
   aging: Player[];
   veterans: Player[];
   youngStars: Player[];
+  prospects: Player[];
   positionStrengths: {
     [key: string]: {
       hasProspect: boolean;
@@ -532,7 +533,7 @@ export default function BestXIPage() {
             </div>
 
             {/* Player Categories */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               {/* Young Stars */}
               <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Young Stars</h2>
@@ -580,6 +581,27 @@ export default function BestXIPage() {
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Aging Players</h2>
                 <div className="space-y-2">
                   {analysis.aging.map(player => (
+                    <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
+                          <p className="text-sm text-[#8B6F47] font-mono">{player.mainPosition}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-[#8B6F47] font-mono">{player.overall}</p>
+                          <p className="text-sm text-[#5A3D2A] font-mono">Age: {player.age}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Prospects */}
+              <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
+                <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Prospects</h2>
+                <div className="space-y-2">
+                  {analysis.prospects.map(player => (
                     <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                       <div className="flex justify-between items-center">
                         <div>

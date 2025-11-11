@@ -25,6 +25,7 @@ interface TeamAnalysis {
   aging: Player[];
   veterans: Player[];
   youngStars: Player[];
+  prospects: Player[];
   positionStrengths: {
     [key: string]: {
       hasProspect: boolean;
@@ -177,6 +178,7 @@ export function analyzeTeam(
       aging: [],
       veterans: [],
       youngStars: [],
+      prospects: [],
       positionStrengths: {},
       sectorStrengths: {}
     };
@@ -340,9 +342,22 @@ export function analyzeTeam(
   }
 
   // Categorize players
-  const aging = players.filter((p: Player) => p.age > avgAge + ageStdDev);
-  const veterans = players.filter((p: Player) => p.age > 30 && p.overall > avgOverall);
-  const youngStars = players.filter((p: Player) => p.age < avgAge - ageStdDev && p.overall > avgOverall);
+  const veterans: Player[] = [];
+  const aging: Player[] = [];
+  const youngStars: Player[] = [];
+  const prospects: Player[] = [];
+
+  players.forEach((player) => {
+    if (player.age > avgAge && player.overall > avgOverall) {
+      veterans.push(player);
+    } else if (player.age > avgAge && player.overall <= avgOverall) {
+      aging.push(player);
+    } else if (player.age <= avgAge && player.overall > avgOverall) {
+      youngStars.push(player);
+    } else if (player.age < avgAge && player.overall <= avgOverall) {
+      prospects.push(player);
+    }
+  });
 
   // Analyze position strengths
   const positionStrengths: TeamAnalysis['positionStrengths'] = {};
@@ -405,6 +420,7 @@ export function analyzeTeam(
     aging,
     veterans,
     youngStars,
+    prospects,
     positionStrengths,
     sectorStrengths
   };
