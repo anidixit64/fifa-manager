@@ -402,21 +402,28 @@ export function analyzeTeam(
     }
   };
 
-  // Aging players automatically flagged
-  aging.forEach((player) => addOutgoingReason(player, 'Aging player to consider selling'));
-
-  // Starters or bench players below team average overall
   const lineupIds = new Set<string>([
     ...bestXI.map(({ player }) => player.id),
     ...bench.map(({ player }) => player.id),
   ]);
+
+  const outgoingCandidates: Player[] = [];
+
+  // Criterion 1: Aging players
+  aging.forEach((player) => {
+    outgoingCandidates.push(player);
+    addOutgoingReason(player, 'Aging player');
+  });
+
+  // Criterion 2: Age above avg, overall below avg
   players.forEach((player) => {
-    if (lineupIds.has(player.id) && player.overall < avgOverall) {
-      addOutgoingReason(player, 'Lineup player below team average overall');
+    if (player.age > avgAge && player.overall < avgOverall) {
+      outgoingCandidates.push(player);
+      addOutgoingReason(player, 'Age above average and overall below average');
     }
   });
 
-  // Positions with heavy depth: 4+ players -> mark lowest overall
+  // Criterion 3: Lowest rated in deep positions
   const positionGroups = new Map<string, Player[]>();
   players.forEach((player) => {
     if (!positionGroups.has(player.mainPosition)) {
@@ -424,19 +431,45 @@ export function analyzeTeam(
     }
     positionGroups.get(player.mainPosition)!.push(player);
   });
+
+  const lowestInDeepPosition = new Map<string, Player[]>();
   positionGroups.forEach((group, position) => {
     if (group.length >= 4) {
       const minOverall = Math.min(...group.map((p) => p.overall));
-      group
-        .filter((player) => player.overall === minOverall)
-        .forEach((player) =>
-          addOutgoingReason(
-            player,
-            `Lowest rated ${position} among ${group.length} players`
-          )
-        );
+      const lowestPlayers = group.filter((player) => player.overall === minOverall);
+      lowestInDeepPosition.set(position, lowestPlayers);
+      lowestPlayers.forEach((player) => {
+        outgoingCandidates.push(player);
+        addOutgoingReason(player, `Lowest rated ${position} among ${group.length} players`);
+      });
     }
   });
+
+  // Criterion 4: Starting XI backups check
+  const bestXIByPosition = new Map<string, Player>();
+  bestXI.forEach(({ player, position }) => bestXIByPosition.set(position, player));
+
+  bestXIByPosition.forEach((starter, position) => {
+    if (!outgoingMap.has(starter.id)) return; // Starter must already meet another criterion
+
+    const backups = positionGroups.get(position)?.filter((p) => p.id !== starter.id) || [];
+    if (backups.length === 0) {
+      outgoingMap.delete(starter.id);
+      return;
+    }
+
+    const validBackup = backups.some((backup) => {
+      const overallDiff = starter.overall - backup.overall;
+      return backup.age < starter.age && overallDiff <= overallStdDev;
+    });
+
+    if (!validBackup) {
+      outgoingMap.delete(starter.id);
+    } else {
+      addOutgoingReason(starter, 'Starter has a younger, capable backup');
+    }
+  });
+
 
   const outgoingTransfers = Array.from(outgoingMap.values());
 
