@@ -26,6 +26,10 @@ interface TeamAnalysis {
   veterans: Player[];
   youngStars: Player[];
   prospects: Player[];
+  outgoingTransfers: Array<{
+    player: Player;
+    reasons: string[];
+  }>;
   categoryThresholds: {
     veterans: { age: number; overall: number };
     aging: { age: number; overall: number };
@@ -185,6 +189,7 @@ export function analyzeTeam(
       veterans: [],
       youngStars: [],
       prospects: [],
+      outgoingTransfers: [],
       categoryThresholds: {
         veterans: { age: 0, overall: 0 },
         aging: { age: 0, overall: 0 },
@@ -384,6 +389,57 @@ export function analyzeTeam(
     }
   });
 
+  // Determine outgoing transfer candidates
+  const outgoingMap = new Map<string, { player: Player; reasons: string[] }>();
+  const addOutgoingReason = (player: Player, reason: string) => {
+    if (!outgoingMap.has(player.id)) {
+      outgoingMap.set(player.id, { player, reasons: [reason] });
+    } else {
+      const entry = outgoingMap.get(player.id)!;
+      if (!entry.reasons.includes(reason)) {
+        entry.reasons.push(reason);
+      }
+    }
+  };
+
+  // Aging players automatically flagged
+  aging.forEach((player) => addOutgoingReason(player, 'Aging player to consider selling'));
+
+  // Starters or bench players below team average overall
+  const lineupIds = new Set<string>([
+    ...bestXI.map(({ player }) => player.id),
+    ...bench.map(({ player }) => player.id),
+  ]);
+  players.forEach((player) => {
+    if (lineupIds.has(player.id) && player.overall < avgOverall) {
+      addOutgoingReason(player, 'Lineup player below team average overall');
+    }
+  });
+
+  // Positions with heavy depth: 4+ players -> mark lowest overall
+  const positionGroups = new Map<string, Player[]>();
+  players.forEach((player) => {
+    if (!positionGroups.has(player.mainPosition)) {
+      positionGroups.set(player.mainPosition, []);
+    }
+    positionGroups.get(player.mainPosition)!.push(player);
+  });
+  positionGroups.forEach((group, position) => {
+    if (group.length >= 4) {
+      const minOverall = Math.min(...group.map((p) => p.overall));
+      group
+        .filter((player) => player.overall === minOverall)
+        .forEach((player) =>
+          addOutgoingReason(
+            player,
+            `Lowest rated ${position} among ${group.length} players`
+          )
+        );
+    }
+  });
+
+  const outgoingTransfers = Array.from(outgoingMap.values());
+
   // Analyze position strengths
   const positionStrengths: TeamAnalysis['positionStrengths'] = {};
   
@@ -446,6 +502,7 @@ export function analyzeTeam(
     veterans,
     youngStars,
     prospects,
+    outgoingTransfers,
     categoryThresholds,
     positionStrengths,
     sectorStrengths

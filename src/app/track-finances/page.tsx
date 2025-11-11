@@ -1053,9 +1053,8 @@ export default function TrackFinancesPage() {
   };
 
   // Get matched suggestions for shortlisted players
-  const getMatchedSuggestions = () => {
+  const getMatchedSuggestions = (suggestions: any[]) => {
     const matchedSuggestions = new Set();
-    const suggestions = generateTransferSuggestions();
     
     console.log('Shortlist players:', shortlist);
     console.log('Transfer suggestions:', suggestions);
@@ -1073,6 +1072,11 @@ export default function TrackFinancesPage() {
     console.log('Matched suggestions:', Array.from(matchedSuggestions));
     return matchedSuggestions;
   };
+
+  const incomingSuggestions = generateTransferSuggestions();
+  const latestAnalysis = analyzeTeam(players, positionCounts, positionPriorities, Array.from(toggledPositions));
+  const outgoingTransfers = latestAnalysis.outgoingTransfers ?? [];
+  const matchedSuggestions = getMatchedSuggestions(incomingSuggestions);
 
   return (
     <main className="min-h-screen bg-[#3c5c34] relative overflow-hidden">
@@ -1974,10 +1978,9 @@ export default function TrackFinancesPage() {
               <div className="p-6">
                 <h3 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Transfer Suggestions</h3>
                 
-                {generateTransferSuggestions().length > 0 ? (
+                {incomingSuggestions.length > 0 ? (
                   <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {generateTransferSuggestions().map((suggestion, index) => {
-                      const matchedSuggestions = getMatchedSuggestions();
+                    {incomingSuggestions.map((suggestion, index) => {
                       const isMatched = matchedSuggestions.has(index);
                       
                       return (
@@ -2030,6 +2033,35 @@ export default function TrackFinancesPage() {
                     </p>
                   </div>
                 )}
+
+                <div className="mt-6 border-t border-[#dde1e0]/20 pt-4">
+                  <h4 className="text-lg font-bold text-[#dde1e0] font-mono tracking-wider mb-3">Outgoing Transfer Candidates</h4>
+                  {outgoingTransfers.length > 0 ? (
+                    <div className="space-y-3 max-h-72 overflow-y-auto">
+                      {outgoingTransfers.map(({ player, reasons }) => (
+                        <div key={player.id} className="bg-[#dde1e0]/15 backdrop-blur-sm p-3 rounded-lg border border-[#a78968]/30">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-mono font-semibold text-[#dde1e0]">
+                              {player.shortName || player.name}
+                            </span>
+                            <span className="font-mono text-sm text-[#a78968]">
+                              {player.mainPosition} · OVR {player.overall}
+                            </span>
+                          </div>
+                          <ul className="list-disc list-inside text-sm text-[#dde1e0]/90 font-mono space-y-1">
+                            {reasons.map((reason, idx) => (
+                              <li key={idx}>{reason}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[#a78968] font-mono italic">
+                      No players currently meet the criteria for outgoing transfers.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 

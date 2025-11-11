@@ -32,6 +32,10 @@ interface TeamAnalysis {
   veterans: Player[];
   youngStars: Player[];
   prospects: Player[];
+  outgoingTransfers: Array<{
+    player: Player;
+    reasons: string[];
+  }>;
   categoryThresholds: {
     veterans: { age: number; overall: number };
     aging: { age: number; overall: number };
@@ -734,45 +738,88 @@ export default function BestXIPage() {
               </div>
 
               {/* Modal Content */}
-              <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
-                {generateTransferSuggestions().length > 0 ? (
-                  <div className="space-y-4">
-                    {generateTransferSuggestions().map((suggestion, index) => (
-                      <div key={index} className="bg-[#3c5c34]/10 backdrop-blur-sm p-4 rounded-lg border border-[#3c5c34]/30">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center space-x-3">
-                            <span className={`px-3 py-1 rounded-full text-sm font-mono font-semibold ${
-                              suggestion.priority === 'high' 
-                                ? 'bg-red-500/20 text-red-700 border border-red-500/30' 
-                                : suggestion.priority === 'medium'
-                                ? 'bg-yellow-500/20 text-yellow-700 border border-yellow-500/30'
-                                : 'bg-blue-500/20 text-blue-700 border border-blue-500/30'
-                            }`}>
-                              {suggestion.priority.toUpperCase()}
-                            </span>
-                            <span className="text-[#3c5c34] font-mono font-semibold text-lg">
-                              {suggestion.type} {suggestion.position}
-                            </span>
+              <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)] space-y-6">
+                {(() => {
+                  const incomingSuggestions = generateTransferSuggestions();
+                  const outgoingTransfers = analysis?.outgoingTransfers ?? [];
+
+                  return (
+                    <>
+                      <div>
+                        <h3 className="text-lg font-bold text-[#3c5c34] font-mono mb-4">Incoming Transfers</h3>
+                        {incomingSuggestions.length > 0 ? (
+                          <div className="space-y-4">
+                            {incomingSuggestions.map((suggestion, index) => (
+                              <div key={index} className="bg-[#3c5c34]/10 backdrop-blur-sm p-4 rounded-lg border border-[#3c5c34]/30">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center space-x-3">
+                                    <span className={`px-3 py-1 rounded-full text-sm font-mono font-semibold ${
+                                      suggestion.priority === 'high' 
+                                        ? 'bg-red-500/20 text-red-700 border border-red-500/30' 
+                                        : suggestion.priority === 'medium'
+                                        ? 'bg-yellow-500/20 text-yellow-700 border border-yellow-500/30'
+                                        : 'bg-blue-500/20 text-blue-700 border border-blue-500/30'
+                                    }`}>
+                                      {suggestion.priority.toUpperCase()}
+                                    </span>
+                                    <span className="text-[#3c5c34] font-mono font-semibold text-lg">
+                                      {suggestion.type} {suggestion.position}
+                                    </span>
+                                  </div>
+                                  <span className="text-[#8B6F47] font-mono text-sm bg-[#dde1e0]/50 px-3 py-1 rounded-full">
+                                    {suggestion.category}
+                                  </span>
+                                </div>
+                                <p className="text-[#3c5c34] font-mono text-sm leading-relaxed">
+                                  {suggestion.reason}
+                                </p>
+                              </div>
+                            ))}
                           </div>
-                          <span className="text-[#8B6F47] font-mono text-sm bg-[#dde1e0]/50 px-3 py-1 rounded-full">
-                            {suggestion.category}
-                          </span>
-                        </div>
-                        <p className="text-[#3c5c34] font-mono text-sm leading-relaxed">
-                          {suggestion.reason}
-                        </p>
+                        ) : (
+                          <div className="text-center py-12">
+                            <div className="text-[#8B6F47] text-6xl mb-4">🎉</div>
+                            <h3 className="text-xl font-bold text-[#3c5c34] font-mono mb-2">Team is Well-Balanced!</h3>
+                            <p className="text-[#8B6F47] font-mono">
+                              Your team appears to have good depth and age balance across all positions.
+                            </p>
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <div className="text-[#8B6F47] text-6xl mb-4">🎉</div>
-                    <h3 className="text-xl font-bold text-[#3c5c34] font-mono mb-2">Team is Well-Balanced!</h3>
-                    <p className="text-[#8B6F47] font-mono">
-                      Your team appears to have good depth and age balance across all positions.
-                    </p>
-                  </div>
-                )}
+
+                      <div className="border-t border-[#3c5c34]/20"></div>
+
+                      <div>
+                        <h3 className="text-lg font-bold text-[#3c5c34] font-mono mb-4">Outgoing Transfer Candidates</h3>
+                        {outgoingTransfers.length > 0 ? (
+                          <div className="space-y-4">
+                            {outgoingTransfers.map(({ player, reasons }) => (
+                              <div key={player.id} className="bg-[#3c5c34]/10 backdrop-blur-sm p-4 rounded-lg border border-[#3c5c34]/30">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-[#3c5c34] font-mono font-semibold text-lg">
+                                    {player.shortName || player.name}
+                                  </span>
+                                  <span className="text-[#8B6F47] font-mono text-sm">
+                                    {player.mainPosition} · OVR {player.overall}
+                                  </span>
+                                </div>
+                                <ul className="list-disc list-inside space-y-1 text-sm text-[#3c5c34] font-mono">
+                                  {reasons.map((reason, idx) => (
+                                    <li key={idx}>{reason}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-[#8B6F47] font-mono">
+                            No players currently meet the criteria for outgoing transfers.
+                          </p>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
               </div>
             </div>
