@@ -187,9 +187,10 @@ export function analyzeTeam(
   // Calculate average age and overall for statistical analysis
   const avgAge = players.reduce((sum: number, p: Player) => sum + p.age, 0) / players.length;
   const avgOverall = players.reduce((sum: number, p: Player) => sum + p.overall, 0) / players.length;
-  const ageStdDev = Math.sqrt(
-    players.reduce((sum: number, p: Player) => sum + Math.pow(p.age - avgAge, 2), 0) / players.length
-  );
+  const ageVariance = players.reduce((sum: number, p: Player) => sum + Math.pow(p.age - avgAge, 2), 0) / players.length;
+  const ageStdDev = Math.sqrt(ageVariance);
+  const overallVariance = players.reduce((sum: number, p: Player) => sum + Math.pow(p.overall - avgOverall, 2), 0) / players.length;
+  const overallStdDev = Math.sqrt(overallVariance);
 
   // Rate players for each position
   const playerRatings: PlayerRating[] = [];
@@ -347,14 +348,19 @@ export function analyzeTeam(
   const youngStars: Player[] = [];
   const prospects: Player[] = [];
 
+  const ageAboveThreshold = avgAge + ageStdDev;
+  const ageBelowThreshold = avgAge - ageStdDev;
+  const overallAboveThreshold = avgOverall + overallStdDev;
+  const overallBelowThreshold = avgOverall - overallStdDev;
+
   players.forEach((player) => {
-    if (player.age > avgAge && player.overall > avgOverall) {
+    if (player.age > ageAboveThreshold && player.overall > overallAboveThreshold) {
       veterans.push(player);
-    } else if (player.age > avgAge && player.overall <= avgOverall) {
+    } else if (player.age > ageAboveThreshold && player.overall < overallBelowThreshold) {
       aging.push(player);
-    } else if (player.age <= avgAge && player.overall > avgOverall) {
+    } else if (player.age < ageBelowThreshold && player.overall > overallAboveThreshold) {
       youngStars.push(player);
-    } else if (player.age < avgAge && player.overall <= avgOverall) {
+    } else if (player.age < ageBelowThreshold && player.overall < overallBelowThreshold) {
       prospects.push(player);
     }
   });

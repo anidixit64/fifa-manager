@@ -542,7 +542,7 @@ export default function BestXIPage() {
                     <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                       <div className="flex justify-between items-center">
                         <div>
-                          <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
+                          <h3 className="font-semibold text-[#dde1e0] font-mono">{player.shortName || player.name}</h3>
                           <p className="text-sm text-[#8B6F47] font-mono">{player.mainPosition}</p>
                         </div>
                         <div className="text-right">
@@ -563,7 +563,7 @@ export default function BestXIPage() {
                     <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                       <div className="flex justify-between items-center">
                         <div>
-                          <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
+                          <h3 className="font-semibold text-[#dde1e0] font-mono">{player.shortName || player.name}</h3>
                           <p className="text-sm text-[#8B6F47] font-mono">{player.mainPosition}</p>
                         </div>
                         <div className="text-right">
@@ -584,7 +584,7 @@ export default function BestXIPage() {
                     <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                       <div className="flex justify-between items-center">
                         <div>
-                          <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
+                          <h3 className="font-semibold text-[#dde1e0] font-mono">{player.shortName || player.name}</h3>
                           <p className="text-sm text-[#8B6F47] font-mono">{player.mainPosition}</p>
                         </div>
                         <div className="text-right">
@@ -605,7 +605,7 @@ export default function BestXIPage() {
                     <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                       <div className="flex justify-between items-center">
                         <div>
-                          <h3 className="font-semibold text-[#dde1e0] font-mono">{player.name}</h3>
+                          <h3 className="font-semibold text-[#dde1e0] font-mono">{player.shortName || player.name}</h3>
                           <p className="text-sm text-[#8B6F47] font-mono">{player.mainPosition}</p>
                         </div>
                         <div className="text-right">
