@@ -26,6 +26,12 @@ interface TeamAnalysis {
   veterans: Player[];
   youngStars: Player[];
   prospects: Player[];
+  categoryThresholds: {
+    veterans: { age: number; overall: number };
+    aging: { age: number; overall: number };
+    youngStars: { age: number; overall: number };
+    prospects: { age: number; overall: number };
+  };
   positionStrengths: {
     [key: string]: {
       hasProspect: boolean;
@@ -179,6 +185,12 @@ export function analyzeTeam(
       veterans: [],
       youngStars: [],
       prospects: [],
+      categoryThresholds: {
+        veterans: { age: 0, overall: 0 },
+        aging: { age: 0, overall: 0 },
+        youngStars: { age: 0, overall: 0 },
+        prospects: { age: 0, overall: 0 },
+      },
       positionStrengths: {},
       sectorStrengths: {}
     };
@@ -353,6 +365,13 @@ export function analyzeTeam(
   const overallAboveThreshold = avgOverall + overallStdDev;
   const overallBelowThreshold = avgOverall - overallStdDev;
 
+  const categoryThresholds = {
+    veterans: { age: ageAboveThreshold, overall: overallAboveThreshold },
+    aging: { age: ageAboveThreshold, overall: overallBelowThreshold },
+    youngStars: { age: ageBelowThreshold, overall: overallAboveThreshold },
+    prospects: { age: ageBelowThreshold, overall: overallBelowThreshold },
+  };
+
   players.forEach((player) => {
     if (player.age > ageAboveThreshold && player.overall > overallAboveThreshold) {
       veterans.push(player);
@@ -427,6 +446,7 @@ export function analyzeTeam(
     veterans,
     youngStars,
     prospects,
+    categoryThresholds,
     positionStrengths,
     sectorStrengths
   };

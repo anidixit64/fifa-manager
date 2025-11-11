@@ -32,6 +32,12 @@ interface TeamAnalysis {
   veterans: Player[];
   youngStars: Player[];
   prospects: Player[];
+  categoryThresholds: {
+    veterans: { age: number; overall: number };
+    aging: { age: number; overall: number };
+    youngStars: { age: number; overall: number };
+    prospects: { age: number; overall: number };
+  };
   positionStrengths: {
     [key: string]: {
       hasProspect: boolean;
@@ -547,7 +553,12 @@ export default function BestXIPage() {
               <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Young Stars</h2>
                 <div className="space-y-2">
-                  {analysis.youngStars.map(player => (
+                  {analysis.youngStars.length === 0 ? (
+                    <p className="text-sm text-[#8B6F47] font-mono">
+                      Criteria: Age &lt; {analysis.categoryThresholds.youngStars.age.toFixed(1)}, Overall &gt; {analysis.categoryThresholds.youngStars.overall.toFixed(1)}
+                    </p>
+                  ) : (
+                    analysis.youngStars.map(player => (
                     <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                       <div className="flex justify-between items-center">
                         <div>
@@ -560,7 +571,8 @@ export default function BestXIPage() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -568,7 +580,12 @@ export default function BestXIPage() {
               <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Veterans</h2>
                 <div className="space-y-2">
-                  {analysis.veterans.map(player => (
+                  {analysis.veterans.length === 0 ? (
+                    <p className="text-sm text-[#8B6F47] font-mono">
+                      Criteria: Age &gt; {analysis.categoryThresholds.veterans.age.toFixed(1)}, Overall &gt; {analysis.categoryThresholds.veterans.overall.toFixed(1)}
+                    </p>
+                  ) : (
+                    analysis.veterans.map(player => (
                     <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                       <div className="flex justify-between items-center">
                         <div>
@@ -581,7 +598,8 @@ export default function BestXIPage() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -589,7 +607,12 @@ export default function BestXIPage() {
               <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Aging Players</h2>
                 <div className="space-y-2">
-                  {analysis.aging.map(player => (
+                  {analysis.aging.length === 0 ? (
+                    <p className="text-sm text-[#8B6F47] font-mono">
+                      Criteria: Age &gt; {analysis.categoryThresholds.aging.age.toFixed(1)}, Overall &lt; {analysis.categoryThresholds.aging.overall.toFixed(1)}
+                    </p>
+                  ) : (
+                    analysis.aging.map(player => (
                     <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                       <div className="flex justify-between items-center">
                         <div>
@@ -602,7 +625,8 @@ export default function BestXIPage() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -610,7 +634,12 @@ export default function BestXIPage() {
               <div className="bg-[#dde1e0]/10 backdrop-blur-sm rounded-lg shadow p-6 border border-[#a78968]/30">
                 <h2 className="text-xl font-bold text-[#dde1e0] font-mono tracking-wider mb-4">Prospects</h2>
                 <div className="space-y-2">
-                  {analysis.prospects.map(player => (
+                  {analysis.prospects.length === 0 ? (
+                    <p className="text-sm text-[#8B6F47] font-mono">
+                      Criteria: Age &lt; {analysis.categoryThresholds.prospects.age.toFixed(1)}, Overall &lt; {analysis.categoryThresholds.prospects.overall.toFixed(1)}
+                    </p>
+                  ) : (
+                    analysis.prospects.map(player => (
                     <div key={player.id} className="bg-[#644d36]/10 p-3 rounded-lg border border-[#d4af37] hover:border-[#d4af37]/60 transition-colors cursor-pointer hover:scale-105 active:scale-95" onClick={() => navigateTo(`/player-stats?playerId=${player.id}`)}>
                       <div className="flex justify-between items-center">
                         <div>
@@ -623,7 +652,8 @@ export default function BestXIPage() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             </div>
