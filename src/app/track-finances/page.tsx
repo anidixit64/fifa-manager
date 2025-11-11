@@ -1150,21 +1150,16 @@ export default function TrackFinancesPage() {
                   <div className="space-y-3">
                       <h3 className="text-[#3c5c34] font-mono font-semibold text-lg">Set Maximum Budget</h3>
                     <div className="space-y-2">
-                        <div className="text-[#3c5c34] font-mono text-sm">Select maximum budget in $10M increments:</div>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((amount) => (
-                          <button
-                            key={amount}
-                            onClick={() => setBudgetAmount((amount * 1000000).toString())}
-                            className={`px-3 py-2 border border-[#3c5c34] rounded font-mono text-sm transition-colors ${
-                              budgetAmount === (amount * 1000000).toString()
-                                ? 'bg-[#3c5c34] text-[#dde1e0]'
-                                : 'bg-white text-[#3c5c34] hover:bg-[#dde1e0]/20'
-                            }`}
-                          >
-                            ${amount}M
-                          </button>
-                        ))}
+                      <div className="text-[#3c5c34] font-mono text-sm">Enter maximum budget amount:</div>
+                      <input
+                        type="number"
+                        value={budgetAmount}
+                        onChange={(e) => setBudgetAmount(e.target.value)}
+                        placeholder="Enter amount in dollars"
+                        className="w-full px-3 py-2 border border-[#3c5c34] rounded font-mono text-sm focus:outline-none focus:border-[#2a4a2a]"
+                      />
+                      <div className="text-[#3c5c34] font-mono text-xs text-gray-600">
+                        Example: enter 25000000 for $25M
                       </div>
                     </div>
                     <div className="flex space-x-2">
@@ -1172,8 +1167,8 @@ export default function TrackFinancesPage() {
                         onClick={() => {
                           const amount = parseInt(budgetAmount) || 0;
                           if (amount > 0) {
-                              setMaxBudget(amount);
-                              setCurrentBudget(amount); // Fill bar to 100%
+                            setMaxBudget(amount);
+                            setCurrentBudget(amount); // Fill bar to 100%
                             setShowBudgetModal(false);
                             setBudgetAmount('');
                           }
