@@ -845,12 +845,20 @@ export default function TrackFinancesPage() {
       const positionPlayers = players.filter(p => p.mainPosition === position);
       
       // Check for depth issues
-      if (data.count < 2) {
+      if (data.count <= 1) {
         suggestions.push({
           type: 'Bench',
           position,
           category: 'Any',
           reason: `Only ${data.count} player(s) at ${position} - needs depth`,
+          priority: 'high'
+        });
+      } else if (data.count === 2) {
+        suggestions.push({
+          type: 'Bench',
+          position,
+          category: 'Any',
+          reason: `Only ${data.count} player(s) at ${position} - consider adding depth`,
           priority: 'medium'
         });
       }
@@ -902,12 +910,13 @@ export default function TrackFinancesPage() {
           // Only suggest positions that are configured in Edit Tactics
           if (configuredPositions.has(position) && 
               !suggestions.some(s => s.position === position && s.type === 'Starting')) {
+            const priority = data.count <= 1 ? 'high' : 'medium';
             suggestions.push({
               type: 'Sector',
               position,
               category: 'Any',
               reason: `Weak ${sector} depth (${data.count} players)`,
-              priority: 'medium'
+              priority
             });
           }
         });
